@@ -4,8 +4,27 @@
   "description": "rogue-like legend of zelda",
   "main": "./server/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Tests complete\"",
+    "pretest": "eslint ./server --fix",
+    "start": "node ./server/app.js",
+    "nodemon": "nodemon --watch ./server ./server/app.js",
+    "watch": "babel --watch ./client --out-file ./hosted/compiled.js",
+    "build": "babel ./client --out-file ./hosted/compiled.js"
   },
   "author": "Us Cody, Just Us",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "nodemon": "^1.12.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "serve-favicon": "^2.3.0",
+    "socket.io": "^2.0.4",
+    "xxhashjs": "^0.2.1"
+  }
 }
