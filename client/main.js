@@ -5,6 +5,15 @@ let socket;
 let hash; 
 let animationFrame;
 
+let mouseX;
+let mouseY;
+
+let players;
+
+let playerCount;
+
+let bulletArray;
+
 //handle for key down events
 const keyDownHandler = (e) => {
   var keyPressed = e.which;
@@ -54,9 +63,26 @@ const init = () => {
   ctx = canvas.getContext('2d');
   
   socket = io.connect();
+    
+  playerCount = 0;
+    
+  players = {};
+    
+  bulletArray = [];
   
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
+
+  //if this user joins
+  socket.on("joined",(data) => {
+     setUser(data);
+  });
+
+  //if other players join
+  socket.on("otherConnects",(data) => {
+     setOtherplayers(data); 
+  });
+    
 };
 
 window.onload = init;
