@@ -3,11 +3,36 @@ html, body {
   height: 100%;
   margin: 0;
   padding:0;
+  background-color: #ccc;
 }
 
 canvas {
+  background-color: white;
+  border-radius: 5px;
   margin: 0 auto;
   padding: 0;
   display: block;
-  border: 1px solid black;
+  border: 1px solid #aaa;
+}
+
+header{
+  text-align: center;
+}
+
+#designDoc{
+  margin: 0 auto;
+  margin-top: 10px;
+  border: 1px solid #aaa;
+  width: 35%;
+  border-radius: 5px;
+  background-color: #bbb;
+}
+
+#designDoc h3{
+  text-align: center;
+}
+
+#designDoc img {
+  display: block;
+  margin: auto;
 }
