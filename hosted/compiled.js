@@ -2,8 +2,8 @@
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var bullet = function bullet(characterpoint, mousepoint) {
-    _classCallCheck(this, bullet);
+var Bullet = function Bullet(characterpoint, mousepoint) {
+    _classCallCheck(this, Bullet);
 
     // position variables
     this.prevX = 572;
@@ -15,6 +15,36 @@ var bullet = function bullet(characterpoint, mousepoint) {
     this.alpha = 0.05;
     //need to work on this
     this.direction = characterpoint - mousepoint;
+};
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Character = function Character(hash) {
+  _classCallCheck(this, Character);
+
+  this.hash = hash;
+  this.lastUpdate = new Date().getTime();
+
+  // position variables
+  this.prevX = 572;
+  this.prevY = 324;
+  this.x = 572;
+  this.y = 324;
+  this.destX = 572;
+  this.destY = 324;
+
+  this.alpha = 0.05;
+
+  this.direction = 0;
+
+  this.moveLeft = false;
+  this.moveRight = false;
+  this.moveUp = false;
+  this.moveDown = false;
+
+  // if using circle-to-circle collision
+  this.radius = 20;
 };
 'use strict';
 
@@ -273,37 +303,43 @@ var STATES = {
 var gameState = STATES.wait;
 
 var players = {};
-var playerCount = 0;
 var bulletArray = [];
 
-var up = false;
-var down = false;
-var right = false;
-var left = false;
+var directions = {
+  DOWNLEFT: 0,
+  DOWN: 1,
+  DOWNRIGHT: 2,
+  LEFT: 3,
+  UPLEFT: 4,
+  RIGHT: 5,
+  UPRIGHT: 6,
+  UP: 7
+};
 
 //handle for key down events
 var keyDownHandler = function keyDownHandler(e) {
   var keyPressed = e.which;
+  var player = players[hash];
 
   // W OR UP
   if (keyPressed === 87 || keyPressed === 38) {
     // move character up
-    up = true;
+    player.moveUp = true;
   }
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
       // move character left
-      left = true;
+      player.moveLeft = true;
     }
     // S OR DOWN
     else if (keyPressed === 83 || keyPressed === 40) {
         // move character down
-        down = true;
+        player.moveDown = true;
       }
       // D OR RIGHT
       else if (keyPressed === 68 || keyPressed === 39) {
           //move character right
-          right = true;
+          player.moveRight = true;
         }
 
   e.preventDefault();
@@ -312,26 +348,27 @@ var keyDownHandler = function keyDownHandler(e) {
 //handler for key up events
 var keyUpHandler = function keyUpHandler(e) {
   var keyPressed = e.which;
+  var player = players[hash];
 
   // W OR UP
   if (keyPressed === 87 || keyPressed === 38) {
     // stop character from moving up
-    up = false;
+    player.moveUp = false;
   }
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
       // stop character from moving left
-      left = false;
+      player.moveLeft = false;
     }
     // S OR DOWN
     else if (keyPressed === 83 || keyPressed === 40) {
         // stop character from moving down
-        down = false;
+        player.moveDown = false;
       }
       // D OR RIGHT
       else if (keyPressed === 68 || keyPressed === 39) {
           // stop character from moving right
-          right = false;
+          player.moveRight = false;
         }
 };
 
@@ -343,19 +380,44 @@ var doOnMouseUp = function doOnMouseUp(e) {};
 var doOnMouseOut = function doOnMouseOut(e) {};
 
 var stateHandler = function stateHandler() {
-  if (gameState === STATES.wait) {
-    waitLoop();
-  } else if (gameState === STATES.preload) {
-    preloadLoop();
-  } else if (gameState === STATES.setupGame) {
-    setupGame();
-  } else if (gameState === STATES.title) {
-    titleLoop();
-  } else if (gameState === STATES.game) {
-    gameUpdateLoop();
-  } else if (gameState === STATES.gameover) {
-    gameOverLoop();
+  switch (gameState) {
+    case STATES.wait:
+      waitLoop();
+      break;
+    case STATES.preload:
+      preloadLoop();
+      break;
+    case STATES.setupGame:
+      setupGame();
+      break;
+    case STATES.title:
+      titleLoop();
+      break;
+    case STATES.game:
+      gameUpdateLoop();
+      break;
+    case STATES.gameover:
+      gameOverLoop();
+      break;
   }
+  /*if(gameState === STATES.wait){
+    waitLoop();
+  } 
+  else if(gameState === STATES.preload){
+    preloadLoop();
+  } 
+  else if(gameState === STATES.setupGame){
+    setupGame();
+  } 
+  else if(gameState === STATES.title){
+    titleLoop();
+  } 
+  else if(gameState === STATES.game){
+    gameUpdateLoop();
+  } 
+  else if(gameState === STATES.gameover){
+    gameOverLoop();
+  }*/
 
   animationFrame = requestAnimationFrame(stateHandler);
 };
@@ -547,25 +609,17 @@ var update = function update(data) {};
 
 // 
 var setUser = function setUser(data) {
-  hash = data.character.hash; // set this client's hash to the unique hash the server gives them
-  players[data.character.hash] = data.character;
-  playerCount += 1;
+    hash = data.hash; // set this client's hash to the unique hash the server gives them
+    players[hash] = new Character(hash);
 
-  //if(playerCount == 4)
-  //{
-  console.log('joined server');
-  gameState = STATES.preload; // start animating;
-  //}
+    console.log('joined server');
+    gameState = STATES.preload; // start animating;
 };
 
 var setOtherplayers = function setOtherplayers(data) {
-  players[data.hash] = data;
-  playerCount += 1;
+    players[data.hash] = new Character(data.hash);
 
-  //if(playerCount == 4)
-  //{
-  //requestAnimationFrame(redraw); // start animating;
-  //}
+    //requestAnimationFrame(redraw); // start animating;
 };
 
 //do the shooting and send to server
@@ -573,100 +627,94 @@ var shooting = function shooting(data) {};
 
 // update this client's position and send to server
 var updatePosition = function updatePosition() {
-  var plr = players[hash];
+    var plr = players[hash];
 
-  plr.prevX = plr.x;
-  plr.prevY = plr.y;
+    plr.prevX = plr.x;
+    plr.prevY = plr.y;
 
-  if (up && plr.destY - 20 > 0) {
-    plr.destY -= 2;
-  }
-  if (down && plr.destY + 20 < canvas.height) {
-    plr.destY += 2;
-  }
-  if (left && plr.destX - 20 > 0) {
-    plr.destX -= 2;
-  }
-  if (right && plr.destX + 20 < canvas.width) {
-    plr.destX += 2;
-  }
+    if (plr.moveUp && plr.destY - 20 > 0) {
+        plr.destY -= 2;
+    }
+    if (plr.moveDown && plr.destY + 20 < canvas.height) {
+        plr.destY += 2;
+    }
+    if (plr.moveLeft && plr.destX - 20 > 0) {
+        plr.destX -= 2;
+    }
+    if (plr.moveRight && plr.destX + 20 < canvas.width) {
+        plr.destX += 2;
+    }
 
-  plr.alpha = 0.05;
-  plr.lastUpdate = new Date().getTime();
+    plr.alpha = 0.05;
+    plr.lastUpdate = new Date().getTime();
 };
 
 // move the sphere arround
-var movement = function movement() {
+var move = function move() {
 
-  var keys = Object.keys(players);
-  //grab each user
-  for (var x = 0; x < keys.length; x++) {
-    var plr = players[keys[x]];
+    var keys = Object.keys(players);
+    //grab each user
+    for (var x = 0; x < keys.length; x++) {
+        var plr = players[keys[x]];
 
-    if (plr.alpha < 1) {
-      plr.alpha += 0.05;
+        if (plr.alpha < 1) {
+            plr.alpha += 0.05;
+        }
+
+        plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
+        plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
     }
-
-    plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
-    plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
-  }
 };
 
 var resetGame = function resetGame() {
-  //game setup
-  playerCount = 0;
-  players = {};
-  bulletArray = [];
-
-  up = false;
-  left = false;
-  right = false;
-  down = false;
+    //game setup
+    players = {};
+    bulletArray = [];
 };
 
 //--GAME LOOPS---------------------region
 var waitLoop = function waitLoop() {
-  drawWait();
-  console.log('waiting for connection to server...');
+    drawWait();
+    console.log('waiting for connection to server...');
 }; //wait until client joined the server
 
 var preloadLoop = function preloadLoop() {
-  //check if images are loaded then go to startup
-  if (loadQueue == numLoaded) {
-    console.log('done loading images');
-    assignStartupEvents();
-    gameState = STATES.title;
-    return;
-  }
+    //check if images are loaded then go to startup
+    if (loadQueue == numLoaded) {
+        console.log('done loading images');
+        assignStartupEvents();
+        gameState = STATES.title;
+        return;
+    }
 
-  drawPreload();
+    drawPreload();
 
-  console.log('loading game...');
+    console.log('loading game...');
 };
 
 var titleLoop = function titleLoop() {
-  drawTitle();
+    drawTitle();
 };
 
 var gameOverLoop = function gameOverLoop() {
-  drawGameOver();
+    drawGameOver();
 
-  console.log('game over');
+    console.log('game over');
 };
 
 var gameUpdateLoop = function gameUpdateLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawPlaceholder();
+    drawPlaceholder();
 
-  //check player input
+    //check player input
 
-  //update game
-  updatePosition();
-  movement();
+    //update game
+    updatePosition();
+    move();
 
-  //draw game
-  drawPlayers();
+    //draw game
+    drawPlayers();
 };
 
 //endregion

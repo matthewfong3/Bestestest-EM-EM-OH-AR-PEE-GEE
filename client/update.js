@@ -5,25 +5,17 @@ const update = (data) => {
 
 // 
 const setUser = (data) => {
-  hash = data.character.hash; // set this client's hash to the unique hash the server gives them
-  players[data.character.hash] = data.character;
-  playerCount += 1;
+  hash = data.hash; // set this client's hash to the unique hash the server gives them
+  players[hash] = new Character(hash);
   
-  //if(playerCount == 4)
-  //{
   console.log('joined server');
   gameState = STATES.preload // start animating;
-  //}
 };
 
 const setOtherplayers = (data) => {
-  players[data.hash] = data;
-  playerCount += 1;
+  players[data.hash] = new Character(data.hash);
     
-  //if(playerCount == 4)
-  //{
       //requestAnimationFrame(redraw); // start animating;
-  //}
 };
 
 //do the shooting and send to server
@@ -38,19 +30,19 @@ const updatePosition = () => {
     plr.prevX = plr.x;
     plr.prevY = plr.y;
 
-    if(up && plr.destY - 20 > 0)
+    if(plr.moveUp && plr.destY - 20 > 0)
     {
         plr.destY -= 2;
     }
-    if(down && plr.destY + 20 < canvas.height)
+    if(plr.moveDown && plr.destY + 20 < canvas.height)
     {
         plr.destY += 2;
     }
-    if(left && plr.destX - 20 > 0)
+    if(plr.moveLeft && plr.destX - 20 > 0)
     {
         plr.destX -= 2;
     }
-    if(right && plr.destX + 20 < canvas.width)
+    if(plr.moveRight && plr.destX + 20 < canvas.width)
     {
         plr.destX += 2;
     }
@@ -60,7 +52,7 @@ const updatePosition = () => {
 };
 
 // move the sphere arround
-const movement = () => {
+const move = () => {
 
     let keys = Object.keys(players);
     //grab each user
@@ -80,14 +72,8 @@ const movement = () => {
 
 const resetGame = () => {
   //game setup
-  playerCount = 0;
   players = {};
   bulletArray = [];
-
-  up = false;
-  left = false;
-  right = false;
-  down = false;
 };
 
 //--GAME LOOPS---------------------region
@@ -129,7 +115,7 @@ const gameUpdateLoop = () => {
   
   //update game
   updatePosition();
-  movement();
+  move();
   
   //draw game
   drawPlayers();

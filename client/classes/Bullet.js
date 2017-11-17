@@ -1,4 +1,4 @@
-class bullet {
+class Bullet {
     constructor(characterpoint, mousepoint) {
     // position variables
     this.prevX = 572;

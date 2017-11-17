@@ -18,37 +18,43 @@ let STATES = {
 let gameState = STATES.wait;
 
 let players = {};
-let playerCount = 0;
 let bulletArray = [];
 
-let up = false;
-let down = false;
-let right = false;
-let left = false;
+const directions = {
+  DOWNLEFT: 0,
+  DOWN: 1,
+  DOWNRIGHT: 2, 
+  LEFT: 3,
+  UPLEFT: 4,
+  RIGHT: 5, 
+  UPRIGHT: 6,
+  UP: 7
+};
 
 //handle for key down events
 const keyDownHandler = (e) => {
   var keyPressed = e.which;
+  const player = players[hash];
 
   // W OR UP
   if(keyPressed === 87 || keyPressed === 38) {
     // move character up
-    up = true;
+    player.moveUp = true;
   }
   // A OR LEFT
   else if(keyPressed === 65 || keyPressed === 37) {
     // move character left
-    left = true;
+    player.moveLeft = true;
   }
   // S OR DOWN
   else if(keyPressed === 83 || keyPressed === 40) {
     // move character down
-    down = true;
+    player.moveDown = true;
   }
   // D OR RIGHT
   else if(keyPressed === 68 || keyPressed === 39) {
     //move character right
-    right = true;
+    player.moveRight = true;
   }
   
   e.preventDefault();
@@ -57,26 +63,27 @@ const keyDownHandler = (e) => {
 //handler for key up events
 const keyUpHandler = (e) => {
   var keyPressed = e.which;
+  const player = players[hash];
 
   // W OR UP
   if(keyPressed === 87 || keyPressed === 38) {
     // stop character from moving up
-    up = false;
+    player.moveUp = false;
   }
   // A OR LEFT
   else if(keyPressed === 65 || keyPressed === 37) {
     // stop character from moving left
-    left = false;
+    player.moveLeft = false;
   }
   // S OR DOWN
   else if(keyPressed === 83 || keyPressed === 40) {
     // stop character from moving down
-    down = false;
+    player.moveDown = false;
   }
   // D OR RIGHT
   else if(keyPressed === 68 || keyPressed === 39) {
     // stop character from moving right
-    right = false;
+    player.moveRight = false;
   }
 };
 
@@ -88,7 +95,27 @@ const doOnMouseUp = (e) => { }
 const doOnMouseOut = (e) => { }
 
 const stateHandler = () => {
-  if(gameState === STATES.wait){
+  switch(gameState){
+    case STATES.wait:
+      waitLoop();
+      break;
+    case STATES.preload:
+      preloadLoop();
+      break;
+    case STATES.setupGame:
+      setupGame();
+      break;
+    case STATES.title:
+      titleLoop();
+      break;
+    case STATES.game:
+      gameUpdateLoop();
+      break;
+    case STATES.gameover:
+      gameOverLoop();
+      break;
+  }
+  /*if(gameState === STATES.wait){
     waitLoop();
   } 
   else if(gameState === STATES.preload){
@@ -105,7 +132,7 @@ const stateHandler = () => {
   } 
   else if(gameState === STATES.gameover){
     gameOverLoop();
-  }
+  }*/
   
   animationFrame = requestAnimationFrame(stateHandler);
 }

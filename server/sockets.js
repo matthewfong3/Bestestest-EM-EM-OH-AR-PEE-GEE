@@ -1,7 +1,5 @@
 const xxh = require('xxhashjs');
 
-const Character = require('./classes/Character.js');
-
 let io;
 
 const setupSockets = (ioServer) => {
@@ -19,10 +17,7 @@ const setupSockets = (ioServer) => {
 
     socket.hash = hash;
 
-    // create a character and send it back to the client
-    const character = new Character(hash);
-
-    socket.emit('joined', { character });
+    socket.emit('joined', { hash });
 
     socket.on('disconnect', () => {
       socket.leave('room');
