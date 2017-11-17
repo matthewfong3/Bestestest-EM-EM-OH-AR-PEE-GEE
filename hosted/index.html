@@ -8,35 +8,76 @@
 	<script src="/assets/compiled.js"> </script>
 </head>
 <body>
-    <header>
-      <h1>Bestestest EM EM OH AR PEE GEE</h1>
-    </header>
-    <canvas id="canvas" height="648" width="1152">Please use an HTML 5 browser</canvas>
-    <section id="designDoc">
-      <h3>Start Menu</h3>
-      <hr>
-      <img src="/assets/designDocImages/start.jpg" alt="start menu" width="480" height="640"/>
-      <hr>
-      <h3>Class Selection</h3>
-      <hr>
-      <img src="/assets/designDocImages/select.jpg" alt="class selection" width="480" height="640"/>
-      <hr>
-      <h3>Level Layout</h3>
-      <hr>
-      <img src="/assets/designDocImages/level.jpg" alt="level layout" width="480" height="640"/>
-      <hr>
-      <h3>Win Screen</h3>
-      <hr>
-      <img src="/assets/designDocImages/win.jpg" alt="win" width="480" height="640"/>
-      <hr>
-      <h3>Death Screen</h3>
-      <hr>
-      <img src="/assets/designDocImages/death.jpg" alt="death" width="480" height="640"/>
-      <hr>
-      <h3>The Gainz</h3>
-      <hr>
-      <img src="/assets/designDocImages/money.jpg" alt="shop screen" width="480" height="640"/>
-    </section>
+<header>
+    <h1>Bestestest EM EM OH AR PEE GEE</h1>
+  </header>
+  
+  <div class="main-wrapper">
+    
+    
+  <div id="canvasArea">
+    <canvas id="canvas_back" height="648" width="1152">Please use an HTML 5 browser</canvas>
+    <canvas id="canvas_main" height="648" width="1152">Please use an HTML 5 browser</canvas>
+    <canvas id="canvas_overlay" height="648" width="1152">Please use an HTML 5 browser</canvas>
+    
+    <!-- this is a tes of popup windows over the canvas (for login stuff or something). one is a basic one, one has an input field -->
+    <div class="popupContainer hidden">
+      <div id="test-popup" class="popup statusWindow" >
+        <b class="header">Test window: </b>
+        <div id="test-popup-title" class="status"> </div>
+        <div id="test-popup-data" class="status">
+          <p class="opt">- test data -</p>
+        </div>
+      </div>
+      
+      <div id="test-dialogue" class="popup statusWindow hidden" style="margin-top: -100px">
+        <b class="header">Test dialogue: </b>
+        <div class="status" style="margin: 0.5em">
+          <input type="text" id="test-dialogue-input" placeholder="test input"/>
+          <input type="button" id="login" value="ok" />
+        </div>
+      </div>    
+    </div>
+
+  </div>  
+  
+  <section id="designDoc">
+    <h3>Start Menu</h3>
+    <hr>
+    <img src="/assets/designDocImages/start.jpg" alt="start menu" width="480" height="640"/>
+    <hr>
+    <h3>Class Selection</h3>
+    <hr>
+    <img src="/assets/designDocImages/select.jpg" alt="class selection" width="480" height="640"/>
+    <hr>
+    <h3>Level Layout</h3>
+    <hr>
+    <img src="/assets/designDocImages/level.jpg" alt="level layout" width="480" height="640"/>
+    <hr>
+    <h3>Win Screen</h3>
+    <hr>
+    <img src="/assets/designDocImages/win.jpg" alt="win" width="480" height="640"/>
+    <hr>
+    <h3>Death Screen</h3>
+    <hr>
+    <img src="/assets/designDocImages/death.jpg" alt="death" width="480" height="640"/>
+    <hr>
+    <h3>The Gainz</h3>
+    <hr>
+    <img src="/assets/designDocImages/money.jpg" alt="shop screen" width="480" height="640"/>
+  </section>  
+  </div>
+  
+  <div id="footer">
+    <p class="header">- Copyright 2017 Us Cody, just us. - </p>
+    <p>All rights reserved</p>
+  </div>
+
+  <div id="audio" class="hidden">
+    <audio id="bgAudio" controls loop></audio>
+    <audio id="effectAudio" controls></audio>
+  </div>
+  
     
 </body>
 </html>

@@ -11,7 +11,7 @@ class Character {
     this.destX = 572;
     this.destY = 324;
     this.alpha = 0.05;
-    this.fillstyle = "black";
+    this.fillstyle = 'black';
     // if using circle-to-circle collision
     this.radius = 20;
   }

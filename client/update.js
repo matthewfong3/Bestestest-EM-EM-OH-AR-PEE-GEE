@@ -8,11 +8,11 @@ const setUser = (data) => {
   hash = data.character.hash; // set this client's hash to the unique hash the server gives them
   players[data.character.hash] = data.character;
   playerCount += 1;
-   
   
   //if(playerCount == 4)
   //{
-      requestAnimationFrame(redraw); // start animating;
+  console.log('joined server');
+  gameState = STATES.preload // start animating;
   //}
 };
 
@@ -22,7 +22,7 @@ const setOtherplayers = (data) => {
     
   //if(playerCount == 4)
   //{
-      requestAnimationFrame(redraw); // start animating;
+      //requestAnimationFrame(redraw); // start animating;
   //}
 };
 
@@ -33,31 +33,30 @@ const shooting = (data) => {
 
 // update this client's position and send to server
 const updatePosition = () => {
-    
-    let square = players[hash];
+    let plr = players[hash];
 
-    square.prevX = square.x;
-    square.prevY = square.y;
+    plr.prevX = plr.x;
+    plr.prevY = plr.y;
 
-    if(up && square.destY - 20 > 0)
+    if(up && plr.destY - 20 > 0)
     {
-        square.destY -= 2;
+        plr.destY -= 2;
     }
-    if(down && square.destY + 20 < canvas.height)
+    if(down && plr.destY + 20 < canvas.height)
     {
-        square.destY += 2;
+        plr.destY += 2;
     }
-    if(left && square.destX - 20 > 0)
+    if(left && plr.destX - 20 > 0)
     {
-        square.destX -= 2;
+        plr.destX -= 2;
     }
-    if(right && square.destX + 20 < canvas.width)
+    if(right && plr.destX + 20 < canvas.width)
     {
-        square.destX += 2;
+        plr.destX += 2;
     }
 
-    square.alpha = 0.05;
-    square.lastUpdate = new Date().getTime();
+    plr.alpha = 0.05;
+    plr.lastUpdate = new Date().getTime();
 };
 
 // move the sphere arround
@@ -67,24 +66,73 @@ const movement = () => {
     //grab each user
     for(let x =0;x<keys.length;x++)
     {
-        let square = players[keys[x]];
+        let plr = players[keys[x]];
 
-        if(square.alpha < 1)
+        if(plr.alpha < 1)
         {
-            square.alpha += 0.05;
+            plr.alpha += 0.05;
         }
 
-        square.x = lerp(square.prevX,square.destX,square.alpha);
-        square.y = lerp(square.prevY,square.destY,square.alpha);
+        plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
+        plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
     }
 };
 
+const resetGame = () => {
+  //game setup
+  playerCount = 0;
+  players = {};
+  bulletArray = [];
 
-//get mouse movement 
-const getmousemove = (canvas,evt) => {
-let rect = canvas.getBoundingClientRect();
-    return{
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
+  up = false;
+  left = false;
+  right = false;
+  down = false;
 };
+
+//--GAME LOOPS---------------------region
+const waitLoop = () => {
+  drawWait();
+  console.log('waiting for connection to server...');
+} //wait until client joined the server
+
+const preloadLoop = () => {
+  //check if images are loaded then go to startup
+  if(loadQueue == numLoaded){
+    console.log('done loading images');
+    assignStartupEvents();
+    gameState = STATES.title;
+    return;
+  }
+  
+  drawPreload();
+  
+  console.log('loading game...');
+};
+
+const titleLoop = () => {
+  drawTitle();
+};
+
+const gameOverLoop = () => {
+  drawGameOver();
+  
+  console.log('game over');
+};
+
+const gameUpdateLoop = () => {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  
+  drawPlaceholder();
+  
+  //check player input
+  
+  //update game
+  updatePosition();
+  movement();
+  
+  //draw game
+  drawPlayers();
+};
+
+//endregion

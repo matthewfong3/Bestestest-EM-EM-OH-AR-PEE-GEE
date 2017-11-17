@@ -4,19 +4,104 @@ html, body {
   margin: 0;
   padding:0;
   background-color: #ccc;
+  font-family:"Trebuchet MS", Helvetica, sans-serif;
 }
 
-canvas {
-  background-color: white;
-  border-radius: 5px;
+.main-wrapper {
+  width: 1152px;
+  padding-top: 1em;
+  padding-left: 1em;
+  padding-right: 1em;
   margin: 0 auto;
-  padding: 0;
-  display: block;
-  border: 1px solid #aaa;
-}
+  //background-color: #ffffff;
+} /*just a class to contain our content*/
 
 header{
   text-align: center;
+}
+
+canvas {
+  border-radius: 7px;
+  border: 1px solid #aaa;
+}
+
+/* start of css for the status/popup window things*/
+.statusWindow {
+  display: inline-block;
+  border-radius: 3px;
+  border: 2px solid #2e2e2e;
+  margin: 0 auto;
+  margin-top: 3px;
+  padding: 0;
+  background-color: #ffffff;
+}
+.statusWindow .header {
+  display: block;
+  background-color: #9268ef;
+  padding: 0.5em;
+  margin-bottom: 0px;
+  color: #efefef;
+}
+.statusWindow .status {
+  padding: 0.1em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+.statusWindow .status p {
+  padding: 0.2em;
+  display: block;
+  margin: 3px;
+}
+.opt {
+  transition: .3s background-color;
+  border-radius: 2px;
+  display: inline-block;
+}
+.opt:hover{
+  background-color: #cbcbcb;
+}
+.popup {
+  position: absolute;
+  display: inline-block;
+  vertical-align:  middle;
+  background: white;
+  //color: aqua;
+  z-index: 3;
+  margin: 0;
+  top: 50%;   
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.popupContainer {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  //background: gray;
+  text-align: center;
+  vertical-align:  middle;
+}
+/*end of window css*/
+
+
+
+#canvasArea {
+  height: 648px;
+  position: relative;
+} /*This is the container for the layered canvases*/
+
+#canvas_back { 
+  position: absolute;
+  z-index: 0;
+}
+#canvas_main {
+  position: absolute;
+  z-index: 1;
+}
+#canvas_overlay { 
+  position: absolute;
+  z-index: 2;
 }
 
 #designDoc{
@@ -27,12 +112,45 @@ header{
   border-radius: 5px;
   background-color: #bbb;
 }
-
 #designDoc h3{
   text-align: center;
 }
-
 #designDoc img {
   display: block;
   margin: auto;
 }
+
+#footer {
+  //width: 85%;
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  padding: 0.2em;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #9268ef;
+}
+#footer p {
+  font-size: 1em;
+  font-weight: bold;
+  color: #efefef;
+  text-align: center;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.hidden {
+  display: none;
+} /*hide section - can be appended/removed to classlist with js*/
+.show {
+  display: block;
+} /*show section - can be appended/removed to classlist with js*/
+
+.noSelect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+  supported by Chrome and Opera */
+} /* so that the canvas cant be selected and mess up gameplay*/

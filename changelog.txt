@@ -1,0 +1,56 @@
+ChangeLog:
+
+**feel free to ignore all of this stuff, this file is mostly to help me keep my sanity :p
+
+[ 11/16 8:50pm ]
+
++helper.js in client
++setup.js in client
++media.js in client
++img,audio folders in hosted (plus music and some images)
+*added layered canvases and dialogue boxes in html, and css to go with it
+
+*didnt touch server side stuff at all*
+
+*main.js [in client]
+  - changed mouseXY vars to mouse { x: - , y: - }
+  - added vars for other canvases, client, and audio stuff
+  - added var for image list
+  - added game states object and gamestate
+  - added a new update loop that just runs whatever state the game is in called 'stateHandler'
+  - added onMouseMove and skeleton for other mouse events
+  - simplified init to call setup.js functions
+     - sets up canvas -> sets up sockets -> sets up sound -> starts loading images -> starts waiting loop
+
+*draw.js: [in client]
+  - removed game logic from 'redraw' to update loop (keeping draw.js scrictly to drawing)
+  - renamed 'redraw' to 'drawPlayers' 
+     - loops throug players and draws them
+  - moved drawing stuff from 'drawPlayers' to 'drawPlayer' 
+     - added begin/close path to player draw
+  - moved lerp function from draw.js to helper.js
+  - added draw player (just draws the placeholder circle player)
+  - added draw functions for game screens (like title, loading, etc)
+
+*update.js: 
+  - changed the setUser to set gamestate to preload once connected to server
+  - added functions for the different game loops (wait, preload, startup, maingame, etc)
+  - added reset game function to reset players and bullets
+
++helper.js [in client]
+  - 
+
++setup.js [in client]
+  - moved canvas setup from main.js to 'setupCanvas' in setup.js
+  - moved socket setup from main to 'setupSockets' in setup.js (although maybe its best to have separate file for it)
+  - moved key and mouse event setup and assignment here
+  - added a startupGame function
+     - sets up some game stuff, plays music, and sets state to game (starts game)
+
++media.js [in client]
+  - added audio stuff, and vars for them
+     - can play bg or sfx audio, swap bg traks, stop bg music
+     - added to load lists for audio (can add more as we get more files)
+  - added image preloader
+     - takes in object with image names and url and loads them into given object
+     - made a to load image list with just the test image for now (can add more later)

@@ -1,23 +1,30 @@
-let canvas;
-let ctx;
+let canvas, ctx, canvas_overlay, ctx_overlay, canvas_back, ctx_back, width, height, animationFrame;
 
-let socket; 
-let hash; 
-let animationFrame;
+let socket, hash, isHost = false, hosted = {}, roomName;
 
-let mouseX;
-let mouseY;
+let bgAudio = undefined, effectAudio = undefined, currentEffect = 0, currentDirection = 1;
 
-let players;
+let mouse = {x:0,y:0};
+let IMAGES = {};
 
-let playerCount;
+let STATES = {
+  wait: 'wait',
+  preload: 'preload',
+  title: 'title',
+  setupGame: 'setupGame',
+  game: 'game',
+  gameover: 'gameover',
+};
+let gameState = STATES.wait;
 
-let bulletArray;
+let players = {};
+let playerCount = 0;
+let bulletArray = [];
 
-let up;
-let down;
-let right;
-let left;
+let up = false;
+let down = false;
+let right = false;
+let left = false;
 
 //handle for key down events
 const keyDownHandler = (e) => {
@@ -43,6 +50,8 @@ const keyDownHandler = (e) => {
     //move character right
     right = true;
   }
+  
+  e.preventDefault();
 };
 
 //handler for key up events
@@ -71,44 +80,46 @@ const keyUpHandler = (e) => {
   }
 };
 
+const doOnMouseMove = (e) => {
+  mouse = getMouse(e);
+}
+const doOnMouseDown = (e) => { }
+const doOnMouseUp = (e) => { }
+const doOnMouseOut = (e) => { }
+
+const stateHandler = () => {
+  if(gameState === STATES.wait){
+    waitLoop();
+  } 
+  else if(gameState === STATES.preload){
+    preloadLoop();
+  } 
+  else if(gameState === STATES.setupGame){
+    setupGame();
+  } 
+  else if(gameState === STATES.title){
+    titleLoop();
+  } 
+  else if(gameState === STATES.game){
+    gameUpdateLoop();
+  } 
+  else if(gameState === STATES.gameover){
+    gameOverLoop();
+  }
+  
+  animationFrame = requestAnimationFrame(stateHandler);
+}
+
 const init = () => {
-  canvas = document.querySelector("#canvas");
-  ctx = canvas.getContext('2d');
+  setupCanvas(); 
+  setupSockets();
   
-  socket = io.connect();
-    
-  playerCount = 0;
-    
-  players = {};
-    
-  bulletArray = [];
-
-  up = false;
-  left = false;
-  right = false;
-  down = false;
+  resetGame();
   
-  document.body.addEventListener('keydown', keyDownHandler);
-  document.body.addEventListener('keyup', keyUpHandler);
+  setupSound();
   
-
-  //find the mouse position
-  canvas.addEventListener('mousemove',(evt)=>{
-  let object = getmousemove(canvas,evt);
-  mouseX = object.x;
-  mouseY = object.y;
-  });
-
-  //if this user joins
-  socket.on("joined",(data) => {
-     setUser(data);
-  });
-
-  //if other players join
-  socket.on("otherConnects",(data) => {
-     setOtherplayers(data); 
-  });
-    
+  preloadImages(toLoadImgs, IMAGES);
+  animationFrame = requestAnimationFrame(stateHandler);
 };
 
 window.onload = init;
