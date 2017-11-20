@@ -5,15 +5,70 @@ const getMouse = (e) => {
       y: e.clientY - offset.top
     };
 }
+// ----- bullet Stuff --------------------------------------------------
+const fire = (e) => {
+  if(canFire)
+  {
+  let playerPos = {x:players[hash].x,y:players[hash].y};
+  let vector = {x:mouse.x - playerPos.x, y: mouse.y - playerPos.y};
+  let mag = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
+  let normVec = {x:vector.x/mag, y:vector.y/mag};
+  let bullet = new Bullet(playerPos,normVec);
+  bulletArray.push(bullet);
+  canFire = false;
+  }
+};
+
+const firecoolDown = () => {
+
+    if(canFire == false)
+    {
+        bufferTime += calculateDT();
+        if(bufferTime >= 0.5)
+        {
+          canFire = true;
+          bufferTime = 0;
+        }
+    }
+}
+
+const movebullets = () => {
+    for(let i =0; i < bulletArray.length; i ++)
+    {
+       let bullet = bulletArray[i];
+       bullet.destX = bullet.x + (bullet.bulletSpeed * bullet.direction.x);
+       bullet.destY = bullet.y + (bullet.bulletSpeed * bullet.direction.y);
+       bullet.alpha = 0.05;
+       bullet.prevX = bullet.x;
+       bullet.prevY = bullet.y;
+       bullet.x = lerp(bullet.x,bullet.destX,bullet.alpha);
+       bullet.y = lerp(bullet.y,bullet.destY,bullet.alpha);
+       //bullet.alpha += 0.05;
+    }
+};
+
+const OutofBoundbullet = () => {
+  for(let i =0; i < bulletArray.length; i++)
+  {
+      let bullet = bulletArray[i];
+      if(bullet.x > canvas_overlay.width || bullet.x < 0 || bullet.y > canvas_overlay.height || bullet.y < 0)
+      {
+        bulletArray.splice(i,1);
+      }
+  }
+}
+
+// -----------------------------------------------------------------
+
 const lerp = (v0, v1, alpha) => {
   return (1 - alpha) * v0 + alpha * v1;
 };
 const calculateDT = () =>{
   var now,fps;
   now = performance.now(); 
-  fps = 1000 / (now - this.lastTime);
+  fps = 1000 / (now - lastTime);
   fps = clampValue(fps, 12, 60);
-  this.lastTime = now; 
+  lastTime = now; 
   return 1/fps;
 };
 const clampValue = (value, min, max) => {

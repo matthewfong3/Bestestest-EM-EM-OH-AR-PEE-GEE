@@ -116,9 +116,24 @@ const gameUpdateLoop = () => {
   //update game
   updatePosition();
   move();
+
+  //move bullets
+  movebullets();
   
   //draw game
   drawPlayers();
+  drawBullets();
+
+  //update lasttime
+  lastTime = performance.now();
+
+  //bullet firing cooldown
+  firecoolDown();
+
+  //remove bullet
+  OutofBoundbullet();
+  console.log(bulletArray.length);
+
 };
 
 //endregion

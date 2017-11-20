@@ -2,19 +2,22 @@
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Bullet = function Bullet(characterpoint, mousepoint) {
+var Bullet = function Bullet(characterpoint, direction) {
     _classCallCheck(this, Bullet);
 
     // position variables
-    this.prevX = 572;
-    this.prevY = 324;
-    this.x = 572;
-    this.y = 324;
-    this.destX = 572;
-    this.destY = 324;
+    this.prevX = characterpoint.x;
+    this.prevY = characterpoint.y;
+    this.x = characterpoint.x;
+    this.y = characterpoint.y;
+    this.destX = characterpoint.x;
+    this.destY = characterpoint.y;
     this.alpha = 0.05;
+    this.bulletSpeed = 40;
+    this.radius = 10;
+    this.style = "yellow";
     //need to work on this
-    this.direction = characterpoint - mousepoint;
+    this.direction = direction;
 };
 "use strict";
 
@@ -63,6 +66,26 @@ var drawPlayer = function drawPlayer(playerdrawn) {
 
   ctx.fillStyle = playerdrawn.style;
   ctx.arc(playerdrawn.x, playerdrawn.y, playerdrawn.radius, 0, Math.PI * 2, false);
+
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+};
+
+var drawBullets = function drawBullets(time) {
+  //draw things
+  for (var i = 0; i < bulletArray.length; i++) {
+    var bullet = bulletArray[i];
+    drawBullet(bullet);
+  }
+};
+
+var drawBullet = function drawBullet(bulletdrawn) {
+  ctx.save();
+  ctx.beginPath();
+
+  ctx.fillStyle = bulletdrawn.style;
+  ctx.arc(bulletdrawn.x, bulletdrawn.y, bulletdrawn.radius, 0, Math.PI * 2, false);
 
   ctx.closePath();
   ctx.fill();
@@ -142,15 +165,64 @@ var getMouse = function getMouse(e) {
     y: e.clientY - offset.top
   };
 };
+// ----- bullet Stuff --------------------------------------------------
+var fire = function fire(e) {
+  if (canFire) {
+    var playerPos = { x: players[hash].x, y: players[hash].y };
+    var vector = { x: mouse.x - playerPos.x, y: mouse.y - playerPos.y };
+    var mag = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+    var normVec = { x: vector.x / mag, y: vector.y / mag };
+    var bullet = new Bullet(playerPos, normVec);
+    bulletArray.push(bullet);
+    canFire = false;
+  }
+};
+
+var firecoolDown = function firecoolDown() {
+
+  if (canFire == false) {
+    bufferTime += calculateDT();
+    if (bufferTime >= 0.5) {
+      canFire = true;
+      bufferTime = 0;
+    }
+  }
+};
+
+var movebullets = function movebullets() {
+  for (var i = 0; i < bulletArray.length; i++) {
+    var bullet = bulletArray[i];
+    bullet.destX = bullet.x + bullet.bulletSpeed * bullet.direction.x;
+    bullet.destY = bullet.y + bullet.bulletSpeed * bullet.direction.y;
+    bullet.alpha = 0.05;
+    bullet.prevX = bullet.x;
+    bullet.prevY = bullet.y;
+    bullet.x = lerp(bullet.x, bullet.destX, bullet.alpha);
+    bullet.y = lerp(bullet.y, bullet.destY, bullet.alpha);
+    //bullet.alpha += 0.05;
+  }
+};
+
+var OutofBoundbullet = function OutofBoundbullet() {
+  for (var i = 0; i < bulletArray.length; i++) {
+    var bullet = bulletArray[i];
+    if (bullet.x > canvas_overlay.width || bullet.x < 0 || bullet.y > canvas_overlay.height || bullet.y < 0) {
+      bulletArray.splice(i, 1);
+    }
+  }
+};
+
+// -----------------------------------------------------------------
+
 var lerp = function lerp(v0, v1, alpha) {
   return (1 - alpha) * v0 + alpha * v1;
 };
 var calculateDT = function calculateDT() {
   var now, fps;
   now = performance.now();
-  fps = 1000 / (now - undefined.lastTime);
+  fps = 1000 / (now - lastTime);
   fps = clampValue(fps, 12, 60);
-  undefined.lastTime = now;
+  lastTime = now;
   return 1 / fps;
 };
 var clampValue = function clampValue(value, min, max) {
@@ -292,6 +364,10 @@ var bgAudio = undefined,
 var mouse = { x: 0, y: 0 };
 var IMAGES = {};
 
+var bufferTime = 0;
+var canFire = true;
+var lastTime = void 0;
+
 var STATES = {
   wait: 'wait',
   preload: 'preload',
@@ -375,7 +451,9 @@ var keyUpHandler = function keyUpHandler(e) {
 var doOnMouseMove = function doOnMouseMove(e) {
   mouse = getMouse(e);
 };
-var doOnMouseDown = function doOnMouseDown(e) {};
+var doOnMouseDown = function doOnMouseDown(e) {
+  fire(e);
+};
 var doOnMouseUp = function doOnMouseUp(e) {};
 var doOnMouseOut = function doOnMouseOut(e) {};
 
@@ -580,6 +658,7 @@ var setupEvents = function setupEvents() {
 
   //find the mouse position
   canvas_overlay.onmousemove = doOnMouseMove;
+  canvas_overlay.onmousedown = doOnMouseDown;
   //console.log('assigned startup game keys');
 }; //events for gameplay
 
@@ -609,17 +688,17 @@ var update = function update(data) {};
 
 // 
 var setUser = function setUser(data) {
-    hash = data.hash; // set this client's hash to the unique hash the server gives them
-    players[hash] = new Character(hash);
+  hash = data.hash; // set this client's hash to the unique hash the server gives them
+  players[hash] = new Character(hash);
 
-    console.log('joined server');
-    gameState = STATES.preload; // start animating;
+  console.log('joined server');
+  gameState = STATES.preload; // start animating;
 };
 
 var setOtherplayers = function setOtherplayers(data) {
-    players[data.hash] = new Character(data.hash);
+  players[data.hash] = new Character(data.hash);
 
-    //requestAnimationFrame(redraw); // start animating;
+  //requestAnimationFrame(redraw); // start animating;
 };
 
 //do the shooting and send to server
@@ -627,94 +706,108 @@ var shooting = function shooting(data) {};
 
 // update this client's position and send to server
 var updatePosition = function updatePosition() {
-    var plr = players[hash];
+  var plr = players[hash];
 
-    plr.prevX = plr.x;
-    plr.prevY = plr.y;
+  plr.prevX = plr.x;
+  plr.prevY = plr.y;
 
-    if (plr.moveUp && plr.destY - 20 > 0) {
-        plr.destY -= 2;
-    }
-    if (plr.moveDown && plr.destY + 20 < canvas.height) {
-        plr.destY += 2;
-    }
-    if (plr.moveLeft && plr.destX - 20 > 0) {
-        plr.destX -= 2;
-    }
-    if (plr.moveRight && plr.destX + 20 < canvas.width) {
-        plr.destX += 2;
-    }
+  if (plr.moveUp && plr.destY - 20 > 0) {
+    plr.destY -= 2;
+  }
+  if (plr.moveDown && plr.destY + 20 < canvas.height) {
+    plr.destY += 2;
+  }
+  if (plr.moveLeft && plr.destX - 20 > 0) {
+    plr.destX -= 2;
+  }
+  if (plr.moveRight && plr.destX + 20 < canvas.width) {
+    plr.destX += 2;
+  }
 
-    plr.alpha = 0.05;
-    plr.lastUpdate = new Date().getTime();
+  plr.alpha = 0.05;
+  plr.lastUpdate = new Date().getTime();
 };
 
 // move the sphere arround
 var move = function move() {
 
-    var keys = Object.keys(players);
-    //grab each user
-    for (var x = 0; x < keys.length; x++) {
-        var plr = players[keys[x]];
+  var keys = Object.keys(players);
+  //grab each user
+  for (var x = 0; x < keys.length; x++) {
+    var plr = players[keys[x]];
 
-        if (plr.alpha < 1) {
-            plr.alpha += 0.05;
-        }
-
-        plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
-        plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
+    if (plr.alpha < 1) {
+      plr.alpha += 0.05;
     }
+
+    plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
+    plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
+  }
 };
 
 var resetGame = function resetGame() {
-    //game setup
-    players = {};
-    bulletArray = [];
+  //game setup
+  players = {};
+  bulletArray = [];
 };
 
 //--GAME LOOPS---------------------region
 var waitLoop = function waitLoop() {
-    drawWait();
-    console.log('waiting for connection to server...');
+  drawWait();
+  console.log('waiting for connection to server...');
 }; //wait until client joined the server
 
 var preloadLoop = function preloadLoop() {
-    //check if images are loaded then go to startup
-    if (loadQueue == numLoaded) {
-        console.log('done loading images');
-        assignStartupEvents();
-        gameState = STATES.title;
-        return;
-    }
+  //check if images are loaded then go to startup
+  if (loadQueue == numLoaded) {
+    console.log('done loading images');
+    assignStartupEvents();
+    gameState = STATES.title;
+    return;
+  }
 
-    drawPreload();
+  drawPreload();
 
-    console.log('loading game...');
+  console.log('loading game...');
 };
 
 var titleLoop = function titleLoop() {
-    drawTitle();
+  drawTitle();
 };
 
 var gameOverLoop = function gameOverLoop() {
-    drawGameOver();
+  drawGameOver();
 
-    console.log('game over');
+  console.log('game over');
 };
 
 var gameUpdateLoop = function gameUpdateLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawPlaceholder();
+  drawPlaceholder();
 
-    //check player input
+  //check player input
 
-    //update game
-    updatePosition();
-    move();
+  //update game
+  updatePosition();
+  move();
 
-    //draw game
-    drawPlayers();
+  //move bullets
+  movebullets();
+
+  //draw game
+  drawPlayers();
+  drawBullets();
+
+  //update lasttime
+  lastTime = performance.now();
+
+  //bullet firing cooldown
+  firecoolDown();
+
+  //remove bullet
+  OutofBoundbullet();
+  console.log(bulletArray.length);
 };
 
 //endregion

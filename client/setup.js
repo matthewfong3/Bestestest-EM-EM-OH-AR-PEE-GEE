@@ -49,6 +49,7 @@ const setupEvents = () => {
   
   //find the mouse position
   canvas_overlay.onmousemove = doOnMouseMove;
+  canvas_overlay.onmousedown = doOnMouseDown;
   //console.log('assigned startup game keys');
 }; //events for gameplay
 

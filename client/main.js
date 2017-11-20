@@ -7,6 +7,10 @@ let bgAudio = undefined, effectAudio = undefined, currentEffect = 0, currentDire
 let mouse = {x:0,y:0};
 let IMAGES = {};
 
+let bufferTime = 0;
+let canFire = true;
+let lastTime;
+
 let STATES = {
   wait: 'wait',
   preload: 'preload',
@@ -90,7 +94,9 @@ const keyUpHandler = (e) => {
 const doOnMouseMove = (e) => {
   mouse = getMouse(e);
 }
-const doOnMouseDown = (e) => { }
+const doOnMouseDown = (e) => { 
+  fire(e);
+}
 const doOnMouseUp = (e) => { }
 const doOnMouseOut = (e) => { }
 

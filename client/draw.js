@@ -19,6 +19,27 @@ const drawPlayer = (playerdrawn) => {
   ctx.restore(); 
 }
 
+const drawBullets = (time) => {
+  //draw things
+  for(let i =0; i < bulletArray.length; i++)
+  {
+    let bullet = bulletArray[i];
+    drawBullet(bullet);
+  }
+}
+
+const drawBullet = (bulletdrawn) => {
+  ctx.save();
+  ctx.beginPath();
+  
+  ctx.fillStyle = bulletdrawn.style;
+  ctx.arc(bulletdrawn.x,bulletdrawn.y,bulletdrawn.radius,0,Math.PI * 2,false);
+  
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore(); 
+}
+
 //--draw game screens-------------
 const drawPlaceholder = () => {
   ctx_back.fillStyle = '#626262';
