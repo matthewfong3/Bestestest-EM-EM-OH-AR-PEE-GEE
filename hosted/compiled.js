@@ -49,6 +49,31 @@ var Character = function Character(hash) {
   // if using circle-to-circle collision
   this.radius = 20;
 };
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Enemy = function Enemy() {
+  _classCallCheck(this, Enemy);
+
+  this.lastUpdate = new Date().getTime();
+
+  // position variables
+  this.prevX = 0;
+  this.prevY = 0;
+  this.x = 0;
+  this.y = 0;
+  this.destX = 0;
+  this.destY = 0;
+
+  this.alpha = 0.05;
+
+  this.direction = 0;
+
+  this.radius = 20;
+
+  this.target;
+};
 'use strict';
 
 var drawPlayers = function drawPlayers(time) {
@@ -88,6 +113,22 @@ var drawBullet = function drawBullet(bulletdrawn) {
   ctx.arc(bulletdrawn.x, bulletdrawn.y, bulletdrawn.radius, 0, Math.PI * 2, false);
 
   ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+};
+
+var drawEnemies = function drawEnemies() {
+  for (var i = 0; i < enemies.length; i++) {
+    drawEnemy(enemies[i]);
+  }
+};
+
+var drawEnemy = function drawEnemy(enemy) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2, false);
+  ctx.closePath();
+  ctx.fillStyle = 'red';
   ctx.fill();
   ctx.restore();
 };
@@ -217,6 +258,7 @@ var OutofBoundbullet = function OutofBoundbullet() {
 var lerp = function lerp(v0, v1, alpha) {
   return (1 - alpha) * v0 + alpha * v1;
 };
+
 var calculateDT = function calculateDT() {
   var now, fps;
   now = performance.now();
@@ -225,8 +267,19 @@ var calculateDT = function calculateDT() {
   lastTime = now;
   return 1 / fps;
 };
+
 var clampValue = function clampValue(value, min, max) {
   return Math.max(min, Math.min(max, value));
+};
+
+var getRandomRange = function getRandomRange(min, max) {
+  return Math.random() * (max - min) + min;
+};
+
+var getDistance = function getDistance(c1, c2) {
+  var dx = c2.x - c1.x;
+  var dy = c2.y - c1.y;
+  return Math.sqrt(dx * dx + dy * dy);
 };
 
 //--collision---------------------------------------
@@ -247,9 +300,7 @@ var isInCircle = function isInCircle(point, circle) {
 
 //check circle x circle intersections [circle]: {x, y, radius}
 var circlesIntersect = function circlesIntersect(c1, c2) {
-  var dx = c2.x - c1.x;
-  var dy = c2.y - c1.y;
-  var distance = Math.sqrt(dx * dx + dy * dy);
+  var distance = getDistance(c1, c2);
   return distance < c1.radius + c2.radius;
 };
 
@@ -380,6 +431,7 @@ var gameState = STATES.wait;
 
 var players = {};
 var bulletArray = [];
+var enemies = [];
 
 var directions = {
   DOWNLEFT: 0,
@@ -478,24 +530,6 @@ var stateHandler = function stateHandler() {
       gameOverLoop();
       break;
   }
-  /*if(gameState === STATES.wait){
-    waitLoop();
-  } 
-  else if(gameState === STATES.preload){
-    preloadLoop();
-  } 
-  else if(gameState === STATES.setupGame){
-    setupGame();
-  } 
-  else if(gameState === STATES.title){
-    titleLoop();
-  } 
-  else if(gameState === STATES.game){
-    gameUpdateLoop();
-  } 
-  else if(gameState === STATES.gameover){
-    gameOverLoop();
-  }*/
 
   animationFrame = requestAnimationFrame(stateHandler);
 };
@@ -641,6 +675,8 @@ var setupGame = function setupGame() {
 
   //game setup
   //TODO setup game stuff
+  initEnemies(5);
+  spawnEnemies();
 
   //play audio
   playBgAudio();
@@ -682,6 +718,69 @@ var removeStartupEvents = function removeStartupEvents() {
 }; //remove those events
 //endregion
 'use strict';
+
+var initEnemies = function initEnemies(numEnemies) {
+  for (var i = 0; i < numEnemies; i++) {
+    enemies.push(new Enemy());
+  }
+};
+
+var spawnEnemies = function spawnEnemies() {
+  for (var i = 0; i < enemies.length; i++) {
+    var x = getRandomRange(20, canvas.width - 20);
+    var y = getRandomRange(20, canvas.height - 20);
+
+    enemies[i].prevX = x;
+    enemies[i].prevY = y;
+    enemies[i].x = x;
+    enemies[i].y = y;
+    enemies[i].destX = x;
+    enemies[i].destY = y;
+  }
+};
+
+var seekTargets = function seekTargets() {
+  var keys = Object.keys(players);
+
+  for (var i = 0; i < enemies.length; i++) {
+    var shortestDist = getDistance(players[keys[0]], enemies[i]);
+
+    enemies[i].target = players[keys[0]];
+    for (var j = 1; j < keys.length; j++) {
+      var distance = getDistance(players[keys[j]], enemies[i]);
+
+      if (distance < shortestDist) enemies[i].target = players[keys[j]];
+    }
+  }
+
+  //for(let i = 0; i < enemies.length; i++){
+  //  enemies[i].target = players[hash];
+  //}
+};
+
+var moveEnemies = function moveEnemies() {
+  var maxSpeed = 20;
+  for (var i = 0; i < enemies.length; i++) {
+    var desired = {
+      x: enemies[i].target.x - enemies[i].x,
+      y: enemies[i].target.y - enemies[i].y
+    };
+
+    var mag = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
+
+    var normDesired = {
+      x: desired.x / mag,
+      y: desired.y / mag
+    };
+
+    enemies[i].destX = enemies[i].x + normDesired.x * maxSpeed;
+    enemies[i].destY = enemies[i].y + normDesired.y * maxSpeed;
+    enemies[i].prevX = enemies[i].x;
+    enemies[i].prevY = enemies[i].y;
+    enemies[i].x = lerp(enemies[i].prevX, enemies[i].destX, enemies[i].alpha);
+    enemies[i].y = lerp(enemies[i].prevY, enemies[i].destY, enemies[i].alpha);
+  }
+};
 
 // when we receive character updates from the server
 var update = function update(data) {};
@@ -792,6 +891,11 @@ var gameUpdateLoop = function gameUpdateLoop() {
   updatePosition();
   move();
 
+  // draw enemies
+  seekTargets();
+  moveEnemies();
+  drawEnemies();
+
   //move bullets
   movebullets();
 
@@ -807,7 +911,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   //remove bullet
   OutofBoundbullet();
-  console.log(bulletArray.length);
+  //console.log(bulletArray.length);
 };
 
 //endregion

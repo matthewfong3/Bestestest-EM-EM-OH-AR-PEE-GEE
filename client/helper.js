@@ -63,6 +63,7 @@ const OutofBoundbullet = () => {
 const lerp = (v0, v1, alpha) => {
   return (1 - alpha) * v0 + alpha * v1;
 };
+
 const calculateDT = () =>{
   var now,fps;
   now = performance.now(); 
@@ -71,8 +72,19 @@ const calculateDT = () =>{
   lastTime = now; 
   return 1/fps;
 };
+
 const clampValue = (value, min, max) => {
   return Math.max(min, Math.min(max, value));
+}
+
+const getRandomRange = (min, max) => {
+  return Math.random() * (max - min) + min;
+};
+
+const getDistance = (c1, c2) => {
+  let dx = c2.x - c1.x;
+  let dy = c2.y - c1.y;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 //--collision---------------------------------------
@@ -93,9 +105,7 @@ const isInCircle = (point, circle) =>{
 
 //check circle x circle intersections [circle]: {x, y, radius}
 const circlesIntersect = (c1, c2) => {
-    var dx = c2.x - c1.x;
-    var dy = c2.y - c1.y;
-    var distance = Math.sqrt(dx*dx +dy*dy);
+    var distance = getDistance(c1, c2);
     return distance < c1.radius + c2.radius;
 };
 

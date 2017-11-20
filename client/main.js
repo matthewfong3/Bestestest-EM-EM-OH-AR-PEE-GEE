@@ -23,6 +23,7 @@ let gameState = STATES.wait;
 
 let players = {};
 let bulletArray = [];
+let enemies = [];
 
 const directions = {
   DOWNLEFT: 0,
@@ -121,24 +122,6 @@ const stateHandler = () => {
       gameOverLoop();
       break;
   }
-  /*if(gameState === STATES.wait){
-    waitLoop();
-  } 
-  else if(gameState === STATES.preload){
-    preloadLoop();
-  } 
-  else if(gameState === STATES.setupGame){
-    setupGame();
-  } 
-  else if(gameState === STATES.title){
-    titleLoop();
-  } 
-  else if(gameState === STATES.game){
-    gameUpdateLoop();
-  } 
-  else if(gameState === STATES.gameover){
-    gameOverLoop();
-  }*/
   
   animationFrame = requestAnimationFrame(stateHandler);
 }

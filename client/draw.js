@@ -40,6 +40,21 @@ const drawBullet = (bulletdrawn) => {
   ctx.restore(); 
 }
 
+const drawEnemies = () => {
+  for(let i = 0; i < enemies.length; i++)
+    drawEnemy(enemies[i]);
+};
+
+const drawEnemy = (enemy) => {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2, false);
+  ctx.closePath();
+  ctx.fillStyle = 'red';
+  ctx.fill();
+  ctx.restore();
+};
+
 //--draw game screens-------------
 const drawPlaceholder = () => {
   ctx_back.fillStyle = '#626262';

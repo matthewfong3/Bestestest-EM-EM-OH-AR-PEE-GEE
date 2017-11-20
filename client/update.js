@@ -1,3 +1,66 @@
+const initEnemies = (numEnemies) => {
+  for(let i = 0; i < numEnemies; i++){
+    enemies.push(new Enemy());
+  }
+};
+
+const spawnEnemies = () => {
+  for(let i = 0; i < enemies.length; i++){
+    let x = getRandomRange(20, canvas.width - 20);
+    let y = getRandomRange(20, canvas.height - 20);
+    
+    enemies[i].prevX = x;
+    enemies[i].prevY = y;
+    enemies[i].x = x;
+    enemies[i].y = y;
+    enemies[i].destX = x;
+    enemies[i].destY = y;
+  }
+};
+
+const seekTargets = () => {
+  let keys = Object.keys(players);
+  
+  for(let i = 0; i < enemies.length; i++){
+    let shortestDist = getDistance(players[keys[0]], enemies[i]);
+    
+    enemies[i].target = players[keys[0]];
+    for(let j = 1; j < keys.length; j++){
+      let distance = getDistance(players[keys[j]], enemies[i]);
+      
+      if(distance < shortestDist) enemies[i].target = players[keys[j]];
+    }
+  }
+  
+  //for(let i = 0; i < enemies.length; i++){
+  //  enemies[i].target = players[hash];
+  //}
+};
+
+const moveEnemies = () => {
+  const maxSpeed = 20;
+  for(let i = 0; i < enemies.length; i++){
+    let desired = {
+      x: enemies[i].target.x - enemies[i].x,
+      y: enemies[i].target.y - enemies[i].y
+    };
+    
+    let mag = Math.sqrt((desired.x * desired.x) + (desired.y * desired.y));
+    
+    let normDesired = {
+      x: desired.x / mag,
+      y: desired.y / mag
+    };
+    
+    enemies[i].destX = enemies[i].x + (normDesired.x * maxSpeed);
+    enemies[i].destY = enemies[i].y + (normDesired.y * maxSpeed);
+    enemies[i].prevX = enemies[i].x;
+    enemies[i].prevY = enemies[i].y;
+    enemies[i].x = lerp(enemies[i].prevX, enemies[i].destX, enemies[i].alpha);
+    enemies[i].y = lerp(enemies[i].prevY, enemies[i].destY, enemies[i].alpha);
+  }
+};
+
 // when we receive character updates from the server
 const update = (data) => {
   
@@ -116,6 +179,11 @@ const gameUpdateLoop = () => {
   //update game
   updatePosition();
   move();
+  
+  // draw enemies
+  seekTargets();
+  moveEnemies();
+  drawEnemies();
 
   //move bullets
   movebullets();
@@ -132,7 +200,7 @@ const gameUpdateLoop = () => {
 
   //remove bullet
   OutofBoundbullet();
-  console.log(bulletArray.length);
+  //console.log(bulletArray.length);
 
 };
 

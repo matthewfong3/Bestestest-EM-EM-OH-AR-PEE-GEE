@@ -32,6 +32,8 @@ const setupGame = () => {
   
   //game setup
   //TODO setup game stuff
+  initEnemies(5);
+  spawnEnemies();
   
   //play audio
   playBgAudio();
