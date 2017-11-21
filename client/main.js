@@ -6,6 +6,9 @@ let bgAudio = undefined, effectAudio = undefined, currentEffect = 0, currentDire
 
 let mouse = {x:0,y:0};
 let IMAGES = {};
+let ANIMATIONS = {};
+let cursor = undefined;
+let dragging = false;
 
 let bufferTime = 0;
 let canFire = true;
@@ -20,6 +23,7 @@ let STATES = {
   gameover: 'gameover',
 };
 let gameState = STATES.wait;
+let paused = false, debug = true;
 
 let players = {};
 let bulletArray = [];
@@ -45,24 +49,26 @@ const keyDownHandler = (e) => {
   if(keyPressed === 87 || keyPressed === 38) {
     // move character up
     player.moveUp = true;
+    e.preventDefault();
   }
   // A OR LEFT
   else if(keyPressed === 65 || keyPressed === 37) {
     // move character left
     player.moveLeft = true;
+    e.preventDefault();
   }
   // S OR DOWN
   else if(keyPressed === 83 || keyPressed === 40) {
     // move character down
     player.moveDown = true;
+    e.preventDefault();
   }
   // D OR RIGHT
   else if(keyPressed === 68 || keyPressed === 39) {
     //move character right
     player.moveRight = true;
+    e.preventDefault();
   }
-  
-  e.preventDefault();
 };
 
 //handler for key up events
@@ -91,15 +97,23 @@ const keyUpHandler = (e) => {
     player.moveRight = false;
   }
 };
+const emptyFunct = () => { };
 
 const doOnMouseMove = (e) => {
   mouse = getMouse(e);
+  cursor.x = mouse.x;
+  cursor.y = mouse.y;
 }
 const doOnMouseDown = (e) => { 
   fire(e);
+  setAnim(cursor, 'click', 'once' );
+  dragging = true;
 }
-const doOnMouseUp = (e) => { }
-const doOnMouseOut = (e) => { }
+const doOnMouseUp = (e) => { 
+  setAnim(cursor, 'click', 'onceReverse', () =>  setAnim(cursor, 'default', 'default'));
+  dragging = false;
+}
+const doOnMouseOut = (e) => { dragging = false }
 
 const stateHandler = () => {
   switch(gameState){
@@ -110,7 +124,7 @@ const stateHandler = () => {
       preloadLoop();
       break;
     case STATES.setupGame:
-      setupGame();
+      startGame();
       break;
     case STATES.title:
       titleLoop();
@@ -122,6 +136,11 @@ const stateHandler = () => {
       gameOverLoop();
       break;
   }
+  
+  if(cursor != undefined){
+    ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
+    playAnim(ctx_overlay ,cursor);
+  } 
   
   animationFrame = requestAnimationFrame(stateHandler);
 }
@@ -135,6 +154,7 @@ const init = () => {
   setupSound();
   
   preloadImages(toLoadImgs, IMAGES);
+  preloadImages(toLoadAnims, ANIMATIONS);
   animationFrame = requestAnimationFrame(stateHandler);
 };
 

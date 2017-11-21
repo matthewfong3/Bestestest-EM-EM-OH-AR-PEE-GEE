@@ -96,6 +96,47 @@ const resetGame = () => {
   bulletArray = [];
 };
 
+const startGame = () => {
+  //assign game key/mouse events
+  setupEvents();
+  
+  console.log('starting up game');
+  
+  //game setup
+  //TODO setup game stuff
+  initEnemies(2);
+  spawnEnemies();
+  
+  //play audio
+  playBgAudio();
+  
+  //go to game loop
+  gameState = STATES.game;
+}; //setup and start the game
+
+const doOnPreloadDone = () => {
+  console.log('done loading images');
+  gameState = STATES.title;
+  assignStartupEvents();
+  
+  cursor = new Sprite({sheet: ANIMATIONS.cursor });
+  setAnim(cursor, 'default', 'default');
+  
+  document.onmousemove = doOnMouseMove;
+  document.onmousedown = doOnMouseDown;
+  document.onmouseup = doOnMouseUp;
+  document.onmouseout = doOnMouseOut;
+};
+
+const suspendPlayerControls = () => {
+  document.onkeydown = undefined;
+  document.onkeyup = undefined;
+}; 
+const restorePlayerControls = () => {
+  document.onkeydown = keyDownHandler;
+  document.onkeyup = keyUpHandler;
+}; 
+
 //--GAME LOOPS---------------------region
 const waitLoop = () => {
   drawWait();
@@ -105,9 +146,8 @@ const waitLoop = () => {
 const preloadLoop = () => {
   //check if images are loaded then go to startup
   if(loadQueue == numLoaded){
-    console.log('done loading images');
-    assignStartupEvents();
-    gameState = STATES.title;
+    //console.log('done loading images');
+    doOnPreloadDone();
     return;
   }
   
@@ -128,6 +168,7 @@ const gameOverLoop = () => {
 
 const gameUpdateLoop = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
   drawPlaceholder();
   

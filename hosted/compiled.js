@@ -525,6 +525,9 @@ var bgAudio = undefined,
 
 var mouse = { x: 0, y: 0 };
 var IMAGES = {};
+var ANIMATIONS = {};
+var cursor = undefined;
+var dragging = false;
 
 var bufferTime = 0;
 var canFire = true;
@@ -539,6 +542,8 @@ var STATES = {
   gameover: 'gameover'
 };
 var gameState = STATES.wait;
+var paused = false,
+    debug = true;
 
 var players = {};
 var bulletArray = [];
@@ -564,24 +569,26 @@ var keyDownHandler = function keyDownHandler(e) {
   if (keyPressed === 87 || keyPressed === 38) {
     // move character up
     player.moveUp = true;
+    e.preventDefault();
   }
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
       // move character left
       player.moveLeft = true;
+      e.preventDefault();
     }
     // S OR DOWN
     else if (keyPressed === 83 || keyPressed === 40) {
         // move character down
         player.moveDown = true;
+        e.preventDefault();
       }
       // D OR RIGHT
       else if (keyPressed === 68 || keyPressed === 39) {
           //move character right
           player.moveRight = true;
+          e.preventDefault();
         }
-
-  e.preventDefault();
 };
 
 //handler for key up events
@@ -610,15 +617,27 @@ var keyUpHandler = function keyUpHandler(e) {
           player.moveRight = false;
         }
 };
+var emptyFunct = function emptyFunct() {};
 
 var doOnMouseMove = function doOnMouseMove(e) {
   mouse = getMouse(e);
+  cursor.x = mouse.x;
+  cursor.y = mouse.y;
 };
 var doOnMouseDown = function doOnMouseDown(e) {
   fire(e);
+  setAnim(cursor, 'click', 'once');
+  dragging = true;
 };
-var doOnMouseUp = function doOnMouseUp(e) {};
-var doOnMouseOut = function doOnMouseOut(e) {};
+var doOnMouseUp = function doOnMouseUp(e) {
+  setAnim(cursor, 'click', 'onceReverse', function () {
+    return setAnim(cursor, 'default', 'default');
+  });
+  dragging = false;
+};
+var doOnMouseOut = function doOnMouseOut(e) {
+  dragging = false;
+};
 
 var stateHandler = function stateHandler() {
   switch (gameState) {
@@ -629,7 +648,7 @@ var stateHandler = function stateHandler() {
       preloadLoop();
       break;
     case STATES.setupGame:
-      setupGame();
+      startGame();
       break;
     case STATES.title:
       titleLoop();
@@ -640,6 +659,11 @@ var stateHandler = function stateHandler() {
     case STATES.gameover:
       gameOverLoop();
       break;
+  }
+
+  if (cursor != undefined) {
+    ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
+    playAnim(ctx_overlay, cursor);
   }
 
   animationFrame = requestAnimationFrame(stateHandler);
@@ -654,6 +678,7 @@ var init = function init() {
   setupSound();
 
   preloadImages(toLoadImgs, IMAGES);
+  preloadImages(toLoadAnims, ANIMATIONS);
   animationFrame = requestAnimationFrame(stateHandler);
 };
 
@@ -674,6 +699,36 @@ var numLoaded = 0;
 var toLoadImgs = [{
   name: 'logo',
   url: 'assets/img/logo.png'
+}];
+
+var toLoadAnims = [{
+  name: 'cursor',
+  url: 'assets/img/cursor.png',
+  animData: {
+    default: {
+      row: 1,
+      cols: 4,
+      total: 4,
+      playSpeed: 16,
+      height: 50,
+      width: 50
+    },
+    availible: {
+      row: 2,
+      cols: 3,
+      playSpeed: 10
+    },
+    unavailible: {
+      row: 3,
+      cols: 3,
+      playSpeed: 10
+    },
+    click: {
+      row: 4,
+      cols: 3,
+      playSpeed: 4
+    }
+  }
 }];
 //endregion
 
@@ -713,6 +768,149 @@ var preloadImages = function preloadImages(imgArr, targetList) {
 };
 //endregion
 
+//--animation/sprites----------------------region
+var Sprite = function Sprite(data) {
+  var sprite = {};
+
+  var sheet = data.sheet;
+  sprite.sheet = sheet;
+  sprite.animData = sheet.animData;
+  sprite.filter = 0;
+  sprite.x = data.x || 0;
+  sprite.y = data.y || 0;
+
+  sprite.width = sheet.animData.default.width || sheet.width / sheet.animData.default.cols;
+  sprite.height = sheet.animData.default.height || sheet.height / sheet.animData.default.total;
+  sprite.z = data.z || 0;
+
+  sprite.frameCount = 0;
+  sprite.frame = 0;
+  sprite.currentAnim = {
+    name: 'default',
+    onDone: emptyFunct
+  };
+  sprite.playSpeed = sheet.animData.default.speed || 14;
+  sprite.playStyle = false;
+
+  sprite.moveUp = false;
+  sprite.moveLeft = false;
+  sprite.moveRight = false;
+  sprite.moveDown = false;
+  sprite.playDir = -1;
+
+  setAnim(sprite, 'default');
+
+  return sprite;
+};
+
+//sets a new animation to play for a sprite
+/* parameters
+anim = animation name (default, walk, attack, etc) *named in to loadAnims
+playstyles:
+once, onceReverse -> play once and stop on last frame
+default, reverse -> play on loop endlessly
+pingPong -> play then play in reverse and repeat
+onDone: for play once playstyles, callback function to call once animation reaches the end
+*/ //anim parameters
+var setAnim = function setAnim(targetSprite, anim, playStyle, onDone) {
+  targetSprite.frameWidth = targetSprite.sheet.width / targetSprite.animData[anim].cols;
+
+  targetSprite.frameHeight = targetSprite.animData[anim].height || targetSprite.height;
+  targetSprite.frameWidth = targetSprite.animData[anim].width || targetSprite.width;
+
+  if (targetSprite.currentAnim.name != anim) targetSprite.frame = 0;
+  targetSprite.row = targetSprite.animData[anim].row;
+  targetSprite.cols = targetSprite.animData[anim].cols;
+  targetSprite.currentAnim.name = anim;
+  targetSprite.playSpeed = targetSprite.animData[anim].playSpeed;
+
+  if (playStyle === 'pingPong') {
+    targetSprite.playStyle = 'pingPong';
+    if (targetSprite.playDir == -1) targetSprite.playDir = 0;
+  } else if (playStyle === 'once') {
+    targetSprite.playStyle = 'once';
+    targetSprite.playDir = 0;
+  } else if (playStyle === 'onceReverse') {
+    targetSprite.playStyle = 'onceReverse';
+    targetSprite.playDir = 1;
+    targetSprite.frame = targetSprite.cols - 1;
+  } else if (playStyle === 'reverse') {
+    targetSprite.playStyle = 'reverse';
+    targetSprite.playDir = 1;
+    targetSprite.frame = targetSprite.cols - 1;
+  }
+
+  targetSprite.currentAnim.onDone = onDone || emptyFunct;
+};
+//play current animation for a ssprite (freeze to suspend frame)
+var playAnim = function playAnim(ctx, targetSprite, freeze) {
+  targetSprite.frameCount++;
+
+  if (freeze) targetSprite.frame = 0;else if (targetSprite.playStyle == 'pingPong') {
+    if (targetSprite.frameCount % targetSprite.playSpeed === 0) {
+
+      if (targetSprite.playDir == 0) {
+        if (targetSprite.frame < targetSprite.cols - 1) {
+          targetSprite.frame++;
+        } else {
+          targetSprite.playDir = 1;
+        }
+      }
+      if (targetSprite.playDir == 1) {
+        if (targetSprite.frame > 0) {
+          targetSprite.frame--;
+        } else {
+          targetSprite.playDir = 0;
+          targetSprite.frame++;
+        }
+      }
+    }
+  } else if (targetSprite.playStyle == 'once' || targetSprite.playStyle == 'onceReverse') {
+    if (targetSprite.frameCount % targetSprite.playSpeed === 0) {
+
+      if (targetSprite.playDir == 0) {
+        if (targetSprite.frame < targetSprite.cols - 1) {
+          targetSprite.frame++;
+        } else if (targetSprite.currentAnim.onDone != emptyFunct) {
+          targetSprite.currentAnim.onDone();
+          targetSprite.currentAnim.onDone = emptyFunct;
+        }
+      }
+      if (targetSprite.playDir == 1) {
+        if (targetSprite.frame > 0) {
+          targetSprite.frame--;
+        } else if (targetSprite.currentAnim.onDone != emptyFunct) {
+          targetSprite.currentAnim.onDone();
+          targetSprite.currentAnim.onDone = emptyFunct;
+        }
+      }
+    }
+  } else if (targetSprite.playStyle == 'reverse') {
+    //switch frames after time
+    if (targetSprite.frameCount % targetSprite.playSpeed === 0) {
+      //move through animation and loop
+      if (targetSprite.frame > 0) {
+        targetSprite.frame--;
+      } else {
+        targetSprite.frame = targetSprite.cols - 1;
+      }
+    }
+  } else {
+    //switch frames after time
+    if (targetSprite.frameCount % targetSprite.playSpeed === 0) {
+      //move through animation and loop
+      if (targetSprite.frame < targetSprite.cols - 1) {
+        targetSprite.frame++;
+      } else {
+        targetSprite.frame = 0;
+      }
+    }
+  }
+
+  ctx.drawImage(targetSprite.sheet.img, targetSprite.frameWidth * targetSprite.frame, targetSprite.height * (targetSprite.row - 1), targetSprite.frameWidth, targetSprite.frameHeight, targetSprite.x, targetSprite.y, targetSprite.frameWidth, targetSprite.frameHeight);
+};
+//endregion
+
 //--sound---------------------------region
 var setupSound = function setupSound() {
   bgAudio = document.querySelector("#bgAudio");
@@ -723,7 +921,8 @@ var setupSound = function setupSound() {
   bgAudio.current = bgTracks.floralLife;
 };
 
-var playBgAudio = function playBgAudio() {
+var playBgAudio = function playBgAudio(reset) {
+  if (reset) bgAudio.currentTime = 0;
   bgAudio.play();
 };
 
@@ -737,9 +936,9 @@ var swapBg = function swapBg(track, reset) {
   bgAudio.play();
 };
 
-var stopBgAudio = function stopBgAudio() {
+var stopBgAudio = function stopBgAudio(reset) {
   bgAudio.pause();
-  bgAudio.currentTime = 0;
+  if (reset) bgAudio.currentTime = 0;
 };
 
 var playEffect = function playEffect() {
@@ -810,22 +1009,26 @@ var setupEvents = function setupEvents() {
 }; //events for gameplay
 
 var assignStartupEvents = function assignStartupEvents() {
-  document.onkeyup = function () {
-    removeStartupEvents();
-    gameState = STATES.setupGame;
-    console.log('setting up game');
-  };
-  canvas_overlay.onmousedown = function () {
-    removeStartupEvents();
-    gameState = STATES.setupGame;
-    console.log('setting up game');
-  };
+  if (gameState === STATES.title) {
+    document.onkeyup = function () {
+      removeStartupEvents();
+      gameState = STATES.setupGame;
+      console.log('setting up game');
+    };
+    canvas_overlay.onmousedown = function () {
+      removeStartupEvents();
+      gameState = STATES.setupGame;
+      console.log('setting up game');
+    };
+  }
   //console.log('assigned pregame keys');
 }; //event to start game
 var removeStartupEvents = function removeStartupEvents() {
   //console.log('removed pregame keys');
-  document.onkeyup = undefined;
-  canvas_overlay.onmousedown = undefined;
+  if (gameState === STATES.title) {
+    document.onkeyup = undefined;
+    canvas_overlay.onmousedown = undefined;
+  }
 }; //remove those events
 //endregion
 'use strict';
@@ -918,6 +1121,47 @@ var resetGame = function resetGame() {
   bulletArray = [];
 };
 
+var startGame = function startGame() {
+  //assign game key/mouse events
+  setupEvents();
+
+  console.log('starting up game');
+
+  //game setup
+  //TODO setup game stuff
+  initEnemies(2);
+  spawnEnemies();
+
+  //play audio
+  playBgAudio();
+
+  //go to game loop
+  gameState = STATES.game;
+}; //setup and start the game
+
+var doOnPreloadDone = function doOnPreloadDone() {
+  console.log('done loading images');
+  gameState = STATES.title;
+  assignStartupEvents();
+
+  cursor = new Sprite({ sheet: ANIMATIONS.cursor });
+  setAnim(cursor, 'default', 'default');
+
+  document.onmousemove = doOnMouseMove;
+  document.onmousedown = doOnMouseDown;
+  document.onmouseup = doOnMouseUp;
+  document.onmouseout = doOnMouseOut;
+};
+
+var suspendPlayerControls = function suspendPlayerControls() {
+  document.onkeydown = undefined;
+  document.onkeyup = undefined;
+};
+var restorePlayerControls = function restorePlayerControls() {
+  document.onkeydown = keyDownHandler;
+  document.onkeyup = keyUpHandler;
+};
+
 //--GAME LOOPS---------------------region
 var waitLoop = function waitLoop() {
   drawWait();
@@ -927,9 +1171,8 @@ var waitLoop = function waitLoop() {
 var preloadLoop = function preloadLoop() {
   //check if images are loaded then go to startup
   if (loadQueue == numLoaded) {
-    console.log('done loading images');
-    assignStartupEvents();
-    gameState = STATES.title;
+    //console.log('done loading images');
+    doOnPreloadDone();
     return;
   }
 
@@ -950,6 +1193,7 @@ var gameOverLoop = function gameOverLoop() {
 
 var gameUpdateLoop = function gameUpdateLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   drawPlaceholder();
 

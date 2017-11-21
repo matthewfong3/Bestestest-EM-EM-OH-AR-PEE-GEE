@@ -23,6 +23,7 @@ header{
 canvas {
   border-radius: 7px;
   border: 1px solid #aaa;
+  cursor: none;
 }
 
 /* start of css for the status/popup window things*/
@@ -41,6 +42,35 @@ canvas {
   padding: 0.5em;
   margin-bottom: 0px;
   color: #efefef;
+}
+.statusWindow .headerBox {
+  display: block;
+  width: 100%;
+  background-color: #9268ef;
+  padding: 0px;
+  margin: 0px;
+  color: #efefef;
+}
+.statusWindow .headerBox .left {
+  display: block;
+  width: 50%;
+  float: left;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+.statusWindow .headerBox .right {
+  display: block;
+  width: 50%;
+  float: right;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+.statusWindow .active{
+
+}
+.statusWindow .inactive{
+  background-color: #baa4ea;
+  color: #393939;
 }
 .statusWindow .status {
   padding: 0.1em;
@@ -71,6 +101,7 @@ canvas {
   top: 50%;   
   left: 50%;
   transform: translate(-50%, -50%);
+  pointer-events: auto; 
 }
 .popupContainer {
   position: relative;
@@ -81,6 +112,7 @@ canvas {
   //background: gray;
   text-align: center;
   vertical-align:  middle;
+  pointer-events: none; 
 }
 /*end of window css*/
 
@@ -125,6 +157,7 @@ canvas {
   width: 100%;
   display: block;
   margin: 0 auto;
+  margin-top: 2em;
   padding: 0.2em;
   padding-left: 20px;
   padding-right: 20px;
