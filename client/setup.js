@@ -32,7 +32,7 @@ const setupGame = () => {
   
   //game setup
   //TODO setup game stuff
-  initEnemies(5);
+  initEnemies(2);
   spawnEnemies();
   
   //play audio

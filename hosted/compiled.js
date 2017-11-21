@@ -51,29 +51,140 @@ var Character = function Character(hash) {
 };
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Enemy = function Enemy() {
-  _classCallCheck(this, Enemy);
+var Enemy = function () {
+  function Enemy() {
+    _classCallCheck(this, Enemy);
 
-  this.lastUpdate = new Date().getTime();
+    this.lastUpdate = new Date().getTime();
 
-  // position variables
-  this.prevX = 0;
-  this.prevY = 0;
-  this.x = 0;
-  this.y = 0;
-  this.destX = 0;
-  this.destY = 0;
+    // position variables
+    this.prevX = 0;
+    this.prevY = 0;
+    this.x = 0;
+    this.y = 0;
+    this.destX = 0;
+    this.destY = 0;
 
-  this.alpha = 0.05;
+    this.alpha = 0.05;
 
-  this.direction = 0;
+    this.direction = 0;
 
-  this.radius = 20;
+    this.radius = 20;
 
-  this.target;
-};
+    this.target;
+
+    this.maxSpeed = 20;
+    this.seeking = true;
+  }
+
+  // methods
+
+
+  _createClass(Enemy, [{
+    key: "seekTarget",
+    value: function seekTarget(players) {
+      var keys = Object.keys(players);
+
+      var location = {
+        x: this.x,
+        y: this.y
+      };
+
+      var shortestDist = getDistance(players[keys[0]], location);
+
+      this.target = players[keys[0]];
+
+      for (var i = 0; i < keys.length; i++) {
+        var distance = getDistance(players[keys[i]], location);
+
+        if (distance < shortestDist) this.target = players[keys[i]];
+      }
+
+      var desired = {
+        x: this.target.x - this.x,
+        y: this.target.y - this.y
+      };
+
+      var mag = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
+
+      var normDesired = {
+        x: desired.x / mag,
+        y: desired.y / mag
+      };
+
+      this.destX = this.x + normDesired.x * this.maxSpeed;
+      this.destY = this.y + normDesired.y * this.maxSpeed;
+      this.prevX = this.x;
+      this.prevY = this.y;
+      this.x = lerp(this.prevX, this.destX, this.alpha);
+      this.y = lerp(this.prevY, this.destY, this.alpha);
+    }
+  }, {
+    key: "seperate",
+    value: function seperate(enemies) {
+      var sepDistance = 50;
+
+      var location = {
+        x: this.x,
+        y: this.y
+      };
+
+      var sum = { x: 0, y: 0 };
+      var count = 0;
+
+      var maxSpeed = 20;
+
+      for (var i = 0; i < enemies.length; i++) {
+        var enemyLoc = {
+          x: enemies[i].x,
+          y: enemies[i].y
+        };
+
+        var distance = getDistance(location, enemyLoc);
+
+        // enemies within safe radius (too close!)
+        if (distance > 0 && distance < sepDistance) {
+          var sepVector = {
+            x: enemies[i].x - location.x,
+            y: enemies[i].y - location.y
+          };
+
+          var mag = Math.sqrt(sepVector.x * sepVector.x + sepVector.y * sepVector.y);
+
+          var normSepVector = {
+            x: sepVector.x / mag,
+            y: sepVector.y / mag
+          };
+
+          sum.x += normSepVector.x;
+          sum.y += normSepVector.y;
+          count++;
+          this.seeking = false;
+        } else {
+          this.seeking = true;
+        }
+      }
+
+      if (count > 0) {
+        sum.x /= count;
+        sum.y /= count;
+
+        this.destX = this.x + sum.x;
+        this.destY = this.y + sum.y;
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.x = lerp(this.prevX, this.destX, this.alpha);
+        this.y = lerp(this.prevY, this.destY, this.alpha);
+      }
+    }
+  }]);
+
+  return Enemy;
+}();
 'use strict';
 
 var drawPlayers = function drawPlayers(time) {
@@ -675,7 +786,7 @@ var setupGame = function setupGame() {
 
   //game setup
   //TODO setup game stuff
-  initEnemies(5);
+  initEnemies(2);
   spawnEnemies();
 
   //play audio
@@ -736,49 +847,6 @@ var spawnEnemies = function spawnEnemies() {
     enemies[i].y = y;
     enemies[i].destX = x;
     enemies[i].destY = y;
-  }
-};
-
-var seekTargets = function seekTargets() {
-  var keys = Object.keys(players);
-
-  for (var i = 0; i < enemies.length; i++) {
-    var shortestDist = getDistance(players[keys[0]], enemies[i]);
-
-    enemies[i].target = players[keys[0]];
-    for (var j = 1; j < keys.length; j++) {
-      var distance = getDistance(players[keys[j]], enemies[i]);
-
-      if (distance < shortestDist) enemies[i].target = players[keys[j]];
-    }
-  }
-
-  //for(let i = 0; i < enemies.length; i++){
-  //  enemies[i].target = players[hash];
-  //}
-};
-
-var moveEnemies = function moveEnemies() {
-  var maxSpeed = 20;
-  for (var i = 0; i < enemies.length; i++) {
-    var desired = {
-      x: enemies[i].target.x - enemies[i].x,
-      y: enemies[i].target.y - enemies[i].y
-    };
-
-    var mag = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
-
-    var normDesired = {
-      x: desired.x / mag,
-      y: desired.y / mag
-    };
-
-    enemies[i].destX = enemies[i].x + normDesired.x * maxSpeed;
-    enemies[i].destY = enemies[i].y + normDesired.y * maxSpeed;
-    enemies[i].prevX = enemies[i].x;
-    enemies[i].prevY = enemies[i].y;
-    enemies[i].x = lerp(enemies[i].prevX, enemies[i].destX, enemies[i].alpha);
-    enemies[i].y = lerp(enemies[i].prevY, enemies[i].destY, enemies[i].alpha);
   }
 };
 
@@ -892,8 +960,11 @@ var gameUpdateLoop = function gameUpdateLoop() {
   move();
 
   // draw enemies
-  seekTargets();
-  moveEnemies();
+  for (var i = 0; i < enemies.length; i++) {
+    enemies[i].seperate(enemies);
+    if (enemies[i].seeking) enemies[i].seekTarget(players);
+  }
+
   drawEnemies();
 
   //move bullets
