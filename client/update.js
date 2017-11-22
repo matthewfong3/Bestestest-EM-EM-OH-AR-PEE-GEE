@@ -20,7 +20,16 @@ const spawnEnemies = () => {
 
 // when we receive character updates from the server
 const update = (data) => {
-  
+  if(isHost){
+    console.log('keys updated');
+    players[data.hash].moveUp = data.input.moveUp;
+    players[data.hash].moveLeft = data.input.moveLeft;
+    players[data.hash].moveDown = data.input.moveDown;
+    players[data.hash].moveRight = data.input.moveRight;
+  } else{
+    console.log('updatedPos');
+    players[data.player.hash] = data.player;
+  }
 };
 
 // 
@@ -33,9 +42,10 @@ const setUser = (data) => {
 };
 
 const setOtherplayers = (data) => {
+  if(data.hash === hash)
+    return;
+  console.log('another user joined');
   players[data.hash] = new Character(data.hash);
-    
-      //requestAnimationFrame(redraw); // start animating;
 };
 
 //do the shooting and send to server
@@ -45,11 +55,14 @@ const shooting = (data) => {
 
 // update this client's position and send to server
 const updatePosition = () => {
-    let plr = players[hash];
-
+  let keys = Object.keys(players);
+  
+  for(let i = 0; i < keys.length; i++){
+    let plr = players[keys[i]];
+    
     plr.prevX = plr.x;
     plr.prevY = plr.y;
-
+  
     if(plr.moveUp && plr.destY - 20 > 0)
     {
         plr.destY -= 2;
@@ -66,28 +79,40 @@ const updatePosition = () => {
     {
         plr.destX += 2;
     }
-
+  
     plr.alpha = 0.05;
     plr.lastUpdate = new Date().getTime();
+    
+    if(plr.alpha < 1)
+    {
+        plr.alpha += 0.05;
+    }
+
+    plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
+    plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
+    
+    socket.emit("updatePos", {player: plr});
+  }    
 };
 
 // move the sphere arround
 const move = () => {
+  let keys = Object.keys(players);
+  //grab each user
+  for(let x =0;x<keys.length;x++)
+  {
+    let plr = players[keys[x]];
 
-    let keys = Object.keys(players);
-    //grab each user
-    for(let x =0;x<keys.length;x++)
+    if(plr.alpha < 1)
     {
-        let plr = players[keys[x]];
-
-        if(plr.alpha < 1)
-        {
-            plr.alpha += 0.05;
-        }
-
-        plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
-        plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
+        plr.alpha += 0.05;
     }
+
+    plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
+    plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
+    
+    socket.emit("updatePos", {player: plr});
+  }
 };
 
 const resetGame = () => {
@@ -171,19 +196,19 @@ const gameUpdateLoop = () => {
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
   drawPlaceholder();
-  
   //check player input
   
   //update game
-  updatePosition();
-  move();
+  if(isHost){
+    updatePosition();
+    //move();
+  }
   
   // draw enemies
   for(let i = 0; i < enemies.length; i++){
     enemies[i].seperate(enemies);
     if(enemies[i].seeking) enemies[i].seekTarget(players);
   }
-  
   drawEnemies();
 
   //move bullets

@@ -589,6 +589,15 @@ var keyDownHandler = function keyDownHandler(e) {
           player.moveRight = true;
           e.preventDefault();
         }
+
+  var input = {
+    moveUp: player.moveUp,
+    moveLeft: player.moveLeft,
+    moveDown: player.moveDown,
+    moveRight: player.moveRight
+  };
+
+  if (!isHost) socket.emit('updateKeys', { hash: hash, input: input });
 };
 
 //handler for key up events
@@ -616,7 +625,17 @@ var keyUpHandler = function keyUpHandler(e) {
           // stop character from moving right
           player.moveRight = false;
         }
+
+  var input = {
+    moveUp: player.moveUp,
+    moveLeft: player.moveLeft,
+    moveDown: player.moveDown,
+    moveRight: player.moveRight
+  };
+
+  if (!isHost) socket.emit('updateKeys', { hash: hash, input: input });
 };
+
 var emptyFunct = function emptyFunct() {};
 
 var doOnMouseMove = function doOnMouseMove(e) {
@@ -966,7 +985,14 @@ var setupCanvas = function setupCanvas() {
 var setupSockets = function setupSockets() {
   socket = io.connect();
 
-  //if this user joins
+  socket.emit('join', {});
+
+  // only runs if it's this user is the first to join a room
+  socket.on('setHost', function () {
+    isHost = true;
+  });
+
+  // once this user successfully joins
   socket.on("joined", function (data) {
     setUser(data);
   });
@@ -975,6 +1001,12 @@ var setupSockets = function setupSockets() {
   socket.on("otherConnects", function (data) {
     setOtherplayers(data);
   });
+
+  // should only run on host client
+  socket.on('updatedKeys', update);
+
+  // should only run on clients that are not the host
+  socket.on('updatedPos', update);
 };
 
 var setupGame = function setupGame() {
@@ -1054,7 +1086,18 @@ var spawnEnemies = function spawnEnemies() {
 };
 
 // when we receive character updates from the server
-var update = function update(data) {};
+var update = function update(data) {
+  if (isHost) {
+    console.log('keys updated');
+    players[data.hash].moveUp = data.input.moveUp;
+    players[data.hash].moveLeft = data.input.moveLeft;
+    players[data.hash].moveDown = data.input.moveDown;
+    players[data.hash].moveRight = data.input.moveRight;
+  } else {
+    console.log('updatedPos');
+    players[data.player.hash] = data.player;
+  }
+};
 
 // 
 var setUser = function setUser(data) {
@@ -1066,9 +1109,9 @@ var setUser = function setUser(data) {
 };
 
 var setOtherplayers = function setOtherplayers(data) {
+  if (data.hash === hash) return;
+  console.log('another user joined');
   players[data.hash] = new Character(data.hash);
-
-  //requestAnimationFrame(redraw); // start animating;
 };
 
 //do the shooting and send to server
@@ -1076,31 +1119,43 @@ var shooting = function shooting(data) {};
 
 // update this client's position and send to server
 var updatePosition = function updatePosition() {
-  var plr = players[hash];
+  var keys = Object.keys(players);
 
-  plr.prevX = plr.x;
-  plr.prevY = plr.y;
+  for (var i = 0; i < keys.length; i++) {
+    var plr = players[keys[i]];
 
-  if (plr.moveUp && plr.destY - 20 > 0) {
-    plr.destY -= 2;
-  }
-  if (plr.moveDown && plr.destY + 20 < canvas.height) {
-    plr.destY += 2;
-  }
-  if (plr.moveLeft && plr.destX - 20 > 0) {
-    plr.destX -= 2;
-  }
-  if (plr.moveRight && plr.destX + 20 < canvas.width) {
-    plr.destX += 2;
-  }
+    plr.prevX = plr.x;
+    plr.prevY = plr.y;
 
-  plr.alpha = 0.05;
-  plr.lastUpdate = new Date().getTime();
+    if (plr.moveUp && plr.destY - 20 > 0) {
+      plr.destY -= 2;
+    }
+    if (plr.moveDown && plr.destY + 20 < canvas.height) {
+      plr.destY += 2;
+    }
+    if (plr.moveLeft && plr.destX - 20 > 0) {
+      plr.destX -= 2;
+    }
+    if (plr.moveRight && plr.destX + 20 < canvas.width) {
+      plr.destX += 2;
+    }
+
+    plr.alpha = 0.05;
+    plr.lastUpdate = new Date().getTime();
+
+    if (plr.alpha < 1) {
+      plr.alpha += 0.05;
+    }
+
+    plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
+    plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
+
+    socket.emit("updatePos", { player: plr });
+  }
 };
 
 // move the sphere arround
 var move = function move() {
-
   var keys = Object.keys(players);
   //grab each user
   for (var x = 0; x < keys.length; x++) {
@@ -1112,6 +1167,8 @@ var move = function move() {
 
     plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
     plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
+
+    socket.emit("updatePos", { player: plr });
   }
 };
 
@@ -1196,19 +1253,19 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   drawPlaceholder();
-
   //check player input
 
   //update game
-  updatePosition();
-  move();
+  if (isHost) {
+    updatePosition();
+    //move();
+  }
 
   // draw enemies
   for (var i = 0; i < enemies.length; i++) {
     enemies[i].seperate(enemies);
     if (enemies[i].seeking) enemies[i].seekTarget(players);
   }
-
   drawEnemies();
 
   //move bullets

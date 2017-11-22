@@ -13,7 +13,14 @@ const setupCanvas = () => {
 const setupSockets = () => {
   socket = io.connect();
   
-  //if this user joins
+  socket.emit('join', {});
+  
+  // only runs if it's this user is the first to join a room
+  socket.on('setHost', () => {
+    isHost = true;
+  });
+  
+  // once this user successfully joins
   socket.on("joined",(data) => {
      setUser(data);
   });
@@ -22,6 +29,12 @@ const setupSockets = () => {
   socket.on("otherConnects",(data) => {
      setOtherplayers(data); 
   });
+  
+  // should only run on host client
+  socket.on('updatedKeys', update);
+  
+  // should only run on clients that are not the host
+  socket.on('updatedPos', update);
 };
 
 const setupGame = () => {

@@ -69,6 +69,15 @@ const keyDownHandler = (e) => {
     player.moveRight = true;
     e.preventDefault();
   }
+  
+  let input = {
+    moveUp: player.moveUp,
+    moveLeft: player.moveLeft,
+    moveDown: player.moveDown,
+    moveRight: player.moveRight
+  };
+  
+  if(!isHost) socket.emit('updateKeys', {hash: hash, input: input});
 };
 
 //handler for key up events
@@ -96,7 +105,17 @@ const keyUpHandler = (e) => {
     // stop character from moving right
     player.moveRight = false;
   }
+  
+  let input = {
+    moveUp: player.moveUp,
+    moveLeft: player.moveLeft,
+    moveDown: player.moveDown,
+    moveRight: player.moveRight
+  };
+  
+  if(!isHost) socket.emit('updateKeys', {hash: hash, input: input});
 };
+
 const emptyFunct = () => { };
 
 const doOnMouseMove = (e) => {
