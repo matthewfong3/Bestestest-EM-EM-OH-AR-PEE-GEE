@@ -7,20 +7,18 @@ const getMouse = (e) => {
 }
 // ----- bullet Stuff --------------------------------------------------
 const fire = (e) => {
-  if(canFire)
-  {
-  let playerPos = {x:players[hash].x,y:players[hash].y};
-  let vector = {x:mouse.x - playerPos.x, y: mouse.y - playerPos.y};
-  let mag = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
-  let normVec = {x:vector.x/mag, y:vector.y/mag};
-  let bullet = new Bullet(playerPos,normVec);
-  bulletArray.push(bullet);
-  canFire = false;
+  if(canFire){
+    let playerPos = {x:players[hash].x,y:players[hash].y};
+    let vector = {x:mouse.x - playerPos.x, y: mouse.y - playerPos.y};
+    let mag = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
+    let normVec = {x:vector.x/mag, y:vector.y/mag};
+    let bullet = new Bullet(playerPos,normVec);
+    bulletArray.push(bullet);
+    canFire = false;
   }
 };
 
 const firecoolDown = () => {
-
     if(canFire == false)
     {
         bufferTime += calculateDT();

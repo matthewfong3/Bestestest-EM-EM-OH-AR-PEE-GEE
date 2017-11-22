@@ -1,3 +1,4 @@
+//-- init & spawn enemies --region
 const initEnemies = (numEnemies) => {
   for(let i = 0; i < numEnemies; i++){
     enemies.push(new Enemy());
@@ -17,6 +18,7 @@ const spawnEnemies = () => {
     enemies[i].destY = y;
   }
 };
+//endregion
 
 // when we receive character updates from the server
 const update = (data) => {
@@ -32,7 +34,7 @@ const update = (data) => {
   }
 };
 
-// 
+//-- set users on connect --region
 const setUser = (data) => {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
   players[hash] = new Character(hash);
@@ -46,7 +48,10 @@ const setOtherplayers = (data) => {
     return;
   console.log('another user joined');
   players[data.hash] = new Character(data.hash);
+  
+  if(isHost) socket.emit('spawnEnemies', {id: data.id, enemies: enemies});
 };
+//endregion
 
 //do the shooting and send to server
 const shooting = (data) => {
@@ -95,26 +100,6 @@ const updatePosition = () => {
   }    
 };
 
-// move the sphere arround
-const move = () => {
-  let keys = Object.keys(players);
-  //grab each user
-  for(let x =0;x<keys.length;x++)
-  {
-    let plr = players[keys[x]];
-
-    if(plr.alpha < 1)
-    {
-        plr.alpha += 0.05;
-    }
-
-    plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
-    plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
-    
-    socket.emit("updatePos", {player: plr});
-  }
-};
-
 const resetGame = () => {
   //game setup
   players = {};
@@ -129,8 +114,11 @@ const startGame = () => {
   
   //game setup
   //TODO setup game stuff
-  initEnemies(2);
-  spawnEnemies();
+  if(isHost){
+    initEnemies(2);
+    spawnEnemies();
+  }
+  
   
   //play audio
   playBgAudio();
@@ -196,26 +184,30 @@ const gameUpdateLoop = () => {
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
   drawPlaceholder();
-  //check player input
   
   //update game
   if(isHost){
+    // updates players movement
     updatePosition();
-    //move();
+    
+    for(let i = 0; i < enemies.length; i++){
+      enemies[i].seperate(enemies);
+      if(enemies[i].seeking) enemies[i].seekTarget(players);
+    }
+    socket.emit('updateEnemies', {enemies: enemies});
   }
   
-  // draw enemies
-  for(let i = 0; i < enemies.length; i++){
-    enemies[i].seperate(enemies);
-    if(enemies[i].seeking) enemies[i].seekTarget(players);
-  }
-  drawEnemies();
+  
 
   //move bullets
   movebullets();
   
-  //draw game
+  
+  // draw enemies
+  drawEnemies();
+  // draw players
   drawPlayers();
+  // draw bullets
   drawBullets();
 
   //update lasttime
@@ -226,8 +218,6 @@ const gameUpdateLoop = () => {
 
   //remove bullet
   OutofBoundbullet();
-  //console.log(bulletArray.length);
-
 };
 
 //endregion

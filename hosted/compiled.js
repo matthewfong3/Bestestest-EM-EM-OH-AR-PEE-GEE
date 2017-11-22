@@ -331,7 +331,6 @@ var fire = function fire(e) {
 };
 
 var firecoolDown = function firecoolDown() {
-
   if (canFire == false) {
     bufferTime += calculateDT();
     if (bufferTime >= 0.5) {
@@ -1007,6 +1006,15 @@ var setupSockets = function setupSockets() {
 
   // should only run on clients that are not the host
   socket.on('updatedPos', update);
+
+  socket.on('spawnedEnemies', function (data) {
+    console.log('received');
+    enemies = data.enemies;
+  });
+
+  socket.on('updatedEnemies', function (data) {
+    enemies = data.enemies;
+  });
 };
 
 var setupGame = function setupGame() {
@@ -1017,8 +1025,6 @@ var setupGame = function setupGame() {
 
   //game setup
   //TODO setup game stuff
-  initEnemies(2);
-  spawnEnemies();
 
   //play audio
   playBgAudio();
@@ -1065,6 +1071,7 @@ var removeStartupEvents = function removeStartupEvents() {
 //endregion
 'use strict';
 
+//-- init & spawn enemies --region
 var initEnemies = function initEnemies(numEnemies) {
   for (var i = 0; i < numEnemies; i++) {
     enemies.push(new Enemy());
@@ -1084,6 +1091,7 @@ var spawnEnemies = function spawnEnemies() {
     enemies[i].destY = y;
   }
 };
+//endregion
 
 // when we receive character updates from the server
 var update = function update(data) {
@@ -1099,7 +1107,7 @@ var update = function update(data) {
   }
 };
 
-// 
+//-- set users on connect --region
 var setUser = function setUser(data) {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
   players[hash] = new Character(hash);
@@ -1112,7 +1120,10 @@ var setOtherplayers = function setOtherplayers(data) {
   if (data.hash === hash) return;
   console.log('another user joined');
   players[data.hash] = new Character(data.hash);
+
+  if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: enemies });
 };
+//endregion
 
 //do the shooting and send to server
 var shooting = function shooting(data) {};
@@ -1154,24 +1165,6 @@ var updatePosition = function updatePosition() {
   }
 };
 
-// move the sphere arround
-var move = function move() {
-  var keys = Object.keys(players);
-  //grab each user
-  for (var x = 0; x < keys.length; x++) {
-    var plr = players[keys[x]];
-
-    if (plr.alpha < 1) {
-      plr.alpha += 0.05;
-    }
-
-    plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
-    plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
-
-    socket.emit("updatePos", { player: plr });
-  }
-};
-
 var resetGame = function resetGame() {
   //game setup
   players = {};
@@ -1186,8 +1179,10 @@ var startGame = function startGame() {
 
   //game setup
   //TODO setup game stuff
-  initEnemies(2);
-  spawnEnemies();
+  if (isHost) {
+    initEnemies(2);
+    spawnEnemies();
+  }
 
   //play audio
   playBgAudio();
@@ -1253,26 +1248,27 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   drawPlaceholder();
-  //check player input
 
   //update game
   if (isHost) {
+    // updates players movement
     updatePosition();
-    //move();
-  }
 
-  // draw enemies
-  for (var i = 0; i < enemies.length; i++) {
-    enemies[i].seperate(enemies);
-    if (enemies[i].seeking) enemies[i].seekTarget(players);
+    for (var i = 0; i < enemies.length; i++) {
+      enemies[i].seperate(enemies);
+      if (enemies[i].seeking) enemies[i].seekTarget(players);
+    }
+    socket.emit('updateEnemies', { enemies: enemies });
   }
-  drawEnemies();
 
   //move bullets
   movebullets();
 
-  //draw game
+  // draw enemies
+  drawEnemies();
+  // draw players
   drawPlayers();
+  // draw bullets
   drawBullets();
 
   //update lasttime
@@ -1283,7 +1279,6 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   //remove bullet
   OutofBoundbullet();
-  //console.log(bulletArray.length);
 };
 
 //endregion

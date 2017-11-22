@@ -33,7 +33,7 @@ const setupSockets = (ioServer) => {
       }
 
       socket.emit('joined', { hash });
-      socket.broadcast.emit('otherConnects', { hash });
+      socket.broadcast.emit('otherConnects', { hash, id: socket.id });
       if (roomMember === 4) {
         roomMember = 0;
         roomNum++;
@@ -41,12 +41,22 @@ const setupSockets = (ioServer) => {
       roomMember++;
     });
 
-    socket.on('updateKeys', (data) => {   
+    // server listens to non-host clients for key updates and sends them to host client
+    socket.on('updateKeys', (data) => {
       io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedKeys', data);
     });
 
+    // server listens to host client for player position updates and sends them to non-host clients
     socket.on('updatePos', (data) => {
       socket.broadcast.emit('updatedPos', data);
+    });
+
+    socket.on('spawnEnemies', (data) => {
+      io.sockets.connected[data.id].emit('spawnedEnemies', data);
+    });
+
+    socket.on('updateEnemies', (data) => {
+      socket.broadcast.emit('updatedEnemies', data);
     });
 
     socket.on('disconnect', () => {

@@ -35,6 +35,15 @@ const setupSockets = () => {
   
   // should only run on clients that are not the host
   socket.on('updatedPos', update);
+  
+  socket.on('spawnedEnemies', (data) => {
+    console.log('received');
+    enemies = data.enemies;
+  });
+  
+  socket.on('updatedEnemies', (data) => {
+    enemies = data.enemies;
+  });
 };
 
 const setupGame = () => {
@@ -45,8 +54,6 @@ const setupGame = () => {
   
   //game setup
   //TODO setup game stuff
-  initEnemies(2);
-  spawnEnemies();
   
   //play audio
   playBgAudio();
