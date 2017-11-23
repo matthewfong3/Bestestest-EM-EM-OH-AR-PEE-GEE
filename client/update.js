@@ -195,13 +195,25 @@ const gameUpdateLoop = () => {
       if(enemies[i].seeking) enemies[i].seekTarget(players);
     }
     socket.emit('updateEnemies', {enemies: enemies});
+    
+    // constantly check if other client's fired a bullet
+    // if so, add a new bullet to bulletArray
+    otherClientFire();
+    // calc other client's fire cooldown
+    otherClientFireCD();
+ 
+    //move bullets
+    movebullets();
+    
+    //update lasttime
+    lastTime = performance.now();
+    
+    //bullet firing cooldown
+    firecoolDown();
+  
+    //remove bullet
+    OutofBoundbullet();
   }
-  
-  
-
-  //move bullets
-  movebullets();
-  
   
   // draw enemies
   drawEnemies();
@@ -209,15 +221,6 @@ const gameUpdateLoop = () => {
   drawPlayers();
   // draw bullets
   drawBullets();
-
-  //update lasttime
-  lastTime = performance.now();
-
-  //bullet firing cooldown
-  firecoolDown();
-
-  //remove bullet
-  OutofBoundbullet();
 };
 
 //endregion

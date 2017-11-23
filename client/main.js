@@ -124,7 +124,10 @@ const doOnMouseMove = (e) => {
   cursor.y = mouse.y;
 }
 const doOnMouseDown = (e) => { 
-  fire(e);
+  if(isHost) fire(e);
+  else {
+    socket.emit('updateFire', {canFire: canFire, mouse: mouse, bufferTime: bufferTime});
+  }
   setAnim(cursor, 'click', 'once' );
   dragging = true;
 }

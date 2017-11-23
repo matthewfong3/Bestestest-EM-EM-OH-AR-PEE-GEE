@@ -10,6 +10,8 @@ const setupCanvas = () => {
   width = canvas.width;
   height = canvas.height;
 };
+
+const playersProps = {};
 const setupSockets = () => {
   socket = io.connect();
   
@@ -33,8 +35,23 @@ const setupSockets = () => {
   // should only run on host client
   socket.on('updatedKeys', update);
   
+  socket.on('updatedFire', (data) => {
+    playersProps[data.hash] = data;
+    //console.log(playersProps[data.hash]);
+  });
+  
   // should only run on clients that are not the host
   socket.on('updatedPos', update);
+  
+  socket.on('updatedFireProps', (data) => {
+    canFire = data.canFire;
+    console.log('receveied: ' + canFire);
+  });
+  
+  socket.on('updatedBullets', (data) => {
+    bulletArray = data.bulletArray;
+    console.log(bulletArray.length);
+  });
   
   socket.on('spawnedEnemies', (data) => {
     console.log('received');

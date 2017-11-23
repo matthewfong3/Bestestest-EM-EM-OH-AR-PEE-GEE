@@ -5,7 +5,7 @@ const getMouse = (e) => {
       y: e.clientY - offset.top
     };
 }
-// ----- bullet Stuff --------------------------------------------------
+// ----- bullet Stuff (host)--------------------------------------------------region
 const fire = (e) => {
   if(canFire){
     let playerPos = {x:players[hash].x,y:players[hash].y};
@@ -19,30 +19,31 @@ const fire = (e) => {
 };
 
 const firecoolDown = () => {
-    if(canFire == false)
+  if(canFire == false)
+  {
+    bufferTime += calculateDT();
+    if(bufferTime >= 0.5)
     {
-        bufferTime += calculateDT();
-        if(bufferTime >= 0.5)
-        {
-          canFire = true;
-          bufferTime = 0;
-        }
+      canFire = true;
+      bufferTime = 0;
     }
+  }
 }
 
 const movebullets = () => {
-    for(let i =0; i < bulletArray.length; i ++)
-    {
-       let bullet = bulletArray[i];
-       bullet.destX = bullet.x + (bullet.bulletSpeed * bullet.direction.x);
-       bullet.destY = bullet.y + (bullet.bulletSpeed * bullet.direction.y);
-       bullet.alpha = 0.05;
-       bullet.prevX = bullet.x;
-       bullet.prevY = bullet.y;
-       bullet.x = lerp(bullet.x,bullet.destX,bullet.alpha);
-       bullet.y = lerp(bullet.y,bullet.destY,bullet.alpha);
-       //bullet.alpha += 0.05;
-    }
+  for(let i =0; i < bulletArray.length; i ++)
+  {
+    let bullet = bulletArray[i];
+    bullet.destX = bullet.x + (bullet.bulletSpeed * bullet.direction.x);
+    bullet.destY = bullet.y + (bullet.bulletSpeed * bullet.direction.y);
+    bullet.alpha = 0.05;
+    bullet.prevX = bullet.x;
+    bullet.prevY = bullet.y;
+    bullet.x = lerp(bullet.prevX,bullet.destX,bullet.alpha);
+    bullet.y = lerp(bullet.prevY,bullet.destY,bullet.alpha);
+    //bullet.alpha += 0.05;
+  }
+  socket.emit('updateBullets', {bulletArray: bulletArray});
 };
 
 const OutofBoundbullet = () => {
@@ -52,11 +53,49 @@ const OutofBoundbullet = () => {
       if(bullet.x > canvas_overlay.width || bullet.x < 0 || bullet.y > canvas_overlay.height || bullet.y < 0)
       {
         bulletArray.splice(i,1);
+        socket.emit('updateBullets', {bulletArray: bulletArray});
       }
   }
 }
 
-// -----------------------------------------------------------------
+// -----------------------------------------------------------------endregion
+
+// -- fire logic for other clients that only host will calculate ----- region
+const otherClientFire = () => {
+  let keys = Object.keys(playersProps);
+  
+  for(let i = 0; i < keys.length; i++){
+    if(playersProps[keys[i]].canFire){
+      let playerPos = {x:players[playersProps[keys[i]].hash].x,y:players[playersProps[keys[i]].hash].y};
+      let vector = {x:playersProps[keys[i]].mouse.x - playerPos.x, y: playersProps[keys[i]].mouse.y - playerPos.y};
+      let mag = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
+      let normVec = {x:vector.x/mag, y:vector.y/mag};
+      let bullet = new Bullet(playerPos,normVec);
+      bulletArray.push(bullet);
+      playersProps[keys[i]].canFire = false;
+      socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+    }
+  }
+};
+
+const otherClientFireCD = () => {
+  let keys = Object.keys(playersProps);
+  
+  for(let i = 0; i < keys.length; i++){
+    if(playersProps[keys[i]].canFire == false)
+    {
+      playersProps[keys[i]].bufferTime += calculateDT();
+      if(playersProps[keys[i]].bufferTime >= 0.5)
+      {
+        playersProps[keys[i]].canFire = true;
+        playersProps[keys[i]].bufferTime = 0;
+        socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+        delete playersProps[keys[i]];
+      }
+    }
+  }
+};
+//endregion
 
 const lerp = (v0, v1, alpha) => {
   return (1 - alpha) * v0 + alpha * v1;

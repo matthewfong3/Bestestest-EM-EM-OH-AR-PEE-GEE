@@ -8,7 +8,7 @@ class Bullet {
     this.destX = characterpoint.x;
     this.destY = characterpoint.y;
     this.alpha = 0.05;
-    this.bulletSpeed = 40;
+    this.bulletSpeed = 60;
     this.radius = 10;
     this.style = "yellow";
     //need to work on this

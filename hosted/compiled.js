@@ -13,7 +13,7 @@ var Bullet = function Bullet(characterpoint, direction) {
     this.destX = characterpoint.x;
     this.destY = characterpoint.y;
     this.alpha = 0.05;
-    this.bulletSpeed = 40;
+    this.bulletSpeed = 60;
     this.radius = 10;
     this.style = "yellow";
     //need to work on this
@@ -317,7 +317,7 @@ var getMouse = function getMouse(e) {
     y: e.clientY - offset.top
   };
 };
-// ----- bullet Stuff --------------------------------------------------
+// ----- bullet Stuff (host)--------------------------------------------------region
 var fire = function fire(e) {
   if (canFire) {
     var playerPos = { x: players[hash].x, y: players[hash].y };
@@ -348,10 +348,11 @@ var movebullets = function movebullets() {
     bullet.alpha = 0.05;
     bullet.prevX = bullet.x;
     bullet.prevY = bullet.y;
-    bullet.x = lerp(bullet.x, bullet.destX, bullet.alpha);
-    bullet.y = lerp(bullet.y, bullet.destY, bullet.alpha);
+    bullet.x = lerp(bullet.prevX, bullet.destX, bullet.alpha);
+    bullet.y = lerp(bullet.prevY, bullet.destY, bullet.alpha);
     //bullet.alpha += 0.05;
   }
+  socket.emit('updateBullets', { bulletArray: bulletArray });
 };
 
 var OutofBoundbullet = function OutofBoundbullet() {
@@ -359,11 +360,47 @@ var OutofBoundbullet = function OutofBoundbullet() {
     var bullet = bulletArray[i];
     if (bullet.x > canvas_overlay.width || bullet.x < 0 || bullet.y > canvas_overlay.height || bullet.y < 0) {
       bulletArray.splice(i, 1);
+      socket.emit('updateBullets', { bulletArray: bulletArray });
     }
   }
 };
 
-// -----------------------------------------------------------------
+// -----------------------------------------------------------------endregion
+
+// -- fire logic for other clients that only host will calculate ----- region
+var otherClientFire = function otherClientFire() {
+  var keys = Object.keys(playersProps);
+
+  for (var i = 0; i < keys.length; i++) {
+    if (playersProps[keys[i]].canFire) {
+      var playerPos = { x: players[playersProps[keys[i]].hash].x, y: players[playersProps[keys[i]].hash].y };
+      var vector = { x: playersProps[keys[i]].mouse.x - playerPos.x, y: playersProps[keys[i]].mouse.y - playerPos.y };
+      var mag = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+      var normVec = { x: vector.x / mag, y: vector.y / mag };
+      var bullet = new Bullet(playerPos, normVec);
+      bulletArray.push(bullet);
+      playersProps[keys[i]].canFire = false;
+      socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
+    }
+  }
+};
+
+var otherClientFireCD = function otherClientFireCD() {
+  var keys = Object.keys(playersProps);
+
+  for (var i = 0; i < keys.length; i++) {
+    if (playersProps[keys[i]].canFire == false) {
+      playersProps[keys[i]].bufferTime += calculateDT();
+      if (playersProps[keys[i]].bufferTime >= 0.5) {
+        playersProps[keys[i]].canFire = true;
+        playersProps[keys[i]].bufferTime = 0;
+        socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
+        delete playersProps[keys[i]];
+      }
+    }
+  }
+};
+//endregion
 
 var lerp = function lerp(v0, v1, alpha) {
   return (1 - alpha) * v0 + alpha * v1;
@@ -643,7 +680,9 @@ var doOnMouseMove = function doOnMouseMove(e) {
   cursor.y = mouse.y;
 };
 var doOnMouseDown = function doOnMouseDown(e) {
-  fire(e);
+  if (isHost) fire(e);else {
+    socket.emit('updateFire', { canFire: canFire, mouse: mouse, bufferTime: bufferTime });
+  }
   setAnim(cursor, 'click', 'once');
   dragging = true;
 };
@@ -981,6 +1020,8 @@ var setupCanvas = function setupCanvas() {
   width = canvas.width;
   height = canvas.height;
 };
+
+var playersProps = {};
 var setupSockets = function setupSockets() {
   socket = io.connect();
 
@@ -1004,8 +1045,23 @@ var setupSockets = function setupSockets() {
   // should only run on host client
   socket.on('updatedKeys', update);
 
+  socket.on('updatedFire', function (data) {
+    playersProps[data.hash] = data;
+    //console.log(playersProps[data.hash]);
+  });
+
   // should only run on clients that are not the host
   socket.on('updatedPos', update);
+
+  socket.on('updatedFireProps', function (data) {
+    canFire = data.canFire;
+    console.log('receveied: ' + canFire);
+  });
+
+  socket.on('updatedBullets', function (data) {
+    bulletArray = data.bulletArray;
+    console.log(bulletArray.length);
+  });
 
   socket.on('spawnedEnemies', function (data) {
     console.log('received');
@@ -1259,10 +1315,25 @@ var gameUpdateLoop = function gameUpdateLoop() {
       if (enemies[i].seeking) enemies[i].seekTarget(players);
     }
     socket.emit('updateEnemies', { enemies: enemies });
-  }
 
-  //move bullets
-  movebullets();
+    // constantly check if other client's fired a bullet
+    // if so, add a new bullet to bulletArray
+    otherClientFire();
+    // calc other client's fire cooldown
+    otherClientFireCD();
+
+    //move bullets
+    movebullets();
+
+    //update lasttime
+    lastTime = performance.now();
+
+    //bullet firing cooldown
+    firecoolDown();
+
+    //remove bullet
+    OutofBoundbullet();
+  }
 
   // draw enemies
   drawEnemies();
@@ -1270,15 +1341,6 @@ var gameUpdateLoop = function gameUpdateLoop() {
   drawPlayers();
   // draw bullets
   drawBullets();
-
-  //update lasttime
-  lastTime = performance.now();
-
-  //bullet firing cooldown
-  firecoolDown();
-
-  //remove bullet
-  OutofBoundbullet();
 };
 
 //endregion
