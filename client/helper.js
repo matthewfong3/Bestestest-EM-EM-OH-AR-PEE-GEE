@@ -4,7 +4,7 @@ const getMouse = (e) => {
       x: e.clientX - offset.left,
       y: e.clientY - offset.top
     };
-}
+};
 // ----- bullet Stuff (host)--------------------------------------------------region
 const fire = (e) => {
   if(canFire){
@@ -28,7 +28,7 @@ const firecoolDown = () => {
       bufferTime = 0;
     }
   }
-}
+};
 
 const movebullets = () => {
   for(let i =0; i < bulletArray.length; i ++)
@@ -56,7 +56,7 @@ const OutofBoundbullet = () => {
         socket.emit('updateBullets', {bulletArray: bulletArray});
       }
   }
-}
+};
 
 // -----------------------------------------------------------------endregion
 
@@ -112,7 +112,7 @@ const calculateDT = () =>{
 
 const clampValue = (value, min, max) => {
   return Math.max(min, Math.min(max, value));
-}
+};
 
 const getRandomRange = (min, max) => {
   return Math.random() * (max - min) + min;
@@ -122,7 +122,7 @@ const getDistance = (c1, c2) => {
   let dx = c2.x - c1.x;
   let dy = c2.y - c1.y;
   return Math.sqrt(dx * dx + dy * dy);
-}
+};
 
 //--collision---------------------------------------
 //check if point is in square [box]: {x, y, height, width}
@@ -144,6 +144,21 @@ const isInCircle = (point, circle) =>{
 const circlesIntersect = (c1, c2) => {
     var distance = getDistance(c1, c2);
     return distance < c1.radius + c2.radius;
+};
+
+const checkCollisions = (arr1, arr2) => {
+  for(let i = 0; i < arr1.length; i++){
+    for(let j = 0; j < arr2.length; j++){
+      if(arr1[i] && arr2[j]){
+        if(circlesIntersect(arr1[i], arr2[j])){
+          console.log('collision b/w bullet and enemy detected');
+          arr1.splice(i, 1);
+          // deal dmg to enemy here
+          socket.emit('updateBullets', {bulletArray: arr1});
+        }
+      }
+    }
+  }
 };
 
 //--draw--------------------------------------------

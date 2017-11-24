@@ -451,6 +451,21 @@ var circlesIntersect = function circlesIntersect(c1, c2) {
   return distance < c1.radius + c2.radius;
 };
 
+var checkCollisions = function checkCollisions(arr1, arr2) {
+  for (var i = 0; i < arr1.length; i++) {
+    for (var j = 0; j < arr2.length; j++) {
+      if (arr1[i] && arr2[j]) {
+        if (circlesIntersect(arr1[i], arr2[j])) {
+          console.log('collision b/w bullet and enemy detected');
+          arr1.splice(i, 1);
+          // deal dmg to enemy here
+          socket.emit('updateBullets', { bulletArray: arr1 });
+        }
+      }
+    }
+  }
+};
+
 //--draw--------------------------------------------
 var fillText = function fillText(targetCtx, string, x, y, font, color, center) {
   targetCtx.save();
@@ -1055,16 +1070,15 @@ var setupSockets = function setupSockets() {
 
   socket.on('updatedFireProps', function (data) {
     canFire = data.canFire;
-    console.log('receveied: ' + canFire);
+    //console.log('receveied: ' + canFire);
   });
 
   socket.on('updatedBullets', function (data) {
     bulletArray = data.bulletArray;
-    console.log(bulletArray.length);
   });
 
   socket.on('spawnedEnemies', function (data) {
-    console.log('received');
+    //console.log('received');
     enemies = data.enemies;
   });
 
@@ -1152,13 +1166,13 @@ var spawnEnemies = function spawnEnemies() {
 // when we receive character updates from the server
 var update = function update(data) {
   if (isHost) {
-    console.log('keys updated');
+    //console.log('keys updated');
     players[data.hash].moveUp = data.input.moveUp;
     players[data.hash].moveLeft = data.input.moveLeft;
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else {
-    console.log('updatedPos');
+    //console.log('updatedPos');
     players[data.player.hash] = data.player;
   }
 };
@@ -1333,6 +1347,11 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
     //remove bullet
     OutofBoundbullet();
+
+    // check collisions b/w bullets and enemies
+    checkCollisions(bulletArray, enemies);
+
+    // check collisions b/w characters (players) and enemies
   }
 
   // draw enemies

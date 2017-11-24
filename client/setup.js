@@ -45,16 +45,15 @@ const setupSockets = () => {
   
   socket.on('updatedFireProps', (data) => {
     canFire = data.canFire;
-    console.log('receveied: ' + canFire);
+    //console.log('receveied: ' + canFire);
   });
   
   socket.on('updatedBullets', (data) => {
     bulletArray = data.bulletArray;
-    console.log(bulletArray.length);
   });
   
   socket.on('spawnedEnemies', (data) => {
-    console.log('received');
+    //console.log('received');
     enemies = data.enemies;
   });
   

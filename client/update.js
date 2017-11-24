@@ -23,13 +23,13 @@ const spawnEnemies = () => {
 // when we receive character updates from the server
 const update = (data) => {
   if(isHost){
-    console.log('keys updated');
+    //console.log('keys updated');
     players[data.hash].moveUp = data.input.moveUp;
     players[data.hash].moveLeft = data.input.moveLeft;
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else{
-    console.log('updatedPos');
+    //console.log('updatedPos');
     players[data.player.hash] = data.player;
   }
 };
@@ -213,6 +213,12 @@ const gameUpdateLoop = () => {
   
     //remove bullet
     OutofBoundbullet();
+    
+    // check collisions b/w bullets and enemies
+    checkCollisions(bulletArray, enemies);
+    
+    // check collisions b/w characters (players) and enemies
+    
   }
   
   // draw enemies
