@@ -218,7 +218,7 @@ const gameUpdateLoop = () => {
     checkCollisions(bulletArray, enemies);
     
     // check collisions b/w characters (players) and enemies
-    
+    checkCollisionsPlayersVEnemies(players, enemies);
   }
   
   // draw enemies

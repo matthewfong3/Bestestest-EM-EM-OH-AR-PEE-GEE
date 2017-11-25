@@ -60,6 +60,10 @@ const setupSockets = () => {
   socket.on('updatedEnemies', (data) => {
     enemies = data.enemies;
   });
+  
+  socket.on('playerCollided', () => {
+    console.log('received: player collision detected with enemy');
+  });
 };
 
 const setupGame = () => {

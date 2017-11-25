@@ -47,11 +47,9 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('updateFire', (data) => {
-      // data.hash = socket.hash; // set an extra property for host to reference back
-      // data.id = socket.id;     // set an extra property for server to reference back
       const newData = {
-        hash: socket.hash,
-        id: socket.id,
+        hash: socket.hash, // set an extra property for host to reference back
+        id: socket.id, // set an extra property for server to reference back
         canFire: data.canFire,
         mouse: data.mouse,
         bufferTime: data.bufferTime,
@@ -78,6 +76,10 @@ const setupSockets = (ioServer) => {
 
     socket.on('updateBullets', (data) => {
       socket.broadcast.emit('updatedBullets', data);
+    });
+
+    socket.on('playerCollide', () => {
+      socket.broadcast.emit('playerCollided', {});
     });
 
     socket.on('disconnect', () => {

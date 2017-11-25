@@ -451,6 +451,7 @@ var circlesIntersect = function circlesIntersect(c1, c2) {
   return distance < c1.radius + c2.radius;
 };
 
+// check collision method for bullet and enemies
 var checkCollisions = function checkCollisions(arr1, arr2) {
   for (var i = 0; i < arr1.length; i++) {
     for (var j = 0; j < arr2.length; j++) {
@@ -461,6 +462,20 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
           // deal dmg to enemy here
           socket.emit('updateBullets', { bulletArray: arr1 });
         }
+      }
+    }
+  }
+};
+
+var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plrObj, array) {
+  var keys = Object.keys(plrObj);
+
+  for (var i = 0; i < keys.length; i++) {
+    for (var j = 0; j < array.length; j++) {
+      if (circlesIntersect(plrObj[keys[i]], array[j])) {
+        console.log('collision b/w character and enemy detected');
+
+        socket.emit('playerCollide', {});
       }
     }
   }
@@ -1085,6 +1100,10 @@ var setupSockets = function setupSockets() {
   socket.on('updatedEnemies', function (data) {
     enemies = data.enemies;
   });
+
+  socket.on('playerCollided', function () {
+    console.log('received: player collision detected with enemy');
+  });
 };
 
 var setupGame = function setupGame() {
@@ -1352,6 +1371,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
     checkCollisions(bulletArray, enemies);
 
     // check collisions b/w characters (players) and enemies
+    checkCollisionsPlayersVEnemies(players, enemies);
   }
 
   // draw enemies

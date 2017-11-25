@@ -146,6 +146,7 @@ const circlesIntersect = (c1, c2) => {
     return distance < c1.radius + c2.radius;
 };
 
+// check collision method for bullet and enemies
 const checkCollisions = (arr1, arr2) => {
   for(let i = 0; i < arr1.length; i++){
     for(let j = 0; j < arr2.length; j++){
@@ -159,6 +160,21 @@ const checkCollisions = (arr1, arr2) => {
       }
     }
   }
+};
+
+const checkCollisionsPlayersVEnemies = (plrObj, array) => {
+  let keys = Object.keys(plrObj);
+  
+  for(let i = 0; i < keys.length; i++){
+    for(let j = 0; j < array.length; j++){
+      if(circlesIntersect(plrObj[keys[i]], array[j])){
+        console.log('collision b/w character and enemy detected');
+        
+        socket.emit('playerCollide', {});
+      }
+    }
+  }
+  
 };
 
 //--draw--------------------------------------------
