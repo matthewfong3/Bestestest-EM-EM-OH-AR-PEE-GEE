@@ -14,6 +14,9 @@ let bufferTime = 0;
 let canFire = true;
 let lastTime;
 
+let startButton;
+let selectButton;
+
 let STATES = {
   wait: 'wait',
   preload: 'preload',
@@ -21,6 +24,7 @@ let STATES = {
   setupGame: 'setupGame',
   game: 'game',
   gameover: 'gameover',
+  characterSelect: 'characterSelect',
 };
 let gameState = STATES.wait;
 let paused = false, debug = true;
@@ -150,6 +154,9 @@ const stateHandler = () => {
       break;
     case STATES.title:
       titleLoop();
+      break;
+    case STATES.characterSelect:
+      characterSelectLoop();
       break;
     case STATES.game:
       gameUpdateLoop();

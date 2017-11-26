@@ -221,10 +221,12 @@ const drawRoundedRect = (x, y, w, h, amt, targetCtx, stroke) => {
 
 //draw a ui (top-canvas) button [button]: {x, y, height, width}
 const drawButton = (button, text, color) => {
-  ctx_top.fillStyle = color || button.color;
-  ctx_top.lineWidth = 1.5;
-  drawRoundedRect(button.x, button.y, button.width,button.height, 3, ctx_top, true);
-  fillText(ctx_top, text || button.text, button.x+button.width/2, button.y+button.height/2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true ); 
+  ctx.save();
+  ctx.fillStyle = color || button.color;
+  ctx.lineWidth = 1.5;
+  drawRoundedRect(button.x, button.y, button.width,button.height, 3, ctx, true);
+  fillText(ctx, text || button.text, button.x+button.width/2, button.y+button.height/2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true ); 
+  ctx.restore();
 };
 
 function wrapText(context, text, x, y, maxWidth, lineHeight) {  
@@ -259,4 +261,16 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
   context.fillRect(x-5, starty, 3, totalheight);
   
   return totalheight;
+}
+
+
+const buttonTap = (button) => {
+      if(cursor.x > button.x && cursor.x < (button.x + button.width) && cursor.y > button.y && cursor.y < (button.y + button.height))
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
 }

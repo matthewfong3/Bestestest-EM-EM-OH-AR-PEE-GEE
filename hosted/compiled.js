@@ -23,6 +23,18 @@ var Bullet = function Bullet(characterpoint, direction) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var button = function button(x, y) {
+    _classCallCheck(this, button);
+
+    this.x = x;
+    this.y = y;
+    this.width = 200;
+    this.height = 50;
+};
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var Character = function Character(hash) {
   _classCallCheck(this, Character);
 
@@ -288,9 +300,31 @@ var drawTitle = function drawTitle() {
   ctx.font = '30pt Courier';
   ctx.fillText('Besteststs MMORPG evar', canvas.width / 2, canvas.height / 2 - 10);
   ctx.font = '15pt Courier';
-  ctx.fillText('- Click or press any button to play! -', canvas.width / 2, canvas.height / 2 + 40);
+  //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
+  drawButton(startButton, "Start", "Color");
   ctx.drawImage(IMAGES.logo.img, canvas.width / 2 - 25, canvas.height / 2 - 100);
 }; //app title screen
+
+var drawCharacterselect = function drawCharacterselect() {
+  ctx.fillStyle = 'grey';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'white';
+  ctx.font = '30pt Courier';
+  ctx.fillText('Select your Character', canvas.width / 2, canvas.height * .10);
+  ctx.font = '15pt Courier';
+  //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
+  drawButton(startButton, "Choose", "Color");
+  ctx.fillStyle = 'white';
+  ctx.fillRect(canvas.width * .1, 150, 150, 300);
+  ctx.fillRect(canvas.width * .32, 150, 150, 300);
+  ctx.fillRect(canvas.width * .54, 150, 150, 300);
+  ctx.fillRect(canvas.width * .75, 150, 150, 300);
+  //ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
+
+}; //character select screen, more of a template right now 
 
 var drawGameOver = function drawGameOver() {
   ctx.fillStyle = 'black';
@@ -529,10 +563,12 @@ var drawRoundedRect = function drawRoundedRect(x, y, w, h, amt, targetCtx, strok
 
 //draw a ui (top-canvas) button [button]: {x, y, height, width}
 var drawButton = function drawButton(button, text, color) {
-  ctx_top.fillStyle = color || button.color;
-  ctx_top.lineWidth = 1.5;
-  drawRoundedRect(button.x, button.y, button.width, button.height, 3, ctx_top, true);
-  fillText(ctx_top, text || button.text, button.x + button.width / 2, button.y + button.height / 2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true);
+  ctx.save();
+  ctx.fillStyle = color || button.color;
+  ctx.lineWidth = 1.5;
+  drawRoundedRect(button.x, button.y, button.width, button.height, 3, ctx, true);
+  fillText(ctx, text || button.text, button.x + button.width / 2, button.y + button.height / 2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true);
+  ctx.restore();
 };
 
 function wrapText(context, text, x, y, maxWidth, lineHeight) {
@@ -566,6 +602,14 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
 
   return totalheight;
 }
+
+var buttonTap = function buttonTap(button) {
+  if (cursor.x > button.x && cursor.x < button.x + button.width && cursor.y > button.y && cursor.y < button.y + button.height) {
+    return true;
+  } else {
+    return false;
+  }
+};
 'use strict';
 
 var canvas = void 0,
@@ -599,13 +643,17 @@ var bufferTime = 0;
 var canFire = true;
 var lastTime = void 0;
 
+var startButton = void 0;
+var selectButton = void 0;
+
 var STATES = {
   wait: 'wait',
   preload: 'preload',
   title: 'title',
   setupGame: 'setupGame',
   game: 'game',
-  gameover: 'gameover'
+  gameover: 'gameover',
+  characterSelect: 'characterSelect'
 };
 var gameState = STATES.wait;
 var paused = false,
@@ -739,6 +787,9 @@ var stateHandler = function stateHandler() {
       break;
     case STATES.title:
       titleLoop();
+      break;
+    case STATES.characterSelect:
+      characterSelectLoop();
       break;
     case STATES.game:
       gameUpdateLoop();
@@ -1137,15 +1188,35 @@ var setupEvents = function setupEvents() {
 
 var assignStartupEvents = function assignStartupEvents() {
   if (gameState === STATES.title) {
-    document.onkeyup = function () {
+    /*
+    document.onkeyup = () => {
       removeStartupEvents();
       gameState = STATES.setupGame;
-      console.log('setting up game');
-    };
+      console.log('setting up game')
+    }
+    */
     canvas_overlay.onmousedown = function () {
-      removeStartupEvents();
-      gameState = STATES.setupGame;
-      console.log('setting up game');
+      var startBool = buttonTap(startButton);
+
+      if (startBool) {
+        gameState = STATES.characterSelect;
+        assignStartupEvents();
+        console.log('setting up game');
+      }
+    };
+  }
+
+  if (gameState === STATES.characterSelect) {
+
+    canvas_overlay.onmousedown = function () {
+
+      var selectBool = buttonTap(selectButton);
+
+      if (selectBool) {
+        removeStartupEvents();
+        gameState = STATES.setupGame;
+        console.log('setting up game');
+      }
     };
   }
   //console.log('assigned pregame keys');
@@ -1282,6 +1353,8 @@ var startGame = function startGame() {
 
 var doOnPreloadDone = function doOnPreloadDone() {
   console.log('done loading images');
+  startButton = new button(canvas.width / 2 - 100, canvas.height * .75);
+  selectButton = new button(canvas.width / 2 - 100, canvas.height * .75);
   gameState = STATES.title;
   assignStartupEvents();
 
@@ -1330,6 +1403,12 @@ var gameOverLoop = function gameOverLoop() {
   drawGameOver();
 
   console.log('game over');
+};
+
+var characterSelectLoop = function characterSelectLoop() {
+  drawCharacterselect();
+
+  console.log('select a character');
 };
 
 var gameUpdateLoop = function gameUpdateLoop() {

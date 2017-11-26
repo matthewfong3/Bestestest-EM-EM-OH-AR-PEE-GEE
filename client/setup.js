@@ -97,15 +97,37 @@ const setupEvents = () => {
 
 const assignStartupEvents = () => {
   if(gameState === STATES.title){
+    /*
     document.onkeyup = () => {
       removeStartupEvents();
       gameState = STATES.setupGame;
       console.log('setting up game')
     }
+    */
     canvas_overlay.onmousedown = () => {
-      removeStartupEvents();
-      gameState = STATES.setupGame; 
-      console.log('setting up game')
+      let startBool = buttonTap(startButton);
+
+      if(startBool)
+      {
+        gameState = STATES.characterSelect; 
+        assignStartupEvents();
+        console.log('setting up game');
+      }
+    }
+  }
+
+  if(gameState === STATES.characterSelect){
+
+    canvas_overlay.onmousedown = () => {
+
+      let selectBool = buttonTap(selectButton);
+      
+      if(selectBool)
+      {
+        removeStartupEvents();
+        gameState = STATES.setupGame; 
+        console.log('setting up game');
+      }
     }
   }
   //console.log('assigned pregame keys');

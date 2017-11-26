@@ -99,9 +99,32 @@ const drawTitle = () => {
   ctx.font = '30pt Courier';
   ctx.fillText('Besteststs MMORPG evar', canvas.width/2,canvas.height/2-10);
   ctx.font = '15pt Courier';
-  ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
+  //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
+  drawButton(startButton,"Start","Color");
   ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
 }; //app title screen
+
+const drawCharacterselect = () => {
+  ctx.fillStyle = 'grey';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'white';
+  ctx.font = '30pt Courier';
+  ctx.fillText('Select your Character', canvas.width/2,canvas.height * .10);
+  ctx.font = '15pt Courier';
+  //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
+  drawButton(startButton,"Choose","Color");
+  ctx.fillStyle = 'white';
+  ctx.fillRect(canvas.width * .1, 150,150,300);
+  ctx.fillRect(canvas.width * .32, 150,150,300);
+  ctx.fillRect(canvas.width * .54, 150,150,300);
+  ctx.fillRect(canvas.width * .75, 150,150,300);
+  //ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
+
+
+};//character select screen, more of a template right now 
 
 const drawGameOver = () => {
 ctx.fillStyle = 'black';

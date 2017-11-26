@@ -129,6 +129,8 @@ const startGame = () => {
 
 const doOnPreloadDone = () => {
   console.log('done loading images');
+  startButton = new button(canvas.width/2-100,canvas.height * .75);
+  selectButton = new button(canvas.width/2-100,canvas.height * .75);
   gameState = STATES.title;
   assignStartupEvents();
   
@@ -177,6 +179,12 @@ const gameOverLoop = () => {
   drawGameOver();
   
   console.log('game over');
+};
+
+const characterSelectLoop = () => {
+  drawCharacterselect();
+
+  console.log('select a character');
 };
 
 const gameUpdateLoop = () => {
