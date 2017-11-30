@@ -81,7 +81,7 @@ const keyDownHandler = (e) => {
     moveRight: player.moveRight
   };
   
-  if(!isHost) socket.emit('updateKeys', {hash: hash, input: input});
+  if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
 };
 
 //handler for key up events
@@ -117,7 +117,7 @@ const keyUpHandler = (e) => {
     moveRight: player.moveRight
   };
   
-  if(!isHost) socket.emit('updateKeys', {hash: hash, input: input});
+  if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
 };
 
 const emptyFunct = () => { };
@@ -130,7 +130,7 @@ const doOnMouseMove = (e) => {
 const doOnMouseDown = (e) => { 
   if(isHost) fire(e);
   else {
-    socket.emit('updateFire', {canFire: canFire, mouse: mouse, bufferTime: bufferTime});
+    if(gameState === STATES.game) socket.emit('updateFire', {canFire: canFire, mouse: mouse, bufferTime: bufferTime});
   }
   setAnim(cursor, 'click', 'once' );
   dragging = true;

@@ -38,9 +38,9 @@ const update = (data) => {
 const setUser = (data) => {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
   players[hash] = new Character(hash);
-  
+  console.log(data.id);
   console.log('joined server');
-  gameState = STATES.preload // start animating;
+  //gameState = STATES.preload // start animating;
 };
 
 const setOtherplayers = (data) => {

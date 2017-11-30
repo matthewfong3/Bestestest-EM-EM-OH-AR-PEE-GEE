@@ -11,13 +11,30 @@ const setupSockets = (ioServer) => {
 
   io.on('connection', (sock) => {
     const socket = sock;
-
-    socket.on('join', () => {
+    
+    socket.on('initialJoin', () => {
       if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
       }
 
       socket.join(`room${roomNum}`);
+      socket.roomNum = roomNum;
+      socket.roomMember = roomMember;
+      
+      socket.emit('initialJoined', {});
+      if (roomMember === 4) {
+        roomMember = 0;
+        roomNum++;
+      }
+      roomMember++;
+    });
+
+    socket.on('join', () => {
+      /*if (!rooms[`room${roomNum}`]) {
+        rooms[`room${roomNum}`] = {};
+      }
+
+      socket.join(`room${roomNum}`);*/
 
       console.log('user has joined');
 
@@ -25,20 +42,16 @@ const setupSockets = (ioServer) => {
       const hash = xxh.h32(`${socket.id}${new Date().getTime()}`, 0xCAFEBABE).toString(16);
 
       socket.hash = hash;
-      socket.roomNum = roomNum;
+      
 
-      if (roomMember === 1) {
-        rooms[`room${roomNum}`].host = socket.id;
+      if (socket.roomMember === 1) {
+        rooms[`room${socket.roomNum}`].host = socket.id;
         socket.emit('setHost', {});
       }
 
       socket.emit('joined', { hash });
       socket.broadcast.emit('otherConnects', { hash, id: socket.id });
-      if (roomMember === 4) {
-        roomMember = 0;
-        roomNum++;
-      }
-      roomMember++;
+      
     });
 
     // server listens to non-host clients for key updates and sends them to host client
@@ -54,6 +67,7 @@ const setupSockets = (ioServer) => {
         mouse: data.mouse,
         bufferTime: data.bufferTime,
       };
+      console.log(rooms[`room${socket.roomNum}`].host);
       io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
     });
 
@@ -84,7 +98,7 @@ const setupSockets = (ioServer) => {
 
     socket.on('disconnect', () => {
       socket.leave(`room${socket.roomNum}`);
-      console.log('someone has left');
+      console.log(`${socket.id} has left`);
     });
   });
 };

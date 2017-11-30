@@ -711,7 +711,7 @@ var keyDownHandler = function keyDownHandler(e) {
     moveRight: player.moveRight
   };
 
-  if (!isHost) socket.emit('updateKeys', { hash: hash, input: input });
+  if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
 };
 
 //handler for key up events
@@ -747,7 +747,7 @@ var keyUpHandler = function keyUpHandler(e) {
     moveRight: player.moveRight
   };
 
-  if (!isHost) socket.emit('updateKeys', { hash: hash, input: input });
+  if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
 };
 
 var emptyFunct = function emptyFunct() {};
@@ -759,7 +759,7 @@ var doOnMouseMove = function doOnMouseMove(e) {
 };
 var doOnMouseDown = function doOnMouseDown(e) {
   if (isHost) fire(e);else {
-    socket.emit('updateFire', { canFire: canFire, mouse: mouse, bufferTime: bufferTime });
+    if (gameState === STATES.game) socket.emit('updateFire', { canFire: canFire, mouse: mouse, bufferTime: bufferTime });
   }
   setAnim(cursor, 'click', 'once');
   dragging = true;
@@ -1106,7 +1106,11 @@ var playersProps = {};
 var setupSockets = function setupSockets() {
   socket = io.connect();
 
-  socket.emit('join', {});
+  socket.emit('initialJoin', {});
+
+  socket.on('initialJoined', function () {
+    return gameState = STATES.preload;
+  });
 
   // only runs if it's this user is the first to join a room
   socket.on('setHost', function () {
@@ -1216,6 +1220,7 @@ var assignStartupEvents = function assignStartupEvents() {
         removeStartupEvents();
         gameState = STATES.setupGame;
         console.log('setting up game');
+        socket.emit('join', {});
       }
     };
   }
@@ -1271,9 +1276,9 @@ var update = function update(data) {
 var setUser = function setUser(data) {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
   players[hash] = new Character(hash);
-
+  console.log(data.id);
   console.log('joined server');
-  gameState = STATES.preload; // start animating;
+  //gameState = STATES.preload // start animating;
 };
 
 var setOtherplayers = function setOtherplayers(data) {

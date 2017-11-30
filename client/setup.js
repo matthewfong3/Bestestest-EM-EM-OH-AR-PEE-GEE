@@ -15,7 +15,9 @@ const playersProps = {};
 const setupSockets = () => {
   socket = io.connect();
   
-  socket.emit('join', {});
+  socket.emit('initialJoin', {});
+  
+  socket.on('initialJoined', () => gameState = STATES.preload);
   
   // only runs if it's this user is the first to join a room
   socket.on('setHost', () => {
@@ -127,6 +129,7 @@ const assignStartupEvents = () => {
         removeStartupEvents();
         gameState = STATES.setupGame; 
         console.log('setting up game');
+        socket.emit('join', {});
       }
     }
   }
