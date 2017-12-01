@@ -48,76 +48,79 @@ const directions = {
 const keyDownHandler = (e) => {
   var keyPressed = e.which;
   const player = players[hash];
-
-  // W OR UP
-  if(keyPressed === 87 || keyPressed === 38) {
-    // move character up
-    player.moveUp = true;
-    e.preventDefault();
-  }
-  // A OR LEFT
-  else if(keyPressed === 65 || keyPressed === 37) {
-    // move character left
-    player.moveLeft = true;
-    e.preventDefault();
-  }
-  // S OR DOWN
-  else if(keyPressed === 83 || keyPressed === 40) {
-    // move character down
-    player.moveDown = true;
-    e.preventDefault();
-  }
-  // D OR RIGHT
-  else if(keyPressed === 68 || keyPressed === 39) {
-    //move character right
-    player.moveRight = true;
-    e.preventDefault();
-  }
   
-  let input = {
-    moveUp: player.moveUp,
-    moveLeft: player.moveLeft,
-    moveDown: player.moveDown,
-    moveRight: player.moveRight
-  };
-  
-  if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
+  if(player.hp > 0){
+    // W OR UP
+    if(keyPressed === 87 || keyPressed === 38) {
+      // move character up
+      player.moveUp = true;
+      e.preventDefault();
+    }
+    // A OR LEFT
+    else if(keyPressed === 65 || keyPressed === 37) {
+      // move character left
+      player.moveLeft = true;
+      e.preventDefault();
+    }
+    // S OR DOWN
+    else if(keyPressed === 83 || keyPressed === 40) {
+      // move character down
+      player.moveDown = true;
+      e.preventDefault();
+    }
+    // D OR RIGHT
+    else if(keyPressed === 68 || keyPressed === 39) {
+      //move character right
+      player.moveRight = true;
+      e.preventDefault();
+    }
+    
+    let input = {
+      moveUp: player.moveUp,
+      moveLeft: player.moveLeft,
+      moveDown: player.moveDown,
+      moveRight: player.moveRight
+    };
+    
+    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
+  }
 };
 
 //handler for key up events
 const keyUpHandler = (e) => {
   var keyPressed = e.which;
   const player = players[hash];
-
-  // W OR UP
-  if(keyPressed === 87 || keyPressed === 38) {
-    // stop character from moving up
-    player.moveUp = false;
+  if(player.hp > 0){
+    // W OR UP
+    if(keyPressed === 87 || keyPressed === 38) {
+      // stop character from moving up
+      player.moveUp = false;
+    }
+    // A OR LEFT
+    else if(keyPressed === 65 || keyPressed === 37) {
+      // stop character from moving left
+      player.moveLeft = false;
+    }
+    // S OR DOWN
+    else if(keyPressed === 83 || keyPressed === 40) {
+      // stop character from moving down
+      player.moveDown = false;
+    }
+    // D OR RIGHT
+    else if(keyPressed === 68 || keyPressed === 39) {
+      // stop character from moving right
+      player.moveRight = false;
+    }
+    
+    let input = {
+      moveUp: player.moveUp,
+      moveLeft: player.moveLeft,
+      moveDown: player.moveDown,
+      moveRight: player.moveRight
+    };
+    
+    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
   }
-  // A OR LEFT
-  else if(keyPressed === 65 || keyPressed === 37) {
-    // stop character from moving left
-    player.moveLeft = false;
-  }
-  // S OR DOWN
-  else if(keyPressed === 83 || keyPressed === 40) {
-    // stop character from moving down
-    player.moveDown = false;
-  }
-  // D OR RIGHT
-  else if(keyPressed === 68 || keyPressed === 39) {
-    // stop character from moving right
-    player.moveRight = false;
-  }
-  
-  let input = {
-    moveUp: player.moveUp,
-    moveLeft: player.moveLeft,
-    moveDown: player.moveDown,
-    moveRight: player.moveRight
-  };
-  
-  if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
 };
 
 const emptyFunct = () => { };
@@ -127,11 +130,17 @@ const doOnMouseMove = (e) => {
   cursor.x = mouse.x;
   cursor.y = mouse.y;
 }
-const doOnMouseDown = (e) => { 
-  if(isHost) fire(e);
-  else {
-    if(gameState === STATES.game) socket.emit('updateFire', {canFire: canFire, mouse: mouse, bufferTime: bufferTime});
+const doOnMouseDown = (e) => {
+  if(gameState === STATES.game){
+    const player = players[hash];
+    if(player.hp > 0){
+      if(isHost) fire(e);
+      else {
+        if(gameState === STATES.game) socket.emit('updateFire', {canFire: canFire, mouse: mouse, bufferTime: bufferTime});
+      }
+    }
   }
+  
   setAnim(cursor, 'click', 'once' );
   dragging = true;
 }

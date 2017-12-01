@@ -15,6 +15,7 @@ class Enemy{
     this.direction = 0;
     
     this.radius = 20;
+    this.hp = 10;
     
     this.target;
     

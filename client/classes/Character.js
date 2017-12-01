@@ -22,5 +22,6 @@ class Character {
     
     // if using circle-to-circle collision
     this.radius = 20;
+    this.hp = 10;
   }
 }

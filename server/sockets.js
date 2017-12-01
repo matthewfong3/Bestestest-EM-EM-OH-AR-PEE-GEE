@@ -11,7 +11,7 @@ const setupSockets = (ioServer) => {
 
   io.on('connection', (sock) => {
     const socket = sock;
-    
+
     socket.on('initialJoin', () => {
       if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
@@ -20,7 +20,7 @@ const setupSockets = (ioServer) => {
       socket.join(`room${roomNum}`);
       socket.roomNum = roomNum;
       socket.roomMember = roomMember;
-      
+
       socket.emit('initialJoined', {});
       if (roomMember === 4) {
         roomMember = 0;
@@ -30,11 +30,11 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('join', () => {
-      /*if (!rooms[`room${roomNum}`]) {
+      /* if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
       }
 
-      socket.join(`room${roomNum}`);*/
+      socket.join(`room${roomNum}`); */
 
       console.log('user has joined');
 
@@ -42,7 +42,7 @@ const setupSockets = (ioServer) => {
       const hash = xxh.h32(`${socket.id}${new Date().getTime()}`, 0xCAFEBABE).toString(16);
 
       socket.hash = hash;
-      
+
 
       if (socket.roomMember === 1) {
         rooms[`room${socket.roomNum}`].host = socket.id;
@@ -51,7 +51,6 @@ const setupSockets = (ioServer) => {
 
       socket.emit('joined', { hash });
       socket.broadcast.emit('otherConnects', { hash, id: socket.id });
-      
     });
 
     // server listens to non-host clients for key updates and sends them to host client
@@ -92,8 +91,8 @@ const setupSockets = (ioServer) => {
       socket.broadcast.emit('updatedBullets', data);
     });
 
-    socket.on('playerCollide', () => {
-      socket.broadcast.emit('playerCollided', {});
+    socket.on('playerCollide', (data) => {
+      socket.broadcast.emit('playerCollided', data);
     });
 
     socket.on('disconnect', () => {

@@ -60,6 +60,7 @@ var Character = function Character(hash) {
 
   // if using circle-to-circle collision
   this.radius = 20;
+  this.hp = 10;
 };
 "use strict";
 
@@ -86,6 +87,7 @@ var Enemy = function () {
     this.direction = 0;
 
     this.radius = 20;
+    this.hp = 10;
 
     this.target;
 
@@ -204,7 +206,7 @@ var drawPlayers = function drawPlayers(time) {
   var keys = Object.keys(players);
   for (var i = 0; i < keys.length; i++) {
     var playerdrawn = players[keys[i]];
-    drawPlayer(playerdrawn);
+    if (playerdrawn.hp > 0) drawPlayer(playerdrawn);
   }
 }; //draw all players in the players list
 
@@ -494,7 +496,13 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
           console.log('collision b/w bullet and enemy detected');
           arr1.splice(i, 1);
           // deal dmg to enemy here
+          if (arr2[j].hp > 0) {
+            arr2[j].hp -= 2;
+          } else {
+            arr2.splice(j, 1);
+          }
           socket.emit('updateBullets', { bulletArray: arr1 });
+          socket.emit('updateEnemies', { enemies: enemies });
         }
       }
     }
@@ -508,8 +516,13 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
     for (var j = 0; j < array.length; j++) {
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
         console.log('collision b/w character and enemy detected');
-
-        socket.emit('playerCollide', {});
+        if (plrObj[keys[i]].hp > 0) {
+          plrObj[keys[i]].hp -= 2;
+        } else {
+          // what happens to player when they 'die'
+          console.log('player should be dead');
+        }
+        socket.emit('playerCollide', { player: plrObj[keys[i]] });
       }
     }
   }
@@ -679,75 +692,78 @@ var keyDownHandler = function keyDownHandler(e) {
   var keyPressed = e.which;
   var player = players[hash];
 
-  // W OR UP
-  if (keyPressed === 87 || keyPressed === 38) {
-    // move character up
-    player.moveUp = true;
-    e.preventDefault();
-  }
-  // A OR LEFT
-  else if (keyPressed === 65 || keyPressed === 37) {
-      // move character left
-      player.moveLeft = true;
+  if (player.hp > 0) {
+    // W OR UP
+    if (keyPressed === 87 || keyPressed === 38) {
+      // move character up
+      player.moveUp = true;
       e.preventDefault();
     }
-    // S OR DOWN
-    else if (keyPressed === 83 || keyPressed === 40) {
-        // move character down
-        player.moveDown = true;
+    // A OR LEFT
+    else if (keyPressed === 65 || keyPressed === 37) {
+        // move character left
+        player.moveLeft = true;
         e.preventDefault();
       }
-      // D OR RIGHT
-      else if (keyPressed === 68 || keyPressed === 39) {
-          //move character right
-          player.moveRight = true;
+      // S OR DOWN
+      else if (keyPressed === 83 || keyPressed === 40) {
+          // move character down
+          player.moveDown = true;
           e.preventDefault();
         }
+        // D OR RIGHT
+        else if (keyPressed === 68 || keyPressed === 39) {
+            //move character right
+            player.moveRight = true;
+            e.preventDefault();
+          }
 
-  var input = {
-    moveUp: player.moveUp,
-    moveLeft: player.moveLeft,
-    moveDown: player.moveDown,
-    moveRight: player.moveRight
-  };
+    var input = {
+      moveUp: player.moveUp,
+      moveLeft: player.moveLeft,
+      moveDown: player.moveDown,
+      moveRight: player.moveRight
+    };
 
-  if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
+    if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
+  }
 };
 
 //handler for key up events
 var keyUpHandler = function keyUpHandler(e) {
   var keyPressed = e.which;
   var player = players[hash];
-
-  // W OR UP
-  if (keyPressed === 87 || keyPressed === 38) {
-    // stop character from moving up
-    player.moveUp = false;
-  }
-  // A OR LEFT
-  else if (keyPressed === 65 || keyPressed === 37) {
-      // stop character from moving left
-      player.moveLeft = false;
+  if (player.hp > 0) {
+    // W OR UP
+    if (keyPressed === 87 || keyPressed === 38) {
+      // stop character from moving up
+      player.moveUp = false;
     }
-    // S OR DOWN
-    else if (keyPressed === 83 || keyPressed === 40) {
-        // stop character from moving down
-        player.moveDown = false;
+    // A OR LEFT
+    else if (keyPressed === 65 || keyPressed === 37) {
+        // stop character from moving left
+        player.moveLeft = false;
       }
-      // D OR RIGHT
-      else if (keyPressed === 68 || keyPressed === 39) {
-          // stop character from moving right
-          player.moveRight = false;
+      // S OR DOWN
+      else if (keyPressed === 83 || keyPressed === 40) {
+          // stop character from moving down
+          player.moveDown = false;
         }
+        // D OR RIGHT
+        else if (keyPressed === 68 || keyPressed === 39) {
+            // stop character from moving right
+            player.moveRight = false;
+          }
 
-  var input = {
-    moveUp: player.moveUp,
-    moveLeft: player.moveLeft,
-    moveDown: player.moveDown,
-    moveRight: player.moveRight
-  };
+    var input = {
+      moveUp: player.moveUp,
+      moveLeft: player.moveLeft,
+      moveDown: player.moveDown,
+      moveRight: player.moveRight
+    };
 
-  if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
+    if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
+  }
 };
 
 var emptyFunct = function emptyFunct() {};
@@ -758,9 +774,15 @@ var doOnMouseMove = function doOnMouseMove(e) {
   cursor.y = mouse.y;
 };
 var doOnMouseDown = function doOnMouseDown(e) {
-  if (isHost) fire(e);else {
-    if (gameState === STATES.game) socket.emit('updateFire', { canFire: canFire, mouse: mouse, bufferTime: bufferTime });
+  if (gameState === STATES.game) {
+    var player = players[hash];
+    if (player.hp > 0) {
+      if (isHost) fire(e);else {
+        if (gameState === STATES.game) socket.emit('updateFire', { canFire: canFire, mouse: mouse, bufferTime: bufferTime });
+      }
+    }
   }
+
   setAnim(cursor, 'click', 'once');
   dragging = true;
 };
@@ -1156,8 +1178,9 @@ var setupSockets = function setupSockets() {
     enemies = data.enemies;
   });
 
-  socket.on('playerCollided', function () {
+  socket.on('playerCollided', function (data) {
     console.log('received: player collision detected with enemy');
+    players[data.hash] = data;
   });
 };
 

@@ -119,7 +119,6 @@ const startGame = () => {
     spawnEnemies();
   }
   
-  
   //play audio
   playBgAudio();
   

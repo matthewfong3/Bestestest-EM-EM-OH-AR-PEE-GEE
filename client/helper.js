@@ -155,7 +155,13 @@ const checkCollisions = (arr1, arr2) => {
           console.log('collision b/w bullet and enemy detected');
           arr1.splice(i, 1);
           // deal dmg to enemy here
+          if(arr2[j].hp > 0){
+            arr2[j].hp -= 2;
+          } else {
+            arr2.splice(j, 1);
+          }
           socket.emit('updateBullets', {bulletArray: arr1});
+          socket.emit('updateEnemies', {enemies: enemies});
         }
       }
     }
@@ -169,8 +175,13 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
     for(let j = 0; j < array.length; j++){
       if(circlesIntersect(plrObj[keys[i]], array[j])){
         console.log('collision b/w character and enemy detected');
-        
-        socket.emit('playerCollide', {});
+        if(plrObj[keys[i]].hp > 0){
+          plrObj[keys[i]].hp -= 2;
+        } else {
+          // what happens to player when they 'die'
+          console.log('player should be dead');
+        }
+        socket.emit('playerCollide', {player: plrObj[keys[i]]});
       }
     }
   }

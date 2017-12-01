@@ -3,7 +3,7 @@ const drawPlayers = (time) => {
   let keys = Object.keys(players);
   for(let i =0; i < keys.length; i++) {
     let playerdrawn = players[keys[i]];
-    drawPlayer(playerdrawn);  
+    if(playerdrawn.hp > 0) drawPlayer(playerdrawn);  
   }
 }; //draw all players in the players list
 

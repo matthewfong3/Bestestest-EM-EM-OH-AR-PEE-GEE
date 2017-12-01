@@ -63,8 +63,9 @@ const setupSockets = () => {
     enemies = data.enemies;
   });
   
-  socket.on('playerCollided', () => {
+  socket.on('playerCollided', (data) => {
     console.log('received: player collision detected with enemy');
+    players[data.hash] = data;
   });
 };
 
