@@ -31,12 +31,12 @@ const toLoadAnims = [
         height: 50,
         width: 50
       },
-      availible: {
+      available: {
         row: 2,
         cols: 3,
         playSpeed: 10
       },
-      unavailible: {
+      unavailable: {
         row: 3,
         cols: 3,
         playSpeed: 10

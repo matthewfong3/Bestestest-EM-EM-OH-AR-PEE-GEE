@@ -86,7 +86,7 @@ const drawWait = () => {
   ctx.textBaseline = 'middle';
   ctx.font = '15pt Courier';
   ctx.fillStyle = 'white';
-  ctx.fillText('waiting for connection ro server...', canvas.width/2,canvas.height/2);
+  ctx.fillText('waiting for connection to server...', canvas.width/2,canvas.height/2);
 }; //waiting for server connction
 
 const drawTitle = () => {

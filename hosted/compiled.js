@@ -19,18 +19,36 @@ var Bullet = function Bullet(characterpoint, direction) {
     //need to work on this
     this.direction = direction;
 };
-"use strict";
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var button = function button(x, y) {
+var button = function () {
+  function button(x, y, opts) {
     _classCallCheck(this, button);
+
+    opts = opts || {};
 
     this.x = x;
     this.y = y;
     this.width = 200;
     this.height = 50;
-};
+    this.text = opts.text || '---';
+    this.available = opts.available || true;
+    this.callback = emptyFunct;
+  }
+
+  _createClass(button, [{
+    key: 'setText',
+    value: function setText(text) {
+      this.text = text;
+    }
+  }]);
+
+  return button;
+}();
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -59,7 +77,7 @@ var Character = function Character(hash) {
   this.moveDown = false;
 
   // if using circle-to-circle collision
-  this.radius = 20;
+  this.radius = 10;
   this.hp = 10;
 };
 "use strict";
@@ -201,6 +219,62 @@ var Enemy = function () {
 }();
 'use strict';
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var room =
+
+/* ex connection:
+  room_2: { //room ID
+    name: 'cellar',
+    enter_location: 2, //which door in room you come out of
+    spawn_1: {x: 25, y: 25}; //where they are spawned in next
+    spawn_2: {x: 25, y: 50};
+    spawn_3: {x: 50, y: 25};
+    spawn_4: {x: 50, y: 50};
+  }
+*/ //<- ex connection
+
+function room(props) {
+  _classCallCheck(this, room);
+
+  this.ID = props.ID || -1; //unique name
+  this.name = props.name || 'room'; //display name
+  this.bg_music = props.bg_music || 'default';
+  this.bg_image = props.bg_image || undefined;
+
+  this.connection = props.connections || {}; //connected rooms
+  this.objects = props.objects || {}; //walls and stuff
+  this.goals = props.goals || {}; //clear goals or treasure goals
+  this.mobs = props.mobs || {}; //enemies and npcs
+  this.items = props.items || {}; //items and treasure chests
+
+  this.visited = props.visited || false;
+  this.cleared = props.cleared || false;
+  this.main_entrance = props.main_entrance || undefined;
+  this.entered_from = props.entered_from || undefined;
+
+  //where players are spawned in room. set in [move to room]
+  this.spawn_1 = props.spawn_1 || undefined;
+  this.spawn_2 = props.spawn_2 || undefined;
+  this.spawn_3 = props.spawn_3 || undefined;
+  this.spawn_4 = props.spawn_4 || undefined;
+};
+
+;
+
+var connection = function connection(props) {
+  _classCallCheck(this, connection);
+
+  this.ID = props.ID || -1;
+  this.name = props.name || 'room';
+  this.enter_location = props.enter_location || undefined; //which entrance in next room
+  this.spawn_1 = props.spawn_1 || undefined;
+  this.spawn_2 = props.spawn_2 || undefined;
+  this.spawn_3 = props.spawn_3 || undefined;
+  this.spawn_4 = props.spawn_4 || undefined;
+};
+'use strict';
+
 var drawPlayers = function drawPlayers(time) {
   //draw things
   var keys = Object.keys(players);
@@ -289,7 +363,7 @@ var drawWait = function drawWait() {
   ctx.textBaseline = 'middle';
   ctx.font = '15pt Courier';
   ctx.fillStyle = 'white';
-  ctx.fillText('waiting for connection ro server...', canvas.width / 2, canvas.height / 2);
+  ctx.fillText('waiting for connection to server...', canvas.width / 2, canvas.height / 2);
 }; //waiting for server connction
 
 var drawTitle = function drawTitle() {
@@ -656,8 +730,9 @@ var bufferTime = 0;
 var canFire = true;
 var lastTime = void 0;
 
-var startButton = void 0;
-var selectButton = void 0;
+var startButton = void 0,
+    selectButton = void 0,
+    roomButton = void 0;
 
 var STATES = {
   wait: 'wait',
@@ -675,6 +750,7 @@ var paused = false,
 var players = {};
 var bulletArray = [];
 var enemies = [];
+var rooms = {};
 
 var directions = {
   DOWNLEFT: 0,
@@ -772,6 +848,10 @@ var doOnMouseMove = function doOnMouseMove(e) {
   mouse = getMouse(e);
   cursor.x = mouse.x;
   cursor.y = mouse.y;
+
+  if (cursor.over !== false && !cursor.isOverButton(cursor.over)) {
+    cursor.exitButton();
+  }
 };
 var doOnMouseDown = function doOnMouseDown(e) {
   if (gameState === STATES.game) {
@@ -781,8 +861,11 @@ var doOnMouseDown = function doOnMouseDown(e) {
         if (gameState === STATES.game) socket.emit('updateFire', { canFire: canFire, mouse: mouse, bufferTime: bufferTime });
       }
     }
+
+    if (menu.open) menu.checkClose();
   }
 
+  checkButton();
   setAnim(cursor, 'click', 'once');
   dragging = true;
 };
@@ -797,6 +880,8 @@ var doOnMouseOut = function doOnMouseOut(e) {
 };
 
 var stateHandler = function stateHandler() {
+  ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
+
   switch (gameState) {
     case STATES.wait:
       waitLoop();
@@ -822,7 +907,6 @@ var stateHandler = function stateHandler() {
   }
 
   if (cursor != undefined) {
-    ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
     playAnim(ctx_overlay, cursor);
   }
 
@@ -840,9 +924,49 @@ var init = function init() {
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
   animationFrame = requestAnimationFrame(stateHandler);
+
+  playBgAudio();
 };
 
 window.onload = init;
+
+var pauseGame = function pauseGame() {
+  paused = true;
+  //stop animation loop
+  cancelAnimationFrame(animationFrame);
+
+  stopBgAudio();
+};
+
+var resumeGame = function resumeGame() {
+  //stop animation loop just in case
+  cancelAnimationFrame(animationFrame);
+
+  playBgAudio();
+  paused = false;
+
+  //call update
+  requestAnimationFrame(stateHandler);
+};
+
+var toggleDebug = function toggleDebug() {
+  if (debug) {
+    debug = false;
+    return;
+  }
+  debug = true;
+};
+
+//ONBLUR
+window.onblur = function () {
+  pauseGame();
+  //console.log('blur');
+};
+//ONFOCUS
+window.onfocus = function () {
+  resumeGame();
+  //console.log('focus');
+};
 "use strict";
 
 //--vars-----------------------------region
@@ -873,12 +997,12 @@ var toLoadAnims = [{
       height: 50,
       width: 50
     },
-    availible: {
+    available: {
       row: 2,
       cols: 3,
       playSpeed: 10
     },
-    unavailible: {
+    unavailable: {
       row: 3,
       cols: 3,
       playSpeed: 10
@@ -1111,6 +1235,136 @@ var playEffect = function playEffect() {
 //endregion
 'use strict';
 
+//handles map related functions
+var menu = {
+  open: false,
+  options: {},
+  title: 'menu'
+};
+
+var setMenu = function setMenu(props) {
+  menu.open = props.open || false;
+  menu.options = props.options || {};
+  menu.title = props.title || 'menu title';
+};
+
+var setVoteMenu = function setVoteMenu() {
+  var opts = {};
+  opts.options = {
+    yes: new button(100, 100, { text: 'yes' }),
+    no: new button(100, 170, { text: 'no' }),
+    meh: new button(100, 240, { text: 'meh' })
+  };
+
+  opts.options.meh.callback = function () {
+    return console.log('meh');
+  };
+  opts.options.yes.callback = function () {
+    return console.log('yes');
+  };
+  opts.options.no.callback = function () {
+    return console.log('no');
+  };
+
+  opts.title = 'enter room? - response in in console';
+  opts.open = true;
+
+  setMenu(opts);
+};
+
+var setPauseMenu = function setPauseMenu() {
+  var opts = {};
+
+  opts.options = {
+    resume: new button(100, 100, { text: 'resume' }),
+    quit: new button(100, 170, { text: 'quit' })
+  };
+
+  opts.title = 'pause menu';
+  opts.open = true;
+
+  setMenu(opts);
+};
+
+var resetMenu = function resetMenu() {
+  var opts = {};
+
+  opts.options = {
+    vote: new button(100, 100, { text: 'vote' }),
+    pause: new button(100, 170, { text: 'pause' }),
+    unavailable: new button(100, 240, { available: false, text: 'unavailable' })
+
+    //fixme: dont know why button constructor wont set avaiible to false vv
+  };opts.options.unavailable.available = false;
+
+  opts.options.vote.callback = setVoteMenu;
+  opts.options.pause.callback = setPauseMenu;
+  opts.options.unavailable.callback = function () {
+    return console.log('button is unavailable');
+  };
+
+  opts.title = 'testing menu - click outside menu to close and reset';
+
+  setMenu(opts);
+};resetMenu();
+
+console.dir(menu.options);
+
+menu.checkClose = function () {
+  if (!isInBounds(cursor, { x: 30, y: 30, width: width - 100, height: height - 100 })) closeMenu();
+};
+
+menu.toggle = function () {
+  //if(roomSelect.open) closeRoomSelect();
+  openMenu();
+};
+
+var openMenu = function openMenu() {
+  suspendPlayerControls();
+
+  menu.open = true;
+  console.log('open menu');
+};
+
+var closeMenu = function closeMenu() {
+  restorePlayerControls();
+
+  menu.open = false;
+  console.log('close menu');
+
+  //toremove: reset menu for testing
+  resetMenu();
+};
+
+var checkMenu = function checkMenu() {
+  if (menu.open) {
+    var keys = Object.keys(menu.options);
+    for (var i = 0; i < keys.length; i++) {
+      var btn = menu.options[keys[i]];
+      if (cursor.isOverButton(btn)) cursor.enterButton(btn);
+    }
+  }
+};
+
+var drawMenu = function drawMenu() {
+  if (menu.open) {
+    ctx_overlay.fillStyle = 'rgba(108, 108, 108, 0.4)';
+    ctx_overlay.strokeStyle = 'black';
+    ctx_overlay.lineWidth = 3;
+    drawRoundedRect(50, 50, width - 100, height - 100, 7, ctx_overlay, true);
+
+    ctx_overlay.textAlign = 'left';
+    fillText(ctx_overlay, menu.title, 100, 80, '15pt courier', 'white');
+
+    var keys = Object.keys(menu.options);
+    for (var i = 0; i < keys.length; i++) {
+      var btn = menu.options[keys[i]];
+      drawButton(btn, btn.text, "white");
+    }
+  }
+};
+'use strict';
+
 //--initial game setup-------------------region
 var setupCanvas = function setupCanvas() {
   canvas = document.querySelector('#canvas_main');
@@ -1200,6 +1454,36 @@ var setupGame = function setupGame() {
   gameState = STATES.game;
 }; //setup and start the game
 
+
+var setupCursor = function setupCursor() {
+  cursor = new Sprite({ sheet: ANIMATIONS.cursor });
+  cursor.over = false;
+
+  cursor.enterButton = function (button) {
+    cursor.over = button;
+    if (button.available) setAnim(cursor, 'available', 'pingPong');else setAnim(cursor, 'unavailable', 'pingPong');
+  };
+
+  cursor.exitButton = function () {
+    cursor.over = false;
+    setAnim(cursor, 'default', 'default');
+  };
+
+  cursor.isOverButton = function (button) {
+    var isOver = false;
+    if (button.radius) {
+      isOver = inInCircle(cursor, button);
+    } else {
+      isOver = isInBounds(cursor, button);
+    }
+    return isOver;
+  };
+};
+
+var checkButton = function checkButton() {
+  if (cursor.over !== false) cursor.over.callback();
+};
+
 //endregion
 
 //--events-------------------------region
@@ -1208,8 +1492,8 @@ var setupEvents = function setupEvents() {
   document.onkeyup = keyUpHandler;
 
   //find the mouse position
-  canvas_overlay.onmousemove = doOnMouseMove;
-  canvas_overlay.onmousedown = doOnMouseDown;
+  //canvas_overlay.onmousemove = doOnMouseMove;
+  //canvas_overlay.onmousedown = doOnMouseDown;
   //console.log('assigned startup game keys');
 }; //events for gameplay
 
@@ -1230,6 +1514,8 @@ var assignStartupEvents = function assignStartupEvents() {
         assignStartupEvents();
         console.log('setting up game');
       }
+      checkButton();
+      setAnim(cursor, 'click', 'once');
     };
   }
 
@@ -1245,6 +1531,8 @@ var assignStartupEvents = function assignStartupEvents() {
         console.log('setting up game');
         socket.emit('join', {});
       }
+      checkButton();
+      setAnim(cursor, 'click', 'once');
     };
   }
   //console.log('assigned pregame keys');
@@ -1383,10 +1671,14 @@ var doOnPreloadDone = function doOnPreloadDone() {
   console.log('done loading images');
   startButton = new button(canvas.width / 2 - 100, canvas.height * .75);
   selectButton = new button(canvas.width / 2 - 100, canvas.height * .75);
+
+  roomButton = new button(30, 30);
+  roomButton.callback = menu.toggle;
+
   gameState = STATES.title;
   assignStartupEvents();
 
-  cursor = new Sprite({ sheet: ANIMATIONS.cursor });
+  setupCursor();
   setAnim(cursor, 'default', 'default');
 
   document.onmousemove = doOnMouseMove;
@@ -1425,6 +1717,8 @@ var preloadLoop = function preloadLoop() {
 
 var titleLoop = function titleLoop() {
   drawTitle();
+
+  if (cursor.isOverButton(startButton)) cursor.enterButton(startButton);
 };
 
 var gameOverLoop = function gameOverLoop() {
@@ -1436,7 +1730,9 @@ var gameOverLoop = function gameOverLoop() {
 var characterSelectLoop = function characterSelectLoop() {
   drawCharacterselect();
 
-  console.log('select a character');
+  if (cursor.isOverButton(selectButton)) cursor.enterButton(selectButton);
+
+  //console.log('select a character');
 };
 
 var gameUpdateLoop = function gameUpdateLoop() {
@@ -1487,6 +1783,13 @@ var gameUpdateLoop = function gameUpdateLoop() {
   drawPlayers();
   // draw bullets
   drawBullets();
+
+  drawButton(roomButton, "menu", '#ffc7c7');
+
+  if (cursor.isOverButton(roomButton)) cursor.enterButton(roomButton);
+
+  checkMenu();
+  drawMenu();
 };
 
 //endregion

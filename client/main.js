@@ -14,8 +14,7 @@ let bufferTime = 0;
 let canFire = true;
 let lastTime;
 
-let startButton;
-let selectButton;
+let startButton, selectButton, roomButton;
 
 let STATES = {
   wait: 'wait',
@@ -32,6 +31,7 @@ let paused = false, debug = true;
 let players = {};
 let bulletArray = [];
 let enemies = [];
+let rooms = {};
 
 const directions = {
   DOWNLEFT: 0,
@@ -129,6 +129,10 @@ const doOnMouseMove = (e) => {
   mouse = getMouse(e);
   cursor.x = mouse.x;
   cursor.y = mouse.y;
+  
+  if(cursor.over !== false && !cursor.isOverButton(cursor.over) ){
+    cursor.exitButton();
+  }
 }
 const doOnMouseDown = (e) => {
   if(gameState === STATES.game){
@@ -139,8 +143,11 @@ const doOnMouseDown = (e) => {
         if(gameState === STATES.game) socket.emit('updateFire', {canFire: canFire, mouse: mouse, bufferTime: bufferTime});
       }
     }
+    
+    if(menu.open) menu.checkClose();
   }
   
+  checkButton();
   setAnim(cursor, 'click', 'once' );
   dragging = true;
 }
@@ -151,6 +158,8 @@ const doOnMouseUp = (e) => {
 const doOnMouseOut = (e) => { dragging = false }
 
 const stateHandler = () => {
+  ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
+  
   switch(gameState){
     case STATES.wait:
       waitLoop();
@@ -176,7 +185,6 @@ const stateHandler = () => {
   }
   
   if(cursor != undefined){
-    ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
     playAnim(ctx_overlay ,cursor);
   } 
   
@@ -194,6 +202,46 @@ const init = () => {
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
   animationFrame = requestAnimationFrame(stateHandler);
+  
+  playBgAudio();
 };
 
 window.onload = init;
+
+const pauseGame = () => {
+  paused = true;
+  //stop animation loop
+  cancelAnimationFrame(animationFrame);
+  
+  stopBgAudio();
+};
+
+const resumeGame = () => {
+  //stop animation loop just in case
+  cancelAnimationFrame(animationFrame);
+  
+  playBgAudio();
+  paused = false;
+  
+  //call update
+  requestAnimationFrame(stateHandler);
+};
+
+const toggleDebug =  () => {
+  if(debug){
+    debug = false;
+    return;
+  }
+  debug = true;
+};
+
+//ONBLUR
+window.onblur = function() { 
+  pauseGame();
+  //console.log('blur');
+}
+//ONFOCUS
+window.onfocus = function() {
+  resumeGame();
+  //console.log('focus');
+};

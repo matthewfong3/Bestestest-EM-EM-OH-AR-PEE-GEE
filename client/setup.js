@@ -85,6 +85,38 @@ const setupGame = () => {
   gameState = STATES.game;
 } //setup and start the game
 
+
+const setupCursor= () => {
+  cursor = new Sprite({sheet: ANIMATIONS.cursor });
+  cursor.over = false;
+  
+  cursor.enterButton = (button) => {
+    cursor.over = button;
+    if(button.available)
+      setAnim(cursor, 'available', 'pingPong' ); 
+    else setAnim(cursor, 'unavailable', 'pingPong' ); 
+  }
+
+  cursor.exitButton = () => {
+    cursor.over = false;
+    setAnim(cursor, 'default', 'default' ); 
+  }
+
+  cursor.isOverButton = (button) => {
+    let isOver = false;
+    if(button.radius) {
+      isOver = inInCircle(cursor, button);
+    } else {
+      isOver = isInBounds(cursor, button);
+    }
+    return isOver;
+  }
+};
+
+const checkButton = () => {
+  if(cursor.over !== false ) cursor.over.callback();
+}
+
 //endregion
 
 //--events-------------------------region
@@ -93,8 +125,8 @@ const setupEvents = () => {
   document.onkeyup = keyUpHandler;
   
   //find the mouse position
-  canvas_overlay.onmousemove = doOnMouseMove;
-  canvas_overlay.onmousedown = doOnMouseDown;
+  //canvas_overlay.onmousemove = doOnMouseMove;
+  //canvas_overlay.onmousedown = doOnMouseDown;
   //console.log('assigned startup game keys');
 }; //events for gameplay
 
@@ -116,6 +148,8 @@ const assignStartupEvents = () => {
         assignStartupEvents();
         console.log('setting up game');
       }
+      checkButton();
+      setAnim(cursor, 'click', 'once' );
     }
   }
 
@@ -132,6 +166,8 @@ const assignStartupEvents = () => {
         console.log('setting up game');
         socket.emit('join', {});
       }
+      checkButton();
+      setAnim(cursor, 'click', 'once' );
     }
   }
   //console.log('assigned pregame keys');

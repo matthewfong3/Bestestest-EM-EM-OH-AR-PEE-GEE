@@ -12,8 +12,12 @@ const app = express();
 
 app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
 app.use(favicon(`${__dirname}/../hosted/img/test.png`));
+
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(`${__dirname}/../hosted/index.html`));
+});
+app.get('/doc', (req, res) => {
+  res.sendFile(path.resolve(`${__dirname}/../hosted/doc.html`));
 });
 
 const server = http.createServer(app);

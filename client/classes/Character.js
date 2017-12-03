@@ -21,7 +21,7 @@ class Character {
     this.moveDown = false;
     
     // if using circle-to-circle collision
-    this.radius = 20;
+    this.radius = 10;
     this.hp = 10;
   }
 }

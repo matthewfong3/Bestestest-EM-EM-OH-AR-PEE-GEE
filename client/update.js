@@ -130,10 +130,14 @@ const doOnPreloadDone = () => {
   console.log('done loading images');
   startButton = new button(canvas.width/2-100,canvas.height * .75);
   selectButton = new button(canvas.width/2-100,canvas.height * .75);
+  
+  roomButton = new button(30,30);
+  roomButton.callback = menu.toggle;
+  
   gameState = STATES.title;
   assignStartupEvents();
   
-  cursor = new Sprite({sheet: ANIMATIONS.cursor });
+  setupCursor();
   setAnim(cursor, 'default', 'default');
   
   document.onmousemove = doOnMouseMove;
@@ -172,6 +176,8 @@ const preloadLoop = () => {
 
 const titleLoop = () => {
   drawTitle();
+  
+  if( cursor.isOverButton(startButton) ) cursor.enterButton(startButton);
 };
 
 const gameOverLoop = () => {
@@ -182,8 +188,10 @@ const gameOverLoop = () => {
 
 const characterSelectLoop = () => {
   drawCharacterselect();
-
-  console.log('select a character');
+  
+  if( cursor.isOverButton(selectButton) ) cursor.enterButton(selectButton);
+  
+  //console.log('select a character');
 };
 
 const gameUpdateLoop = () => {
@@ -234,6 +242,15 @@ const gameUpdateLoop = () => {
   drawPlayers();
   // draw bullets
   drawBullets();
+  
+  drawButton(roomButton,"menu", '#ffc7c7');
+  
+  if( cursor.isOverButton(roomButton) ) cursor.enterButton(roomButton);
+  
+  checkMenu();
+  drawMenu();
+  
 };
+
 
 //endregion
