@@ -37,7 +37,22 @@ const update = (data) => {
 //-- set users on connect --region
 const setUser = (data) => {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
-  players[hash] = new Character(hash, IMAGES.player_purple);
+  if(color == "blue")
+  {
+    players[hash] = new Character(hash, IMAGES.player_blue);
+  }
+  if(color == "red")
+  {
+    players[hash] = new Character(hash, IMAGES.player_red);
+  }
+  if(color == "green")
+  {
+    players[hash] = new Character(hash, IMAGES.player_green);
+  }
+  if(color == "purple")
+  {
+    players[hash] = new Character(hash, IMAGES.player_purple);
+  }
   console.log(data.id);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
@@ -47,7 +62,22 @@ const setOtherplayers = (data) => {
   if(data.hash === hash)
     return;
   console.log('another user joined');
-  players[data.hash] = new Character(data.hash, IMAGES.player_green);
+  if(data.color == "green")
+  {
+    players[data.hash] = new Character(data.hash, IMAGES.player_green);
+  }
+  else if(data.color == "blue")
+  {
+    players[data.hash] = new Character(data.hash, IMAGES.player_blue);
+  }
+  else if(data.color == "red")
+  {
+    players[data.hash] = new Character(data.hash, IMAGES.player_red);
+  }
+  if(data.color == "purple")
+  {
+    players[data.hash] = new Character(data.hash, IMAGES.player_purple);
+  }
   
   if(isHost) socket.emit('spawnEnemies', {id: data.id, enemies: enemies});
 };
@@ -248,6 +278,8 @@ const gameUpdateLoop = () => {
   drawPlayers();
   // draw bullets
   drawBullets();
+  //draw Health
+  drawHealthbar();
   
   drawButton(roomButton,"menu", '#ffc7c7');
   

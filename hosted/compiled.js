@@ -95,9 +95,24 @@ var Character = function Character(hash, image) {
   // if using circle-to-circle collision
   this.radius = 15;
   this.hp = 10;
+  this.maxHP = 10;
 
   image = image || {};
   this.object = image;
+};
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var colorOption = function colorOption(x, y, width, height, text, avalability) {
+    _classCallCheck(this, colorOption);
+
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.text = text;
+    this.avalability = avalability;
 };
 "use strict";
 
@@ -290,7 +305,7 @@ var Room = function () {
 }();
 
 ;
-'use strict';
+"use strict";
 
 var drawPlayers = function drawPlayers(time) {
   //draw things
@@ -303,6 +318,17 @@ var drawPlayers = function drawPlayers(time) {
 
 var drawPlayer = function drawPlayer(playerdrawn) {
   if (playerdrawn.object) {
+
+    if (playerdrawn.object.name == "player_red") {
+      playerdrawn.object.img = IMAGES.player_red.img;
+    } else if (playerdrawn.object.name == "player_green") {
+      playerdrawn.object.img = IMAGES.player_green.img;
+    } else if (playerdrawn.object.name == "player_purple") {
+      playerdrawn.object.img = IMAGES.player_purple.img;
+    } else if (playerdrawn.object.name == "player_blue") {
+      playerdrawn.object.img = IMAGES.player_blue.img;
+    }
+
     ctx.drawImage(playerdrawn.object.img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
   } else {
 
@@ -324,6 +350,25 @@ var drawBullets = function drawBullets(time) {
     var bullet = bulletArray[i];
     drawBullet(bullet);
   }
+};
+
+var drawHealthbar = function drawHealthbar() {
+  //grab this client's player info
+  var player = players[hash];
+  var playerhealthPercentage = player.hp / player.maxHP * 200;
+  ctx.save();
+
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "red";
+
+  ctx.strokeRect(900, 50, 200, 30);
+  ctx.fillRect(900, 50, playerhealthPercentage, 30);
+
+  ctx.font = "24px Arial";
+  ctx.fillStyle = "black";
+  ctx.fillText("HP:", 925, 35);
+
+  ctx.restore();
 };
 
 var drawBullet = function drawBullet(bulletdrawn) {
@@ -416,10 +461,9 @@ var drawCharacterselect = function drawCharacterselect() {
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton, "Choose", "Color");
   ctx.fillStyle = 'white';
-  ctx.fillRect(canvas.width * .1, 150, 150, 300);
-  ctx.fillRect(canvas.width * .32, 150, 150, 300);
-  ctx.fillRect(canvas.width * .54, 150, 150, 300);
-  ctx.fillRect(canvas.width * .75, 150, 150, 300);
+
+  drawcolorOptions();
+
   //ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
 
 }; //character select screen, more of a template right now 
@@ -440,6 +484,45 @@ var drawGameOver = function drawGameOver() {
   ctx.fillText('- Click or press any button to play again! -', canvas.width / 2, canvas.height / 2 + 40);
   ctx.drawImage(IMAGES.logo.img, canvas.width / 2 - 25, canvas.height / 2 - 100);
 }; //game over screen
+
+var drawcolorOptions = function drawcolorOptions() {
+  ctx.save();
+
+  ctx.strokeStyle = "black";
+
+  ctx.font = '30pt Courier';
+
+  if (canBered) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptionred.x, colorOptionred.y, colorOptionred.width, colorOptionred.height);
+    ctx.strokeRect(colorOptionred.x, colorOptionred.y, colorOptionred.width, colorOptionred.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Red", colorOptionred.x + 75, colorOptionred.y + 150);
+  }
+  if (canBepurple) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptionpurple.x, colorOptionpurple.y, colorOptionpurple.width, colorOptionpurple.height);
+    ctx.strokeRect(colorOptionpurple.x, colorOptionpurple.y, colorOptionpurple.width, colorOptionpurple.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Purple", colorOptionpurple.x + 75, colorOptionpurple.y + 150);
+  }
+  if (canBegreen) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptiongreen.x, colorOptiongreen.y, colorOptiongreen.width, colorOptiongreen.height);
+    ctx.strokeRect(colorOptiongreen.x, colorOptiongreen.y, colorOptiongreen.width, colorOptiongreen.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Green", colorOptiongreen.x + 75, colorOptiongreen.y + 150);
+  }
+  if (canBeblue) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptionblue.x, colorOptionblue.y, colorOptionblue.width, colorOptionblue.height);
+    ctx.strokeRect(colorOptionblue.x, colorOptionblue.y, colorOptionblue.width, colorOptionblue.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Blue", colorOptionblue.x + 75, colorOptionblue.y + 150);
+  }
+
+  ctx.restore();
+};
 'use strict';
 
 var editMode = true; //maybe if we make a room 'editor'
@@ -809,6 +892,19 @@ var buttonTap = function buttonTap(button) {
     return false;
   }
 };
+
+var colorOptiontap = function colorOptiontap() {
+
+  if (cursor.x > colorOptionred.x && cursor.x < colorOptionred.x + colorOptionred.width && cursor.y > colorOptionred.y && cursor.y < colorOptionred.y + colorOptionred.height) {
+    color = "red";
+  } else if (cursor.x > colorOptiongreen.x && cursor.x < colorOptiongreen.x + colorOptiongreen.width && cursor.y > colorOptiongreen.y && cursor.y < colorOptiongreen.y + colorOptiongreen.height) {
+    color = "green";
+  } else if (cursor.x > colorOptionblue.x && cursor.x < colorOptionblue.x + colorOptionblue.width && cursor.y > colorOptionblue.y && cursor.y < colorOptionblue.y + colorOptionblue.height) {
+    color = "blue";
+  } else if (cursor.x > colorOptionpurple.x && cursor.x < colorOptionpurple.x + colorOptionpurple.width && cursor.y > colorOptionpurple.y && cursor.y < colorOptionpurple.y + colorOptionpurple.height) {
+    color = "purple";
+  }
+};
 'use strict';
 
 var canvas = void 0,
@@ -842,6 +938,17 @@ var ANIMATIONS = {};
 var bufferTime = 0;
 var canFire = true;
 var lastTime = void 0;
+
+var color = void 0;
+var canBered = void 0;
+var canBepurple = void 0;
+var canBegreen = void 0;
+var canBeblue = void 0;
+
+var colorOptionred = void 0;
+var colorOptionpurple = void 0;
+var colorOptionblue = void 0;
+var colorOptiongreen = void 0;
 
 var startButton = void 0,
     selectButton = void 0,
@@ -1039,6 +1146,8 @@ var init = function init() {
   animationFrame = requestAnimationFrame(stateHandler);
 
   playBgAudio();
+
+  color = undefined;
 };
 
 window.onload = init;
@@ -1552,8 +1661,17 @@ var setupSockets = function setupSockets() {
 
   socket.emit('initialJoin', {});
 
-  socket.on('initialJoined', function () {
-    return gameState = STATES.preload;
+  socket.on('initialJoined', function (data) {
+    gameState = STATES.preload;
+    canBered = data.Red;
+    canBepurple = data.Purple;
+    canBegreen = data.Green;
+    canBeblue = data.Blue;
+
+    colorOptionred = new colorOption(canvas.width * .1, 150, 150, 300, "Red", canBered);
+    colorOptionpurple = new colorOption(canvas.width * .32, 150, 150, 300, "Purple", canBepurple);
+    colorOptiongreen = new colorOption(canvas.width * .54, 150, 150, 300, "Green", canBegreen);
+    colorOptionblue = new colorOption(canvas.width * .75, 150, 150, 300, "Blue", canBeblue);
   });
 
   // only runs if it's this user is the first to join a room
@@ -1692,12 +1810,12 @@ var assignStartupEvents = function assignStartupEvents() {
     canvas_overlay.onmousedown = function () {
 
       var selectBool = buttonTap(selectButton);
-
-      if (selectBool) {
+      colorOptiontap();
+      if (selectBool && color != undefined) {
         removeStartupEvents();
         gameState = STATES.setupGame;
         console.log('setting up game');
-        socket.emit('join', {});
+        socket.emit('join', { color: color });
       }
       checkButton();
       setAnim(cursor, 'click', 'once');
@@ -1713,7 +1831,7 @@ var removeStartupEvents = function removeStartupEvents() {
   }
 }; //remove those events
 //endregion
-'use strict';
+"use strict";
 
 //-- init & spawn enemies --region
 var initEnemies = function initEnemies(numEnemies) {
@@ -1754,7 +1872,18 @@ var update = function update(data) {
 //-- set users on connect --region
 var setUser = function setUser(data) {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
-  players[hash] = new Character(hash, IMAGES.player_purple);
+  if (color == "blue") {
+    players[hash] = new Character(hash, IMAGES.player_blue);
+  }
+  if (color == "red") {
+    players[hash] = new Character(hash, IMAGES.player_red);
+  }
+  if (color == "green") {
+    players[hash] = new Character(hash, IMAGES.player_green);
+  }
+  if (color == "purple") {
+    players[hash] = new Character(hash, IMAGES.player_purple);
+  }
   console.log(data.id);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
@@ -1763,7 +1892,16 @@ var setUser = function setUser(data) {
 var setOtherplayers = function setOtherplayers(data) {
   if (data.hash === hash) return;
   console.log('another user joined');
-  players[data.hash] = new Character(data.hash, IMAGES.player_green);
+  if (data.color == "green") {
+    players[data.hash] = new Character(data.hash, IMAGES.player_green);
+  } else if (data.color == "blue") {
+    players[data.hash] = new Character(data.hash, IMAGES.player_blue);
+  } else if (data.color == "red") {
+    players[data.hash] = new Character(data.hash, IMAGES.player_red);
+  }
+  if (data.color == "purple") {
+    players[data.hash] = new Character(data.hash, IMAGES.player_purple);
+  }
 
   if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: enemies });
 };
@@ -1956,6 +2094,8 @@ var gameUpdateLoop = function gameUpdateLoop() {
   drawPlayers();
   // draw bullets
   drawBullets();
+  //draw Health
+  drawHealthbar();
 
   drawButton(roomButton, "menu", '#ffc7c7');
 

@@ -15,6 +15,17 @@ let bufferTime = 0;
 let canFire = true;
 let lastTime;
 
+let color;
+let canBered;
+let canBepurple;
+let canBegreen;
+let canBeblue;
+
+let colorOptionred;
+let colorOptionpurple;
+let colorOptionblue;
+let colorOptiongreen;
+
 let startButton, selectButton, roomButton;
 
 let STATES = {
@@ -205,6 +216,8 @@ const init = () => {
   animationFrame = requestAnimationFrame(stateHandler);
   
   playBgAudio();
+
+  color = undefined;
 };
 
 window.onload = init;

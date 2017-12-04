@@ -285,3 +285,24 @@ const buttonTap = (button) => {
         return false;
       }
 }
+
+const colorOptiontap = () => {
+
+  if(cursor.x > colorOptionred.x && cursor.x < (colorOptionred.x + colorOptionred.width) && cursor.y > colorOptionred.y && cursor.y < (colorOptionred.y + colorOptionred.height))
+  {
+    color = "red";  
+  }
+  else if(cursor.x > colorOptiongreen.x && cursor.x < (colorOptiongreen.x + colorOptiongreen.width) && cursor.y > colorOptiongreen.y && cursor.y < (colorOptiongreen.y + colorOptiongreen.height))
+  {
+    color = "green";
+  }
+  else if(cursor.x > colorOptionblue.x && cursor.x < (colorOptionblue.x + colorOptionblue.width) && cursor.y > colorOptionblue.y && cursor.y < (colorOptionblue.y + colorOptionblue.height))
+  {
+    color = "blue";
+  }
+  else if(cursor.x > colorOptionpurple.x && cursor.x < (colorOptionpurple.x + colorOptionpurple.width) && cursor.y > colorOptionpurple.y && cursor.y < (colorOptionpurple.y + colorOptionpurple.height))
+  {
+    color = "purple";
+  }
+
+}

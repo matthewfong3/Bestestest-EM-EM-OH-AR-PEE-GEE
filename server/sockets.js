@@ -15,13 +15,17 @@ const setupSockets = (ioServer) => {
     socket.on('initialJoin', () => {
       if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
+        rooms[`room${roomNum}`].Red = true;
+        rooms[`room${roomNum}`].Blue = true;
+        rooms[`room${roomNum}`].Green = true;
+        rooms[`room${roomNum}`].Purple = true;
       }
 
       socket.join(`room${roomNum}`);
       socket.roomNum = roomNum;
       socket.roomMember = roomMember;
 
-      socket.emit('initialJoined', {});
+      socket.emit('initialJoined', {Red: rooms[`room${roomNum}`].Red, Blue: rooms[`room${roomNum}`].Blue, Green : rooms[`room${roomNum}`].Green, Purple: rooms[`room${roomNum}`].Purple});
       if (roomMember === 4) {
         roomMember = 0;
         roomNum++;
@@ -29,7 +33,7 @@ const setupSockets = (ioServer) => {
       roomMember++;
     });
 
-    socket.on('join', () => {
+    socket.on('join', (data) => {
       /* if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
       }
@@ -37,6 +41,23 @@ const setupSockets = (ioServer) => {
       socket.join(`room${roomNum}`); */
 
       console.log('user has joined');
+
+      if(data.color == "red")
+      {
+        rooms[`room${socket.roomNum}`].Red = false;
+      }
+      else if(data.color == "purple" )
+      {
+        rooms[`room${socket.roomNum}`].Purple = false;
+      }
+      else if(data.color == "blue")
+      {
+        rooms[`room${socket.roomNum}`].Blue = false;
+      }
+      else if(data.color == "green")
+      {
+        rooms[`room${socket.roomNum}`].Green = false;
+      }
 
       // create an unique hash for each new client
       const hash = xxh.h32(`${socket.id}${new Date().getTime()}`, 0xCAFEBABE).toString(16);
@@ -50,7 +71,7 @@ const setupSockets = (ioServer) => {
       }
 
       socket.emit('joined', { hash });
-      socket.broadcast.emit('otherConnects', { hash, id: socket.id });
+      socket.broadcast.emit('otherConnects', { hash, id: socket.id, color: data.color});
     });
 
     // server listens to non-host clients for key updates and sends them to host client

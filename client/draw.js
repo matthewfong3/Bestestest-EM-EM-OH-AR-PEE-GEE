@@ -9,6 +9,24 @@ const drawPlayers = (time) => {
 
 const drawPlayer = (playerdrawn) => {
   if(playerdrawn.object){
+
+      if(playerdrawn.object.name == "player_red")
+      {
+        playerdrawn.object.img = IMAGES.player_red.img;
+      }
+      else if(playerdrawn.object.name == "player_green")
+      {
+        playerdrawn.object.img = IMAGES.player_green.img;
+      }
+      else if(playerdrawn.object.name == "player_purple")
+      {
+        playerdrawn.object.img = IMAGES.player_purple.img;
+      }
+      else if(playerdrawn.object.name == "player_blue")
+      {
+        playerdrawn.object.img = IMAGES.player_blue.img;
+      }
+
     ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
   }else {
   
@@ -31,6 +49,29 @@ const drawBullets = (time) => {
     let bullet = bulletArray[i];
     drawBullet(bullet);
   }
+}
+
+const drawHealthbar = () => {
+  //grab this client's player info
+  let player = players[hash];
+  let playerhealthPercentage = player.hp/player.maxHP * 200; 
+  ctx.save();
+
+  
+
+
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "red";
+
+  ctx.strokeRect(900,50,200,30);
+  ctx.fillRect(900,50,playerhealthPercentage,30);
+
+  ctx.font = "24px Arial";
+  ctx.fillStyle = "black";
+  ctx.fillText("HP:",925,35);
+
+  ctx.restore();
+
 }
 
 const drawBullet = (bulletdrawn) => {
@@ -122,10 +163,9 @@ const drawCharacterselect = () => {
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton,"Choose","Color");
   ctx.fillStyle = 'white';
-  ctx.fillRect(canvas.width * .1, 150,150,300);
-  ctx.fillRect(canvas.width * .32, 150,150,300);
-  ctx.fillRect(canvas.width * .54, 150,150,300);
-  ctx.fillRect(canvas.width * .75, 150,150,300);
+
+  drawcolorOptions();
+
   //ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
 
 
@@ -147,3 +187,53 @@ ctx.fillStyle = 'black';
   ctx.fillText('- Click or press any button to play again! -', canvas.width/2,canvas.height/2+40);
   ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
 }; //game over screen
+
+const drawcolorOptions = () => {
+  ctx.save();
+
+  ctx.strokeStyle = "black";
+  
+  ctx.font = '30pt Courier';
+
+  if(canBered)
+  {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptionred.x,colorOptionred.y,colorOptionred.width,colorOptionred.height);
+    ctx.strokeRect(colorOptionred.x,colorOptionred.y,colorOptionred.width,colorOptionred.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Red",colorOptionred.x + 75,colorOptionred.y + 150);
+  }
+  if(canBepurple)
+  {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptionpurple.x,colorOptionpurple.y,colorOptionpurple.width,colorOptionpurple.height);
+    ctx.strokeRect(colorOptionpurple.x,colorOptionpurple.y,colorOptionpurple.width,colorOptionpurple.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Purple",colorOptionpurple.x + 75,colorOptionpurple.y + 150);
+  }
+  if(canBegreen)
+  {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptiongreen.x,colorOptiongreen.y,colorOptiongreen.width,colorOptiongreen.height);
+    ctx.strokeRect(colorOptiongreen.x,colorOptiongreen.y,colorOptiongreen.width,colorOptiongreen.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Green",colorOptiongreen.x + 75,colorOptiongreen.y + 150);
+  }
+  if(canBeblue)
+  {
+    ctx.fillStyle = "white";
+    ctx.fillRect(colorOptionblue.x,colorOptionblue.y,colorOptionblue.width,colorOptionblue.height);
+    ctx.strokeRect(colorOptionblue.x,colorOptionblue.y,colorOptionblue.width,colorOptionblue.height);
+    ctx.fillStyle = "black";
+    ctx.fillText("Blue",colorOptionblue.x + 75,colorOptionblue.y + 150);
+  }
+  
+  
+
+
+
+
+  ctx.restore();
+
+
+}

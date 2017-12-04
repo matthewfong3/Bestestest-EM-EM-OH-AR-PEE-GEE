@@ -23,6 +23,7 @@ class Character {
     // if using circle-to-circle collision
     this.radius = 15;
     this.hp = 10;
+    this.maxHP = 10;
     
     image = image || {};
     this.object = image;

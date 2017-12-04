@@ -17,7 +17,20 @@ const setupSockets = () => {
   
   socket.emit('initialJoin', {});
   
-  socket.on('initialJoined', () => gameState = STATES.preload);
+  socket.on('initialJoined', (data) => {
+    gameState = STATES.preload
+    canBered = data.Red;
+    canBepurple = data.Purple;
+    canBegreen = data.Green;
+    canBeblue = data.Blue;
+
+    colorOptionred = new colorOption(canvas.width * .1, 150,150,300,"Red",canBered);
+    colorOptionpurple = new colorOption(canvas.width * .32, 150,150,300,"Purple",canBepurple);
+    colorOptiongreen = new colorOption(canvas.width * .54, 150,150,300, "Green", canBegreen);
+    colorOptionblue = new colorOption(canvas.width * .75, 150,150,300, "Blue", canBeblue);
+  
+  
+  });
   
   // only runs if it's this user is the first to join a room
   socket.on('setHost', () => {
@@ -158,13 +171,13 @@ const assignStartupEvents = () => {
     canvas_overlay.onmousedown = () => {
 
       let selectBool = buttonTap(selectButton);
-      
-      if(selectBool)
+      colorOptiontap();
+      if(selectBool && color != undefined)
       {
         removeStartupEvents();
         gameState = STATES.setupGame; 
         console.log('setting up game');
-        socket.emit('join', {});
+        socket.emit('join', {color});
       }
       checkButton();
       setAnim(cursor, 'click', 'once' );
