@@ -37,7 +37,7 @@ const update = (data) => {
 //-- set users on connect --region
 const setUser = (data) => {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
-  players[hash] = new Character(hash);
+  players[hash] = new Character(hash, IMAGES.player_purple);
   console.log(data.id);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
@@ -47,7 +47,7 @@ const setOtherplayers = (data) => {
   if(data.hash === hash)
     return;
   console.log('another user joined');
-  players[data.hash] = new Character(data.hash);
+  players[data.hash] = new Character(data.hash, IMAGES.player_green);
   
   if(isHost) socket.emit('spawnEnemies', {id: data.id, enemies: enemies});
 };
@@ -121,6 +121,8 @@ const startGame = () => {
   
   //play audio
   playBgAudio();
+  
+  setupDungeonAssets();
   
   //go to game loop
   gameState = STATES.game;
@@ -236,6 +238,10 @@ const gameUpdateLoop = () => {
     checkCollisionsPlayersVEnemies(players, enemies);
   }
   
+  ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
+  room_0.drawDoors();
+  
+  
   // draw enemies
   drawEnemies();
   // draw players
@@ -249,7 +255,6 @@ const gameUpdateLoop = () => {
   
   checkMenu();
   drawMenu();
-  
 };
 
 

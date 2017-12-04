@@ -33,17 +33,33 @@ var button = function () {
 
     this.x = x;
     this.y = y;
-    this.width = 200;
-    this.height = 50;
+    this.width = opts.width || 200;
+    this.height = opts.height || 50;
     this.text = opts.text || '---';
     this.available = opts.available || true;
-    this.callback = emptyFunct;
+    this.callback = opts.callback || emptyFunct;
   }
 
   _createClass(button, [{
     key: 'setText',
     value: function setText(text) {
       this.text = text;
+    }
+  }, {
+    key: 'setAvailable',
+    value: function setAvailable() {
+      this.available = true;
+    }
+  }, {
+    key: 'setUnavailable',
+    value: function setUnavailable() {
+      this.available = false;
+    }
+  }, {
+    key: 'moveTo',
+    value: function moveTo(x, y) {
+      this.x = x;
+      this.y = y;
     }
   }]);
 
@@ -53,7 +69,7 @@ var button = function () {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Character = function Character(hash) {
+var Character = function Character(hash, image) {
   _classCallCheck(this, Character);
 
   this.hash = hash;
@@ -77,8 +93,11 @@ var Character = function Character(hash) {
   this.moveDown = false;
 
   // if using circle-to-circle collision
-  this.radius = 10;
+  this.radius = 15;
   this.hp = 10;
+
+  image = image || {};
+  this.object = image;
 };
 "use strict";
 
@@ -219,60 +238,58 @@ var Enemy = function () {
 }();
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var room =
+var Room = function () {
 
-/* ex connection:
-  room_2: { //room ID
-    name: 'cellar',
-    enter_location: 2, //which door in room you come out of
-    spawn_1: {x: 25, y: 25}; //where they are spawned in next
-    spawn_2: {x: 25, y: 50};
-    spawn_3: {x: 50, y: 25};
-    spawn_4: {x: 50, y: 50};
+  /* ex entrance
+    top: {
+      ID: 'room_1',
+      name: 'roof',
+      location: {x: width/2-doors.top.width/2, y: 0},
+      object: doors.top,
+      open: false,
+      visited: false,
+      conditions: [ goal_defeatAllEnemies ]
+    },
+  */ // <- ex entrance
+
+  function Room(props) {
+    _classCallCheck(this, Room);
+
+    this.ID = props.ID || -1; //unique name
+    this.name = props.name || 'room'; //display name
+    this.bg_music = props.bg_music || 'default';
+    this.bg_image = props.bg_image || undefined;
+
+    this.objects = props.objects || {}; //walls and stuff
+    this.goals = props.goals || {}; //clear goals or treasure goals
+    this.mobs = props.mobs || {}; //enemies and npcs
+    this.items = props.items || {}; //items and treasure chests
+
+    this.visited = props.visited || false;
+    this.cleared = props.cleared || false;
+    this.entrances = props.entrances || undefined; //where players are spawned in room. set in [move to room]
+    this.entered_from = props.entered_from || undefined;
   }
-*/ //<- ex connection
 
-function room(props) {
-  _classCallCheck(this, room);
+  _createClass(Room, [{
+    key: 'drawDoors',
+    value: function drawDoors() {
+      var keys = Object.keys(this.entrances);
+      for (var i = 0; i < keys.length; i++) {
+        var door = this.entrances[keys[i]];
+        if (door.open) ctx.drawImage(door.object.img_open.img, door.location.x, door.location.y);else ctx.drawImage(door.object.img_lock.img, door.location.x, door.location.y);
+      }
+    }
+  }]);
 
-  this.ID = props.ID || -1; //unique name
-  this.name = props.name || 'room'; //display name
-  this.bg_music = props.bg_music || 'default';
-  this.bg_image = props.bg_image || undefined;
-
-  this.connection = props.connections || {}; //connected rooms
-  this.objects = props.objects || {}; //walls and stuff
-  this.goals = props.goals || {}; //clear goals or treasure goals
-  this.mobs = props.mobs || {}; //enemies and npcs
-  this.items = props.items || {}; //items and treasure chests
-
-  this.visited = props.visited || false;
-  this.cleared = props.cleared || false;
-  this.main_entrance = props.main_entrance || undefined;
-  this.entered_from = props.entered_from || undefined;
-
-  //where players are spawned in room. set in [move to room]
-  this.spawn_1 = props.spawn_1 || undefined;
-  this.spawn_2 = props.spawn_2 || undefined;
-  this.spawn_3 = props.spawn_3 || undefined;
-  this.spawn_4 = props.spawn_4 || undefined;
-};
+  return Room;
+}();
 
 ;
-
-var connection = function connection(props) {
-  _classCallCheck(this, connection);
-
-  this.ID = props.ID || -1;
-  this.name = props.name || 'room';
-  this.enter_location = props.enter_location || undefined; //which entrance in next room
-  this.spawn_1 = props.spawn_1 || undefined;
-  this.spawn_2 = props.spawn_2 || undefined;
-  this.spawn_3 = props.spawn_3 || undefined;
-  this.spawn_4 = props.spawn_4 || undefined;
-};
 'use strict';
 
 var drawPlayers = function drawPlayers(time) {
@@ -285,15 +302,20 @@ var drawPlayers = function drawPlayers(time) {
 }; //draw all players in the players list
 
 var drawPlayer = function drawPlayer(playerdrawn) {
-  ctx.save();
-  ctx.beginPath();
+  if (playerdrawn.object) {
+    ctx.drawImage(playerdrawn.object.img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
+  } else {
 
-  ctx.fillStyle = playerdrawn.style;
-  ctx.arc(playerdrawn.x, playerdrawn.y, playerdrawn.radius, 0, Math.PI * 2, false);
+    ctx.save();
+    ctx.beginPath();
 
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
+    ctx.fillStyle = playerdrawn.style;
+    ctx.arc(playerdrawn.x, playerdrawn.y, playerdrawn.radius, 0, Math.PI * 2, false);
+
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
 };
 
 var drawBullets = function drawBullets(time) {
@@ -418,6 +440,96 @@ var drawGameOver = function drawGameOver() {
   ctx.fillText('- Click or press any button to play again! -', canvas.width / 2, canvas.height / 2 + 40);
   ctx.drawImage(IMAGES.logo.img, canvas.width / 2 - 25, canvas.height / 2 - 100);
 }; //game over screen
+'use strict';
+
+var editMode = true; //maybe if we make a room 'editor'
+
+var doors = {};
+
+//test rooms
+var room_0 = {};
+
+var setupDungeonAssets = function setupDungeonAssets() {
+  doors.top = {
+    img_open: IMAGES.door_top,
+    img_lock: IMAGES.door_top_lock,
+    width: IMAGES.door_top.width,
+    height: IMAGES.door_top.height
+  };
+  doors.bottom = {
+    img_open: IMAGES.door_bottom,
+    img_lock: IMAGES.door_bottom_lock,
+    width: IMAGES.door_bottom.width,
+    height: IMAGES.door_bottom.height
+  };
+  doors.left = {
+    img_open: IMAGES.door_left,
+    img_lock: IMAGES.door_left_lock,
+    width: IMAGES.door_left.width,
+    height: IMAGES.door_left.height
+  };
+  doors.right = {
+    img_open: IMAGES.door_right,
+    img_lock: IMAGES.door_right_lock,
+    width: IMAGES.door_right.width,
+    height: IMAGES.door_right.height
+  };
+
+  room_0 = new Room({
+    ID: 'room_0',
+    name: 'first room',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+
+    entrances: {
+      top: {
+        ID: 'room_1',
+        name: 'roof',
+        location: { x: width / 2 - doors.top.width / 2, y: 0 },
+        object: doors.top,
+        open: false,
+        visited: false,
+        conditions: [goal_defeatAllEnemies]
+      },
+      bottom: {
+        ID: 'room_2',
+        name: 'basement',
+        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
+        open: true,
+        visited: false,
+        object: doors.bottom
+      },
+      right: {
+        ID: 'room_3',
+        name: 'hall',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: false,
+        object: doors.right
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });
+};
+
+//room clear goals
+var goal_defeatAllEnemies = function goal_defeatAllEnemies(room) {
+  var keys = Object.keys(room.enemies);
+  for (var i = 0; i < keys.length; i++) {
+    if (room.enemies[keys[i]].hp > 0) return false;
+  }
+  return true;
+};
+
+var goal_collectObjects = function goal_collectObjects(toCollect) {};
+
+var goal_reachArea = function goal_reachArea(area) {};
+
+var goal_triggerEvents = function goal_triggerEvents(events) {};
+
+var goal_defeatBoss = function goal_defeatBoss(boss) {};
 'use strict';
 
 var getMouse = function getMouse(e) {
@@ -721,10 +833,11 @@ var bgAudio = undefined,
     currentDirection = 1;
 
 var mouse = { x: 0, y: 0 };
-var IMAGES = {};
-var ANIMATIONS = {};
 var cursor = undefined;
 var dragging = false;
+
+var IMAGES = {};
+var ANIMATIONS = {};
 
 var bufferTime = 0;
 var canFire = true;
@@ -967,13 +1080,16 @@ window.onfocus = function () {
   resumeGame();
   //console.log('focus');
 };
-"use strict";
+'use strict';
 
 //--vars-----------------------------region
 var bgTracks = {
   floralLife: { src: 'assets/audio/Floral Life (Henesys).mp3', lastTime: 0 },
+  exploration: { src: 'assets/audio/Exploration - Xenoblade Chronicles 2.mp3', lastTime: 0 },
   current: {}
 };
+var currentTrack = bgTracks.exploration;
+
 var effectSounds = ["1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"];
 
 //image preloading vv
@@ -981,6 +1097,58 @@ var loadQueue = -1;
 var numLoaded = 0;
 
 var toLoadImgs = [{
+  name: 'door_top_lock',
+  url: 'assets/img/door-top-lock.png'
+}, //top door lock
+{
+  name: 'door_top',
+  url: 'assets/img/door-top.png'
+}, //top door
+{
+  name: 'door_bottom_lock',
+  url: 'assets/img/door-bottom-lock.png'
+}, //bottom door lock
+{
+  name: 'door_bottom',
+  url: 'assets/img/door-bottom.png'
+}, //bottom door
+{
+  name: 'door_left_lock',
+  url: 'assets/img/door-left-lock.png'
+}, //left door lock
+{
+  name: 'door_left',
+  url: 'assets/img/door-left.png'
+}, //left door
+{
+  name: 'door_right_lock',
+  url: 'assets/img/door-right-lock.png'
+}, //right door lock
+{
+  name: 'door_right',
+  url: 'assets/img/door-right.png'
+}, //right door
+{
+  name: 'dungeon_walls',
+  url: 'assets/img/dungeon-walls.png'
+}, //dungeon walls
+{
+  name: 'player_red',
+  url: 'assets/img/plr-red.png'
+}, //red player
+{
+  name: 'player_blue',
+  url: 'assets/img/plr-blue.png'
+}, //blue player
+{
+  name: 'player_green',
+  url: 'assets/img/plr-green.png'
+}, //green player
+{
+  name: 'player_purple',
+  url: 'assets/img/plr-purple.png'
+}, //purple player
+{
   name: 'logo',
   url: 'assets/img/logo.png'
 }];
@@ -1201,8 +1369,8 @@ var setupSound = function setupSound() {
   bgAudio.volume = 0.25;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
-  bgAudio.src = bgTracks.floralLife.src;
-  bgAudio.current = bgTracks.floralLife;
+  bgAudio.current = bgTracks.exploration;
+  bgAudio.src = bgAudio.current.src;
 };
 
 var playBgAudio = function playBgAudio(reset) {
@@ -1586,7 +1754,7 @@ var update = function update(data) {
 //-- set users on connect --region
 var setUser = function setUser(data) {
   hash = data.hash; // set this client's hash to the unique hash the server gives them
-  players[hash] = new Character(hash);
+  players[hash] = new Character(hash, IMAGES.player_purple);
   console.log(data.id);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
@@ -1595,7 +1763,7 @@ var setUser = function setUser(data) {
 var setOtherplayers = function setOtherplayers(data) {
   if (data.hash === hash) return;
   console.log('another user joined');
-  players[data.hash] = new Character(data.hash);
+  players[data.hash] = new Character(data.hash, IMAGES.player_green);
 
   if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: enemies });
 };
@@ -1662,6 +1830,8 @@ var startGame = function startGame() {
 
   //play audio
   playBgAudio();
+
+  setupDungeonAssets();
 
   //go to game loop
   gameState = STATES.game;
@@ -1776,6 +1946,9 @@ var gameUpdateLoop = function gameUpdateLoop() {
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
   }
+
+  ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
+  room_0.drawDoors();
 
   // draw enemies
   drawEnemies();

@@ -1,8 +1,11 @@
 //--vars-----------------------------region
 let bgTracks = {
   floralLife: { src: 'assets/audio/Floral Life (Henesys).mp3', lastTime: 0 },
+  exploration: { src: 'assets/audio/Exploration - Xenoblade Chronicles 2.mp3', lastTime: 0 },
   current: { }
 }
+let currentTrack = bgTracks.exploration;
+
 let effectSounds = [
   "1.mp3" ,"2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"
 ];
@@ -12,6 +15,58 @@ let loadQueue = -1;
 let numLoaded = 0;
 
 const toLoadImgs = [
+  {
+    name: 'door_top_lock',
+    url: 'assets/img/door-top-lock.png'
+  }, //top door lock
+  {
+    name: 'door_top',
+    url: 'assets/img/door-top.png'
+  }, //top door
+  {
+    name: 'door_bottom_lock',
+    url: 'assets/img/door-bottom-lock.png'
+  }, //bottom door lock
+  {
+    name: 'door_bottom',
+    url: 'assets/img/door-bottom.png'
+  }, //bottom door
+  {
+    name: 'door_left_lock',
+    url: 'assets/img/door-left-lock.png'
+  }, //left door lock
+  {
+    name: 'door_left',
+    url: 'assets/img/door-left.png'
+  }, //left door
+  {
+    name: 'door_right_lock',
+    url: 'assets/img/door-right-lock.png'
+  }, //right door lock
+  {
+    name: 'door_right',
+    url: 'assets/img/door-right.png'
+  }, //right door
+  {
+    name: 'dungeon_walls',
+    url: 'assets/img/dungeon-walls.png'
+  }, //dungeon walls
+  {
+    name: 'player_red',
+    url: 'assets/img/plr-red.png'
+  }, //red player
+  {
+    name: 'player_blue',
+    url: 'assets/img/plr-blue.png'
+  }, //blue player
+  {
+    name: 'player_green',
+    url: 'assets/img/plr-green.png'
+  }, //green player
+  {
+    name: 'player_purple',
+    url: 'assets/img/plr-purple.png'
+  }, //purple player
   {
     name: 'logo',
     url: 'assets/img/logo.png'
@@ -251,8 +306,8 @@ const setupSound = () => {
   bgAudio.volume=0.25;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
-  bgAudio.src = bgTracks.floralLife.src;
-  bgAudio.current = bgTracks.floralLife;
+  bgAudio.current = bgTracks.exploration;
+  bgAudio.src = bgAudio.current.src;
 };
 
 const playBgAudio = (reset) => {

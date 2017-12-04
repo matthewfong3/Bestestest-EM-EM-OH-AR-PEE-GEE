@@ -8,15 +8,20 @@ const drawPlayers = (time) => {
 }; //draw all players in the players list
 
 const drawPlayer = (playerdrawn) => {
-  ctx.save();
-  ctx.beginPath();
+  if(playerdrawn.object){
+    ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
+  }else {
   
-  ctx.fillStyle = playerdrawn.style;
-  ctx.arc(playerdrawn.x,playerdrawn.y,playerdrawn.radius,0,Math.PI * 2,false);
-  
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore(); 
+    ctx.save();
+    ctx.beginPath();
+    
+    ctx.fillStyle = playerdrawn.style;
+    ctx.arc(playerdrawn.x,playerdrawn.y,playerdrawn.radius,0,Math.PI * 2,false);
+    
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore(); 
+  }
 }
 
 const drawBullets = (time) => {

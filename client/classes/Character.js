@@ -1,5 +1,5 @@
 class Character {
-  constructor(hash) {
+  constructor(hash, image) {
     this.hash = hash;
     this.lastUpdate = new Date().getTime();
 
@@ -21,7 +21,10 @@ class Character {
     this.moveDown = false;
     
     // if using circle-to-circle collision
-    this.radius = 10;
+    this.radius = 15;
     this.hp = 10;
+    
+    image = image || {};
+    this.object = image;
   }
 }

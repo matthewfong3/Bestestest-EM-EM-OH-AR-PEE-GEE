@@ -5,10 +5,11 @@ let socket, hash, isHost = false, hosted = {}, roomName;
 let bgAudio = undefined, effectAudio = undefined, currentEffect = 0, currentDirection = 1;
 
 let mouse = {x:0,y:0};
-let IMAGES = {};
-let ANIMATIONS = {};
 let cursor = undefined;
 let dragging = false;
+
+let IMAGES = {};
+let ANIMATIONS = {};
 
 let bufferTime = 0;
 let canFire = true;
