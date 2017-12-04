@@ -25,7 +25,9 @@ const setupSockets = (ioServer) => {
       socket.roomNum = roomNum;
       socket.roomMember = roomMember;
 
-      socket.emit('initialJoined', {Red: rooms[`room${roomNum}`].Red, Blue: rooms[`room${roomNum}`].Blue, Green : rooms[`room${roomNum}`].Green, Purple: rooms[`room${roomNum}`].Purple});
+      socket.emit('initialJoined', {
+        Red: rooms[`room${roomNum}`].Red, Blue: rooms[`room${roomNum}`].Blue, Green: rooms[`room${roomNum}`].Green, Purple: rooms[`room${roomNum}`].Purple,
+      });
       if (roomMember === 4) {
         roomMember = 0;
         roomNum++;
@@ -42,20 +44,13 @@ const setupSockets = (ioServer) => {
 
       console.log('user has joined');
 
-      if(data.color == "red")
-      {
+      if (data.color === 'red') {
         rooms[`room${socket.roomNum}`].Red = false;
-      }
-      else if(data.color == "purple" )
-      {
+      } else if (data.color === 'purple') {
         rooms[`room${socket.roomNum}`].Purple = false;
-      }
-      else if(data.color == "blue")
-      {
+      } else if (data.color === 'blue') {
         rooms[`room${socket.roomNum}`].Blue = false;
-      }
-      else if(data.color == "green")
-      {
+      } else if (data.color === 'green') {
         rooms[`room${socket.roomNum}`].Green = false;
       }
 
@@ -71,7 +66,7 @@ const setupSockets = (ioServer) => {
       }
 
       socket.emit('joined', { hash });
-      socket.broadcast.emit('otherConnects', { hash, id: socket.id, color: data.color});
+      socket.broadcast.emit('otherConnects', { hash, id: socket.id, color: data.color });
     });
 
     // server listens to non-host clients for key updates and sends them to host client
