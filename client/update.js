@@ -29,7 +29,7 @@ const update = (data) => {
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else{
-    //console.log('updatedPos');
+    console.log('updatedPos');
     players[data.player.hash] = data.player;
   }
 };
