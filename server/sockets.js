@@ -84,6 +84,7 @@ const setupSockets = (ioServer) => {
       };
       console.log(rooms[`room${socket.roomNum}`].host + " is the host");
       console.log(socket.roomMember + " sent this to server");
+      console.log(io.sockets.connected[rooms[`room${socket.roomNum}`].host]);
       io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
     });
 
