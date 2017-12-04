@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "rogue-like legend of zelda",
   "main": "./server/app.js",
+  "engines": {
+    "node": "8.4.0",
+    "npm": "5.3.0"
+  },
   "scripts": {
     "test": "echo \"Tests complete\"",
     "pretest": "eslint ./server --fix",
