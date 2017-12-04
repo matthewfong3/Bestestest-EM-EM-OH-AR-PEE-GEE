@@ -71,7 +71,8 @@ const setupSockets = (ioServer) => {
 
     // server listens to non-host clients for key updates and sends them to host client
     socket.on('updateKeys', (data) => {
-      io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedKeys', data);
+      //io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedKeys', data);
+      io.sockets[rooms[`room${socket.roomNum}`].host].emit('updatedKeys', data);
     });
 
     socket.on('updateFire', (data) => {
@@ -85,7 +86,8 @@ const setupSockets = (ioServer) => {
       console.log(rooms[`room${socket.roomNum}`].host + " is the host");
       console.log(socket.roomMember + " sent this to server");
       console.log(io.sockets.connected[rooms[`room${socket.roomNum}`].host]);
-      io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
+      //io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
+      io.sockets[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
     });
 
     // server listens to host client for player position updates and sends them to non-host clients
