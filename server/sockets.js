@@ -82,7 +82,8 @@ const setupSockets = (ioServer) => {
         mouse: data.mouse,
         bufferTime: data.bufferTime,
       };
-      console.log(rooms[`room${socket.roomNum}`].host);
+      console.log(rooms[`room${socket.roomNum}`].host + " is the host");
+      console.log(socket.roomMember + " sent this to server");
       io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
     });
 
