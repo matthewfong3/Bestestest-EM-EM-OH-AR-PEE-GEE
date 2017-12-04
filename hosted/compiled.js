@@ -1863,7 +1863,7 @@ var spawnEnemies = function spawnEnemies() {
 // when we receive character updates from the server
 var update = function update(data) {
   if (isHost) {
-    //console.log('keys updated');
+    console.log('keys updated');
     players[data.hash].moveUp = data.input.moveUp;
     players[data.hash].moveLeft = data.input.moveLeft;
     players[data.hash].moveDown = data.input.moveDown;
