@@ -116,6 +116,7 @@ const setupSockets = (ioServer) => {
 
     socket.on('disconnect', () => {
       socket.leave(`room${socket.roomNum}`);
+      rooms[`room${socket.roomNum}`].host = null;
       console.log(`${socket.id} has left`);
     });
   });
