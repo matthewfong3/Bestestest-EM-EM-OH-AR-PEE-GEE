@@ -54,7 +54,7 @@ const drawBullets = (time) => {
 const drawHealthbar = () => {
   //grab this client's player info
   let player = players[hash];
-  let playerhealthPercentage = player.hp/player.maxHP * 200; 
+  if(player) let playerhealthPercentage = player.hp/player.maxHP * 200; 
   ctx.save();
 
   
