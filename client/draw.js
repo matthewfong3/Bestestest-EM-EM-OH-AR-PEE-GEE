@@ -54,11 +54,11 @@ const drawBullets = (time) => {
 const drawHealthbar = () => {
   //grab this client's player info
   let player = players[hash];
-  if(player) let playerhealthPercentage = player.hp/player.maxHP * 200; 
+  let playerhealthPercentage = 200;
+  if(player){
+    playerhealthPercentage = player.hp/player.maxHP * 200;
+  } 
   ctx.save();
-
-  
-
 
   ctx.strokeStyle = "black";
   ctx.fillStyle = "red";
@@ -71,7 +71,6 @@ const drawHealthbar = () => {
   ctx.fillText("HP:",925,35);
 
   ctx.restore();
-
 }
 
 const drawBullet = (bulletdrawn) => {

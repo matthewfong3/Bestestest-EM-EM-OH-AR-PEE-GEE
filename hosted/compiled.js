@@ -355,7 +355,10 @@ var drawBullets = function drawBullets(time) {
 var drawHealthbar = function drawHealthbar() {
   //grab this client's player info
   var player = players[hash];
-  var playerhealthPercentage = player.hp / player.maxHP * 200;
+  var playerhealthPercentage = 200;
+  if (player) {
+    playerhealthPercentage = player.hp / player.maxHP * 200;
+  }
   ctx.save();
 
   ctx.strokeStyle = "black";
@@ -1155,20 +1158,20 @@ window.onload = init;
 var pauseGame = function pauseGame() {
   paused = true;
   //stop animation loop
-  cancelAnimationFrame(animationFrame);
+  //cancelAnimationFrame(animationFrame);
 
   stopBgAudio();
 };
 
 var resumeGame = function resumeGame() {
   //stop animation loop just in case
-  cancelAnimationFrame(animationFrame);
+  //cancelAnimationFrame(animationFrame);
 
   playBgAudio();
   paused = false;
 
   //call update
-  requestAnimationFrame(stateHandler);
+  //requestAnimationFrame(stateHandler);
 };
 
 var toggleDebug = function toggleDebug() {

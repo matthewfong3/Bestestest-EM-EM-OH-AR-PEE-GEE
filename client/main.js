@@ -225,20 +225,20 @@ window.onload = init;
 const pauseGame = () => {
   paused = true;
   //stop animation loop
-  cancelAnimationFrame(animationFrame);
+  //cancelAnimationFrame(animationFrame);
   
   stopBgAudio();
 };
 
 const resumeGame = () => {
   //stop animation loop just in case
-  cancelAnimationFrame(animationFrame);
+  //cancelAnimationFrame(animationFrame);
   
   playBgAudio();
   paused = false;
   
   //call update
-  requestAnimationFrame(stateHandler);
+  //requestAnimationFrame(stateHandler);
 };
 
 const toggleDebug =  () => {
