@@ -1836,7 +1836,7 @@ var removeStartupEvents = function removeStartupEvents() {
   }
 }; //remove those events
 //endregion
-"use strict";
+'use strict';
 
 //-- init & spawn enemies --region
 var initEnemies = function initEnemies(numEnemies) {
@@ -1869,7 +1869,7 @@ var update = function update(data) {
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else {
-    //console.log('updatedPos');
+    console.log('updatedPos');
     players[data.player.hash] = data.player;
   }
 };
