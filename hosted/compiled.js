@@ -1680,6 +1680,8 @@ var setupSockets = function setupSockets() {
   // only runs if it's this user is the first to join a room
   socket.on('setHost', function () {
     isHost = true;
+    initEnemies(2);
+    spawnEnemies();
   });
 
   // once this user successfully joins
@@ -1964,11 +1966,6 @@ var startGame = function startGame() {
 
   //game setup
   //TODO setup game stuff
-  if (isHost) {
-    console.log('in hjere');
-    initEnemies(2);
-    spawnEnemies();
-  }
 
   //play audio
   playBgAudio();
