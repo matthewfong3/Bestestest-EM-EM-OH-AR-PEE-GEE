@@ -145,6 +145,7 @@ const startGame = () => {
   //game setup
   //TODO setup game stuff
   if(isHost){
+    console.log('in hjere');
     initEnemies(2);
     spawnEnemies();
   }

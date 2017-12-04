@@ -216,7 +216,7 @@ const init = () => {
   animationFrame = requestAnimationFrame(stateHandler);
   
   playBgAudio();
-
+ 
   color = undefined;
 };
 
