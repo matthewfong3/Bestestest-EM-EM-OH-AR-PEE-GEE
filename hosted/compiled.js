@@ -1864,6 +1864,10 @@ var setupSockets = function setupSockets() {
     console.log('received: player collision detected with enemy');
     players[data.hash] = data;
   });
+
+  socket.on('reconnect', function () {
+    console.log('reconnected');
+  });
 };
 
 var setupGame = function setupGame() {

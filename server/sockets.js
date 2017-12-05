@@ -71,7 +71,7 @@ const setupSockets = (ioServer) => {
 
     // server listens to non-host clients for key updates and sends them to host client
     socket.on('updateKeys', (data) => {
-      //io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedKeys', data);
+      // io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedKeys', data);
       socket.to(rooms[`room${socket.roomNum}`].host).emit('updatedKeys', data);
     });
 
@@ -83,9 +83,9 @@ const setupSockets = (ioServer) => {
         mouse: data.mouse,
         bufferTime: data.bufferTime,
       };
-      console.log(rooms[`room${socket.roomNum}`].host + " is the host");
-      console.log(socket.roomMember + " sent this to server");
-      //io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
+      console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
+      console.log(`${socket.roomMember} sent this to server`);
+      // io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
       socket.to(rooms[`room${socket.roomNum}`].host).emit('updatedFire', newData);
     });
 
@@ -115,10 +115,14 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('disconnect', () => {
-      socket.leave(`room${socket.roomNum}`);
-      rooms[`room${socket.roomNum}`].host = null;
       console.log(`${socket.id} has left`);
+      if(socket.id === rooms[`room${socket.roomNum}`].host){
+        //rooms[`room${socket.roomNum}`].host = ;
+      }
+      socket.leave(`room${socket.roomNum}`);
+      
     });
+    
   });
 };
 

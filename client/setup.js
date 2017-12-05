@@ -82,6 +82,10 @@ const setupSockets = () => {
     console.log('received: player collision detected with enemy');
     players[data.hash] = data;
   });
+  
+  socket.on('reconnect', () => {
+    console.log('reconnected');
+  });
 };
 
 const setupGame = () => {
