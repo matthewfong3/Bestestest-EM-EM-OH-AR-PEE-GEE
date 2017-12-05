@@ -1,4 +1,10 @@
 //handles map related functions
+const COLORS = {
+  available: 'white',
+  unavailable: '#c1c1c1'
+}
+
+
 const menu = {
   open: false,
   options: { },
@@ -23,9 +29,37 @@ const setVoteMenu = () => {
   opts.options.yes.callback = () => console.log('yes');
   opts.options.no.callback = () => console.log('no');
   
-  opts.title = 'enter room? - response in in console';
+  opts.title = 'vote! - response in in console';
   opts.open = true;
   
+  setMenu(opts);
+};
+
+const setChangeRoomMenu = () => {
+  const opts = {};
+  opts.options = { };
+  
+  let offset = 100
+  const keys = Object.keys(ROOMS.current.entrances);
+  for(let i = 0; i< keys.length; i++){
+    const door = ROOMS.current.entrances[keys[i]];
+    if(door.open) {
+      opts.options[door.ID] = new button(100, offset, {text: door.name});
+      opts.options[door.ID].callback = () => {
+        enterRoom(ROOMS[door.ID]);
+        closeMenu();
+      }
+    }
+    else{ 
+      opts.options[door.ID] = new button(100, offset, {text: `${door.name} [X]`});
+      opts.options[door.ID].available = false;
+    }
+    offset+=70;
+  }
+  
+  opts.title = 'Choose a room to move to';
+  opts.open = true;
+
   setMenu(opts);
 };
 
@@ -104,7 +138,7 @@ const checkMenu = () => {
 
 const drawMenu = () => {
   if(menu.open){
-    ctx_overlay.fillStyle = 'rgba(108, 108, 108, 0.4)';
+    ctx_overlay.fillStyle = 'rgba(100, 115, 139, 0.45)';
     ctx_overlay.strokeStyle = 'black';
     ctx_overlay.lineWidth = 3;
     drawRoundedRect(50, 50, width-100, height-100, 7,ctx_overlay, true );
@@ -115,7 +149,7 @@ const drawMenu = () => {
     const keys = Object.keys(menu.options);
     for(let i = 0; i< keys.length; i++){
       const btn = menu.options[keys[i]];
-      drawButton(btn, btn.text , "white");
+      drawButton(btn, btn.text , "white", ctx_overlay);
     }
     
   }

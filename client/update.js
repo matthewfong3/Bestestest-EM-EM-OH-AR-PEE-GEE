@@ -159,8 +159,14 @@ const doOnPreloadDone = () => {
   startButton = new button(canvas.width/2-100,canvas.height * .75);
   selectButton = new button(canvas.width/2-100,canvas.height * .75);
   
-  roomButton = new button(30,30);
-  roomButton.callback = menu.toggle;
+  debugButton = new button(10,10, {width: 70, height: 35, text: '[debug]'});
+  debugButton.callback = menu.toggle;
+  
+  moveButton = new button(90,10, {width: 50, height: 35, text: 'move'});
+  moveButton.callback = function(){
+    setChangeRoomMenu();
+    menu.toggle();
+  };
   
   gameState = STATES.title;
   assignStartupEvents();
@@ -226,7 +232,7 @@ const gameUpdateLoop = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
-  drawPlaceholder();
+  //drawPlaceholder();
   
   //update game
   if(isHost){
@@ -264,9 +270,7 @@ const gameUpdateLoop = () => {
     checkCollisionsPlayersVEnemies(players, enemies);
   }
   
-  ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
-  room_0.drawDoors();
-  
+  ROOMS.current.drawRoom();
   
   // draw enemies
   drawEnemies();
@@ -277,9 +281,11 @@ const gameUpdateLoop = () => {
   //draw Health
   drawHealthbar();
   
-  drawButton(roomButton,"menu", '#ffc7c7');
+  drawButton(debugButton, debugButton.text, '#ffc7c7');
+  drawButton(moveButton, moveButton.text, '#ffc7c7');
   
-  if( cursor.isOverButton(roomButton) ) cursor.enterButton(roomButton);
+  if( cursor.isOverButton(debugButton) ) cursor.enterButton(debugButton);
+  if( cursor.isOverButton(moveButton) ) cursor.enterButton(moveButton);
   
   checkMenu();
   drawMenu();

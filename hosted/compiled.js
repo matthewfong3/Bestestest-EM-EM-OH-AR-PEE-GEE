@@ -38,6 +38,7 @@ var button = function () {
     this.text = opts.text || '---';
     this.available = opts.available || true;
     this.callback = opts.callback || emptyFunct;
+    this.textColor = opts.textColor || 'black';
   }
 
   _createClass(button, [{
@@ -299,6 +300,14 @@ var Room = function () {
         if (door.open) ctx.drawImage(door.object.img_open.img, door.location.x, door.location.y);else ctx.drawImage(door.object.img_lock.img, door.location.x, door.location.y);
       }
     }
+  }, {
+    key: 'drawRoom',
+    value: function drawRoom() {
+      if (this.bg_image) ctx.drawImage(IMAGES[this.bg_image].img, 0, 0);else ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
+      this.drawDoors();
+      ctx_overlay.textAlign = 'left';
+      fillText(ctx_overlay, this.name, 60, height - 15, '15pt courier', 'black');
+    }
   }]);
 
   return Room;
@@ -533,7 +542,11 @@ var editMode = true; //maybe if we make a room 'editor'
 var doors = {};
 
 //test rooms
+var ROOMS = {};
 var room_0 = {};
+var room_1 = {};
+var room_2 = {};
+var room_3 = {};
 
 var setupDungeonAssets = function setupDungeonAssets() {
   doors.top = {
@@ -565,7 +578,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     ID: 'room_0',
     name: 'first room',
     bg_music: 'exploration',
-    bg_image: 'room_1',
+    bg_image: 'room_0',
 
     entrances: {
       top: {
@@ -573,7 +586,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
         name: 'roof',
         location: { x: width / 2 - doors.top.width / 2, y: 0 },
         object: doors.top,
-        open: false,
+        open: true,
         visited: false,
         conditions: [goal_defeatAllEnemies]
       },
@@ -589,7 +602,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
         ID: 'room_3',
         name: 'hall',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
-        open: true,
+        open: false,
         visited: false,
         object: doors.right
       }
@@ -597,7 +610,74 @@ var setupDungeonAssets = function setupDungeonAssets() {
 
     goals: goal_defeatAllEnemies
 
-  });
+  });ROOMS['room_0'] = room_0;
+
+  room_1 = new Room({
+    ID: 'room_1',
+    name: 'roof',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+
+    entrances: {
+      bottom: {
+        ID: 'room_0',
+        name: 'first room',
+        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
+        open: true,
+        visited: false,
+        object: doors.bottom
+      },
+      right: {
+        ID: 'room_4',
+        name: 'balcony',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: false,
+        visited: false,
+        object: doors.right
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_1'] = room_1;
+
+  room_2 = new Room({
+    ID: 'room_2',
+    name: 'basement',
+    bg_music: 'exploration',
+    bg_image: 'room_2',
+
+    entrances: {
+      top: {
+        ID: 'room_0',
+        name: 'first room',
+        location: { x: width / 2 - doors.top.width / 2, y: 0 },
+        object: doors.top,
+        open: true,
+        visited: false
+      },
+      left: {
+        ID: 'room_5',
+        name: 'storage',
+        location: { x: 0, y: height / 2 - doors.right.height / 2 },
+        open: false,
+        visited: false,
+        object: doors.left
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_2'] = room_2;
+
+  ROOMS.current = room_0;
+  enterRoom(room_0);
+};
+
+var enterRoom = function enterRoom(newRoom) {
+  ROOMS.current.visited = true;
+
+  ROOMS.current = newRoom;
 };
 
 //room clear goals
@@ -611,7 +691,13 @@ var goal_defeatAllEnemies = function goal_defeatAllEnemies(room) {
 
 var goal_collectObjects = function goal_collectObjects(toCollect) {};
 
-var goal_reachArea = function goal_reachArea(area) {};
+var goal_reachArea = function goal_reachArea(area) {
+  if (area.radius) {
+    //check circle collision with area
+  } else {
+      //check box collision with area
+    }
+};
 
 var goal_triggerEvents = function goal_triggerEvents(events) {};
 
@@ -847,13 +933,14 @@ var drawRoundedRect = function drawRoundedRect(x, y, w, h, amt, targetCtx, strok
 };
 
 //draw a ui (top-canvas) button [button]: {x, y, height, width}
-var drawButton = function drawButton(button, text, color) {
-  ctx.save();
-  ctx.fillStyle = color || button.color;
-  ctx.lineWidth = 1.5;
-  drawRoundedRect(button.x, button.y, button.width, button.height, 3, ctx, true);
-  fillText(ctx, text || button.text, button.x + button.width / 2, button.y + button.height / 2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true);
-  ctx.restore();
+var drawButton = function drawButton(button, text, color, context) {
+  var c = context || ctx;
+  c.save();
+  c.fillStyle = color || button.color;
+  c.lineWidth = 1.5;
+  drawRoundedRect(button.x, button.y, button.width, button.height, 3, c, true);
+  fillText(c, text || button.text, button.x + button.width / 2, button.y + button.height / 2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true);
+  c.restore();
 };
 
 function wrapText(context, text, x, y, maxWidth, lineHeight) {
@@ -955,7 +1042,8 @@ var colorOptiongreen = void 0;
 
 var startButton = void 0,
     selectButton = void 0,
-    roomButton = void 0;
+    debugButton = void 0,
+    moveButton = void 0;
 
 var STATES = {
   wait: 'wait',
@@ -1245,6 +1333,18 @@ var toLoadImgs = [{
   url: 'assets/img/dungeon-walls.png'
 }, //dungeon walls
 {
+  name: 'room_0',
+  url: 'assets/img/room_0.png'
+}, //room 0
+{
+  name: 'room_1',
+  url: 'assets/img/room_1.png'
+}, //room 1
+{
+  name: 'room_2',
+  url: 'assets/img/room_2.png'
+}, //room 2
+{
   name: 'player_red',
   url: 'assets/img/plr-red.png'
 }, //red player
@@ -1516,6 +1616,11 @@ var playEffect = function playEffect() {
 'use strict';
 
 //handles map related functions
+var COLORS = {
+  available: 'white',
+  unavailable: '#c1c1c1'
+};
+
 var menu = {
   open: false,
   options: {},
@@ -1546,7 +1651,39 @@ var setVoteMenu = function setVoteMenu() {
     return console.log('no');
   };
 
-  opts.title = 'enter room? - response in in console';
+  opts.title = 'vote! - response in in console';
+  opts.open = true;
+
+  setMenu(opts);
+};
+
+var setChangeRoomMenu = function setChangeRoomMenu() {
+  var opts = {};
+  opts.options = {};
+
+  var offset = 100;
+  var keys = Object.keys(ROOMS.current.entrances);
+
+  var _loop = function _loop(i) {
+    var door = ROOMS.current.entrances[keys[i]];
+    if (door.open) {
+      opts.options[door.ID] = new button(100, offset, { text: door.name });
+      opts.options[door.ID].callback = function () {
+        enterRoom(ROOMS[door.ID]);
+        closeMenu();
+      };
+    } else {
+      opts.options[door.ID] = new button(100, offset, { text: door.name + ' [X]' });
+      opts.options[door.ID].available = false;
+    }
+    offset += 70;
+  };
+
+  for (var i = 0; i < keys.length; i++) {
+    _loop(i);
+  }
+
+  opts.title = 'Choose a room to move to';
   opts.open = true;
 
   setMenu(opts);
@@ -1628,7 +1765,7 @@ var checkMenu = function checkMenu() {
 
 var drawMenu = function drawMenu() {
   if (menu.open) {
-    ctx_overlay.fillStyle = 'rgba(108, 108, 108, 0.4)';
+    ctx_overlay.fillStyle = 'rgba(100, 115, 139, 0.45)';
     ctx_overlay.strokeStyle = 'black';
     ctx_overlay.lineWidth = 3;
     drawRoundedRect(50, 50, width - 100, height - 100, 7, ctx_overlay, true);
@@ -1639,7 +1776,7 @@ var drawMenu = function drawMenu() {
     var keys = Object.keys(menu.options);
     for (var i = 0; i < keys.length; i++) {
       var btn = menu.options[keys[i]];
-      drawButton(btn, btn.text, "white");
+      drawButton(btn, btn.text, "white", ctx_overlay);
     }
   }
 };
@@ -1981,8 +2118,14 @@ var doOnPreloadDone = function doOnPreloadDone() {
   startButton = new button(canvas.width / 2 - 100, canvas.height * .75);
   selectButton = new button(canvas.width / 2 - 100, canvas.height * .75);
 
-  roomButton = new button(30, 30);
-  roomButton.callback = menu.toggle;
+  debugButton = new button(10, 10, { width: 70, height: 35, text: '[debug]' });
+  debugButton.callback = menu.toggle;
+
+  moveButton = new button(90, 10, { width: 50, height: 35, text: 'move' });
+  moveButton.callback = function () {
+    setChangeRoomMenu();
+    menu.toggle();
+  };
 
   gameState = STATES.title;
   assignStartupEvents();
@@ -2048,7 +2191,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
-  drawPlaceholder();
+  //drawPlaceholder();
 
   //update game
   if (isHost) {
@@ -2086,8 +2229,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
     checkCollisionsPlayersVEnemies(players, enemies);
   }
 
-  ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
-  room_0.drawDoors();
+  ROOMS.current.drawRoom();
 
   // draw enemies
   drawEnemies();
@@ -2098,9 +2240,11 @@ var gameUpdateLoop = function gameUpdateLoop() {
   //draw Health
   drawHealthbar();
 
-  drawButton(roomButton, "menu", '#ffc7c7');
+  drawButton(debugButton, debugButton.text, '#ffc7c7');
+  drawButton(moveButton, moveButton.text, '#ffc7c7');
 
-  if (cursor.isOverButton(roomButton)) cursor.enterButton(roomButton);
+  if (cursor.isOverButton(debugButton)) cursor.enterButton(debugButton);
+  if (cursor.isOverButton(moveButton)) cursor.enterButton(moveButton);
 
   checkMenu();
   drawMenu();

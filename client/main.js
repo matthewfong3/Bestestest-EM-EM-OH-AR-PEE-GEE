@@ -26,7 +26,7 @@ let colorOptionpurple;
 let colorOptionblue;
 let colorOptiongreen;
 
-let startButton, selectButton, roomButton;
+let startButton, selectButton, debugButton, moveButton;
 
 let STATES = {
   wait: 'wait',

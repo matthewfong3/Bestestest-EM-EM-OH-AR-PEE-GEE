@@ -9,7 +9,7 @@ class button {
     this.text = opts.text || '---';
     this.available = opts.available || true;
     this.callback = opts.callback || emptyFunct;
-    
+    this.textColor = opts.textColor || 'black';
   }
   
   setText(text){

@@ -41,6 +41,13 @@ class Room {
     }
   }
   
+  drawRoom() {
+    if(this.bg_image) ctx.drawImage(IMAGES[this.bg_image].img, 0, 0);
+    else ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
+    this.drawDoors();
+    ctx_overlay.textAlign = 'left';
+    fillText(ctx_overlay, this.name, 60, height - 15, '15pt courier', 'black');
+  }
   
   
 };

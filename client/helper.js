@@ -231,13 +231,14 @@ const drawRoundedRect = (x, y, w, h, amt, targetCtx, stroke) => {
 };
 
 //draw a ui (top-canvas) button [button]: {x, y, height, width}
-const drawButton = (button, text, color) => {
-  ctx.save();
-  ctx.fillStyle = color || button.color;
-  ctx.lineWidth = 1.5;
-  drawRoundedRect(button.x, button.y, button.width,button.height, 3, ctx, true);
-  fillText(ctx, text || button.text, button.x+button.width/2, button.y+button.height/2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true ); 
-  ctx.restore();
+const drawButton = (button, text, color, context) => {
+  let c = context || ctx;
+  c.save();
+  c.fillStyle = color || button.color;
+  c.lineWidth = 1.5;
+  drawRoundedRect(button.x, button.y, button.width,button.height, 3, c, true);
+  fillText(c, text || button.text, button.x+button.width/2, button.y+button.height/2, 'bold 13pt Trebuchet MS', button.textColor || 'black', true ); 
+  c.restore();
 };
 
 function wrapText(context, text, x, y, maxWidth, lineHeight) {  

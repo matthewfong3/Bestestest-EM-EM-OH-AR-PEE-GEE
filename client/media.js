@@ -52,6 +52,18 @@ const toLoadImgs = [
     url: 'assets/img/dungeon-walls.png'
   }, //dungeon walls
   {
+    name: 'room_0',
+    url: 'assets/img/room_0.png'
+  }, //room 0
+  {
+    name: 'room_1',
+    url: 'assets/img/room_1.png'
+  }, //room 1
+  {
+    name: 'room_2',
+    url: 'assets/img/room_2.png'
+  }, //room 2
+  {
     name: 'player_red',
     url: 'assets/img/plr-red.png'
   }, //red player
