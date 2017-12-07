@@ -86,6 +86,16 @@ const setupSockets = () => {
   socket.on('reconnect', () => {
     console.log('reconnected');
   });
+    
+  socket.on('reviveTohost',(data) => {
+    console.log("someone is getting revived")
+     revive(data.Hash); 
+  });
+    
+  socket.on('revivedtoSer',(data) => {
+      console.log("revived message recieved from host")
+      players[data.Hash] = data;
+  })
 };
 
 const setupGame = () => {

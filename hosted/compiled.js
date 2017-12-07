@@ -92,6 +92,7 @@ var Character = function Character(hash, image) {
   this.moveRight = false;
   this.moveUp = false;
   this.moveDown = false;
+  this.revive = false;
 
   // if using circle-to-circle collision
   this.radius = 15;
@@ -321,7 +322,9 @@ var drawPlayers = function drawPlayers(time) {
   var keys = Object.keys(players);
   for (var i = 0; i < keys.length; i++) {
     var playerdrawn = players[keys[i]];
-    if (playerdrawn.hp > 0) drawPlayer(playerdrawn);
+    if (playerdrawn.hp > 0) drawPlayer(playerdrawn);else {
+      drawDeadPlayer(playerdrawn);
+    }
   }
 }; //draw all players in the players list
 
@@ -351,6 +354,18 @@ var drawPlayer = function drawPlayer(playerdrawn) {
     ctx.fill();
     ctx.restore();
   }
+};
+
+var drawDeadPlayer = function drawDeadPlayer(playerdrawn) {
+  ctx.save();
+  ctx.beginPath();
+
+  ctx.fillStyle = "black";
+  ctx.arc(playerdrawn.x, playerdrawn.y, playerdrawn.radius, 0, Math.PI * 2, false);
+
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 };
 
 var drawBullets = function drawBullets(time) {
@@ -995,6 +1010,36 @@ var colorOptiontap = function colorOptiontap() {
     color = "purple";
   }
 };
+
+var checkdeadtoplayerRadius = function checkdeadtoplayerRadius() {
+
+  var player = players[hash];
+  var keys = Object.keys(players);
+  for (var i = 0; i < keys.length; i++) {
+    //if its the same character, skip over
+    if (players[keys[i]].hash == hash) {} else {
+      var otherPlayer = players[keys[i]];
+      //see if that other player is dead 
+      if (otherPlayer.hp <= 0) {
+        var deltaX = Math.pow(player.x - otherPlayer.x, 2);
+        var deltaY = Math.pow(player.y - otherPlayer.y, 2);
+        var distance = Math.sqrt(deltaX + deltaY);
+        if (distance <= 30) {
+          var playerReviving = players[keys[i]].hash;
+          return playerReviving;
+        }
+      }
+    }
+  }
+  return undefined;
+};
+
+var revive = function revive(hashRevive) {
+
+  players[hashRevive].hp = players[hashRevive].maxHP / 2;
+  var player = players[hashRevive];
+  socket.emit('revivedtoSer', { player: player });
+};
 'use strict';
 
 var canvas = void 0,
@@ -1104,6 +1149,20 @@ var keyDownHandler = function keyDownHandler(e) {
             player.moveRight = true;
             e.preventDefault();
           }
+          // R for Revive
+          else if (keyPressed === 82) {
+
+              var reviving = checkdeadtoplayerRadius();
+              if (reviving != undefined) {
+                //tell the host to revive this player if not the host
+                if (!isHost) {
+                  socket.emit('revivetoSer', { Hash: reviving });
+                } else {
+                  //revive this player 
+                  revive(reviving);
+                }
+              }
+            }
 
     var input = {
       moveUp: player.moveUp,
@@ -1114,6 +1173,22 @@ var keyDownHandler = function keyDownHandler(e) {
 
     if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
   }
+  //if the person is dead, make sure that they aren't moving anymore
+  else {
+
+      player.moveUp = false;
+      player.moveDown = false;
+      player.moveLeft = false;
+      player.moveRight = false;
+
+      var _input = {
+        moveUp: player.moveUp,
+        moveLeft: player.moveLeft,
+        moveDown: player.moveDown,
+        moveRight: player.moveRight
+      };
+      if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: _input });
+    };
 };
 
 //handler for key up events
@@ -1867,6 +1942,16 @@ var setupSockets = function setupSockets() {
 
   socket.on('reconnect', function () {
     console.log('reconnected');
+  });
+
+  socket.on('reviveTohost', function (data) {
+    console.log("someone is getting revived");
+    revive(data.Hash);
+  });
+
+  socket.on('revivedtoSer', function (data) {
+    console.log("revived message recieved from host");
+    players[data.Hash] = data;
   });
 };
 

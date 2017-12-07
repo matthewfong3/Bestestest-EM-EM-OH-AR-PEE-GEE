@@ -19,6 +19,7 @@ class Character {
     this.moveRight = false;
     this.moveUp = false;
     this.moveDown = false;
+    this.revive = false;
     
     // if using circle-to-circle collision
     this.radius = 15;

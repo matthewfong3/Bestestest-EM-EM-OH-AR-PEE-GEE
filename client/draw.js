@@ -3,7 +3,10 @@ const drawPlayers = (time) => {
   let keys = Object.keys(players);
   for(let i =0; i < keys.length; i++) {
     let playerdrawn = players[keys[i]];
-    if(playerdrawn.hp > 0) drawPlayer(playerdrawn);  
+    if(playerdrawn.hp > 0) drawPlayer(playerdrawn);
+    else{
+        drawDeadPlayer(playerdrawn);
+    }
   }
 }; //draw all players in the players list
 
@@ -40,6 +43,18 @@ const drawPlayer = (playerdrawn) => {
     ctx.fill();
     ctx.restore(); 
   }
+}
+
+const drawDeadPlayer = (playerdrawn) => {
+    ctx.save();
+    ctx.beginPath();
+    
+    ctx.fillStyle = "black";
+    ctx.arc(playerdrawn.x,playerdrawn.y,playerdrawn.radius,0,Math.PI * 2,false);
+    
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore(); 
 }
 
 const drawBullets = (time) => {

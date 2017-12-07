@@ -307,3 +307,41 @@ const colorOptiontap = () => {
   }
 
 }
+
+const checkdeadtoplayerRadius = () => {
+  
+    let player = players[hash];
+    let keys = Object.keys(players);
+    for(let i =0; i < keys.length; i++)
+    {
+        //if its the same character, skip over
+        if(players[keys[i]].hash == hash)
+        {
+            
+        }
+        else
+        {
+            let otherPlayer = players[keys[i]];
+            //see if that other player is dead 
+            if(otherPlayer.hp <= 0)
+            {
+                let deltaX = Math.pow(player.x - otherPlayer.x,2);
+                let deltaY = Math.pow(player.y - otherPlayer.y,2);
+                let distance = Math.sqrt(deltaX + deltaY);
+                if(distance <= 30)
+                {
+                    let playerReviving = players[keys[i]].hash;
+                    return playerReviving;
+                } 
+            }
+        }
+    }
+    return undefined;
+};
+
+const revive = (hashRevive) => {
+
+    players[hashRevive].hp = players[hashRevive].maxHP/2;
+    let player = players[hashRevive];
+    socket.emit('revivedtoSer',{player});
+}

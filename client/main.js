@@ -86,6 +86,25 @@ const keyDownHandler = (e) => {
       player.moveRight = true;
       e.preventDefault();
     }
+    // R for Revive
+    else if(keyPressed === 82) {
+        
+        let reviving = checkdeadtoplayerRadius();
+        if(reviving != undefined)
+        {
+            //tell the host to revive this player if not the host
+            if(!isHost)
+            {
+                socket.emit('revivetoSer', {Hash:reviving});
+            }
+            else
+            {
+                //revive this player 
+                revive(reviving);
+            }
+        }
+    
+    }
     
     let input = {
       moveUp: player.moveUp,
@@ -96,6 +115,22 @@ const keyDownHandler = (e) => {
     
     if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
   }
+    //if the person is dead, make sure that they aren't moving anymore
+    else {
+        
+      player.moveUp = false;
+      player.moveDown = false;
+      player.moveLeft = false;
+      player.moveRight = false;
+        
+    let input = {
+      moveUp: player.moveUp,
+      moveLeft: player.moveLeft,
+      moveDown: player.moveDown,
+      moveRight: player.moveRight
+    }
+      if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
+    };
 };
 
 //handler for key up events
