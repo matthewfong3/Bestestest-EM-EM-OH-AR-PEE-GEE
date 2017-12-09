@@ -1482,8 +1482,6 @@ var stateHandler = function stateHandler() {
   if (cursor != undefined) {
     playAnim(ctx_overlay, cursor);
   }
-
-  animationFrame = requestAnimationFrame(stateHandler);
 };
 
 var init = function init() {
@@ -1496,8 +1494,7 @@ var init = function init() {
 
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
-  //animationFrame = requestAnimationFrame(stateHandler);
-  stateHandler();
+  animationFrame = requestAnimationFrame(stateHandler);
   playBgAudio();
 
   color = undefined;
