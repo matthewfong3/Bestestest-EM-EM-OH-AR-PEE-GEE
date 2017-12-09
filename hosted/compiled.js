@@ -2085,6 +2085,7 @@ var setupSockets = function setupSockets() {
   // only runs if it's this user is the first to join a room
   socket.on('setHost', function () {
     isHost = true;
+    console.log('I am the host');
     //initEnemies(2);
     //spawnEnemies();
   });
@@ -2137,6 +2138,10 @@ var setupSockets = function setupSockets() {
 
   socket.on('reconnect', function () {
     console.log('reconnected');
+  });
+
+  socket.on('deleteDisconnect', function (data) {
+    delete players[data.hash];
   });
 
   socket.on('reviveTohost', function (data) {
