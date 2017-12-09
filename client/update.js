@@ -29,8 +29,23 @@ const update = (data) => {
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else{
-    console.log('updatedPos');
-    players = data.players;
+    //console.log('updatedPos');
+    let keys = Object.keys(data.players);
+    for(let i = 0; i < keys.length; i++){
+      if(players[data.players[keys[i]].hash]){
+        // if players[hash] exist only update the position variables
+        players[data.players[keys[i]].hash].destX = data.players[keys[i]].destX;
+        players[data.players[keys[i]].hash].destY = data.players[keys[i]].destY;
+        players[data.players[keys[i]].hash].prevX = data.players[keys[i]].prevX;
+        players[data.players[keys[i]].hash].prevY = data.players[keys[i]].prevY;
+        players[data.players[keys[i]].hash].x = data.players[keys[i]].x;
+        players[data.players[keys[i]].hash].y = data.players[keys[i]].y;
+        players[data.players[keys[i]].hash].alpha = data.players[keys[i]].alpha; 
+      } else {
+        // if does not exist, create it
+        players[data.players[keys[i]].hash] = data.players[keys[i]];
+      }
+    }
   }
 };
 

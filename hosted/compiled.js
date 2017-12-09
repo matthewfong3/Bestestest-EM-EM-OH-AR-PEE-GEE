@@ -1003,10 +1003,11 @@ var otherClientFire = function otherClientFire() {
       var bullet = new Bullet(playerPos, normVec);
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
+      socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
     }
   }
   //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
-  socket.emit('updateFireProps', { playersProps: playersProps });
+  //socket.emit('updateFireProps', {playersProps: playersProps});
 };
 
 var otherClientFireCD = function otherClientFireCD() {
@@ -1018,12 +1019,12 @@ var otherClientFireCD = function otherClientFireCD() {
       if (playersProps[keys[i]].bufferTime >= 0.5) {
         playersProps[keys[i]].canFire = true;
         playersProps[keys[i]].bufferTime = 0;
-        //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+        socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
         delete playersProps[keys[i]];
       }
     }
   }
-  socket.emit('updateFireProps', { playersProps: playersProps });
+  //socket.emit('updateFireProps', {playersProps: playersProps});
 };
 //endregion
 
@@ -2084,8 +2085,8 @@ var setupSockets = function setupSockets() {
   // only runs if it's this user is the first to join a room
   socket.on('setHost', function () {
     isHost = true;
-    initEnemies(2);
-    spawnEnemies();
+    //initEnemies(2);
+    //spawnEnemies();
   });
 
   // once this user successfully joins
@@ -2102,7 +2103,7 @@ var setupSockets = function setupSockets() {
   socket.on('updatedKeys', update);
 
   socket.on('updatedFire', function (data) {
-    playersProps[data.hash] = data;
+    playersProps[hash] = data;
     //console.log(playersProps[data.hash]);
   });
 
@@ -2110,7 +2111,9 @@ var setupSockets = function setupSockets() {
   socket.on('updatedPos', update);
 
   socket.on('updatedFireProps', function (data) {
-    canFire = data.playersProps[hash].canFire;
+    if (gameState === STATES.game) {
+      canFire = data.canFire;
+    }
     //console.log('receveied: ' + canFire);
   });
 
@@ -2254,7 +2257,7 @@ var removeStartupEvents = function removeStartupEvents() {
   }
 }; //remove those events
 //endregion
-'use strict';
+"use strict";
 
 //-- init & spawn enemies --region
 var initEnemies = function initEnemies(numEnemies) {
@@ -2287,8 +2290,23 @@ var update = function update(data) {
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else {
-    console.log('updatedPos');
-    players = data.players;
+    //console.log('updatedPos');
+    var keys = Object.keys(data.players);
+    for (var i = 0; i < keys.length; i++) {
+      if (players[data.players[keys[i]].hash]) {
+        // if players[hash] exist only update the position variables
+        players[data.players[keys[i]].hash].destX = data.players[keys[i]].destX;
+        players[data.players[keys[i]].hash].destY = data.players[keys[i]].destY;
+        players[data.players[keys[i]].hash].prevX = data.players[keys[i]].prevX;
+        players[data.players[keys[i]].hash].prevY = data.players[keys[i]].prevY;
+        players[data.players[keys[i]].hash].x = data.players[keys[i]].x;
+        players[data.players[keys[i]].hash].y = data.players[keys[i]].y;
+        players[data.players[keys[i]].hash].alpha = data.players[keys[i]].alpha;
+      } else {
+        // if does not exist, create it
+        players[data.players[keys[i]].hash] = data.players[keys[i]];
+      }
+    }
   }
 };
 

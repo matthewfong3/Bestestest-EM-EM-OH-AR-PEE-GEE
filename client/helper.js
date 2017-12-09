@@ -73,10 +73,11 @@ const otherClientFire = () => {
       let bullet = new Bullet(playerPos,normVec);
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
+      socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
     }
   }
   //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
-  socket.emit('updateFireProps', {playersProps: playersProps});
+  //socket.emit('updateFireProps', {playersProps: playersProps});
 };
 
 const otherClientFireCD = () => {
@@ -90,12 +91,12 @@ const otherClientFireCD = () => {
       {
         playersProps[keys[i]].canFire = true;
         playersProps[keys[i]].bufferTime = 0;
-        //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+        socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
         delete playersProps[keys[i]];
       }
     }
   }
-  socket.emit('updateFireProps', {playersProps: playersProps});
+  //socket.emit('updateFireProps', {playersProps: playersProps});
 };
 //endregion
 

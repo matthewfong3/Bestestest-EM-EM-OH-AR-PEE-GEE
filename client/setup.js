@@ -35,8 +35,8 @@ const setupSockets = () => {
   // only runs if it's this user is the first to join a room
   socket.on('setHost', () => {
     isHost = true;
-    initEnemies(2);
-    spawnEnemies();
+    //initEnemies(2);
+    //spawnEnemies();
   });
   
   // once this user successfully joins
@@ -53,7 +53,7 @@ const setupSockets = () => {
   socket.on('updatedKeys', update);
   
   socket.on('updatedFire', (data) => {
-    playersProps[data.hash] = data;
+    playersProps[hash] = data;
     //console.log(playersProps[data.hash]);
   });
   
@@ -61,7 +61,9 @@ const setupSockets = () => {
   socket.on('updatedPos', update);
   
   socket.on('updatedFireProps', (data) => {
-    canFire = data.playersProps[hash].canFire;
+    if(gameState === STATES.game){
+      canFire = data.canFire; 
+    }
     //console.log('receveied: ' + canFire);
   });
   
