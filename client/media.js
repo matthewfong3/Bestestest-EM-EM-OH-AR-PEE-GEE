@@ -6,9 +6,9 @@ let bgTracks = {
 }
 let currentTrack = bgTracks.exploration;
 
-let effectSounds = [
+let effectSounds = {
   "1.mp3" ,"2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"
-];
+};
 
 //image preloading vv
 let loadQueue = -1;
@@ -342,10 +342,10 @@ const stopBgAudio = (reset) => {
   if(reset) bgAudio.currentTime = 0;
 };
 
-const playEffect = () => {
-  currentEffect = Math.round(Math.random()*8)-1;
-  if(currentEffect<0)currentEffect=0;
-  effectAudio.src = "assets/audio/" + effectSounds[currentEffect];
+const playEffect = (fileName) => {
+  //currentEffect = Math.round(Math.random()*8)-1;
+  //if(currentEffect<0)currentEffect=0;
+  effectAudio.src = effectSounds.fileName.src; //"assets/audio/" + effectSounds[currentEffect];
   //console.log(currentEffect);
   effectAudio.play();
 };

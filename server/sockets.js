@@ -88,9 +88,9 @@ const setupSockets = (ioServer) => {
       // io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
       socket.to(rooms[`room${socket.roomNum}`].host).emit('updatedFire', newData);
     });
-      
+
     socket.on('revivetoSer', (data) => {
-        socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveTohost', data);
+      socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveTohost', data);
     });
 
     // server listens to host client for player position updates and sends them to non-host clients
@@ -117,20 +117,18 @@ const setupSockets = (ioServer) => {
     socket.on('playerCollide', (data) => {
       socket.broadcast.emit('playerCollided', data);
     });
-      
+
     socket.on('revivedtoSer', (data) => {
-        socket.broadcast.emit('revivedtoClients',data);
-    })
+      socket.broadcast.emit('revivedtoClients', data);
+    });
 
     socket.on('disconnect', () => {
       console.log(`${socket.id} has left`);
-      if(socket.id === rooms[`room${socket.roomNum}`].host){
-        //rooms[`room${socket.roomNum}`].host = ;
+      if (socket.id === rooms[`room${socket.roomNum}`].host) {
+        // rooms[`room${socket.roomNum}`].host = ;
       }
       socket.leave(`room${socket.roomNum}`);
-      
     });
-    
   });
 };
 

@@ -106,14 +106,14 @@ const keyDownHandler = (e) => {
     
     }
     
-    let input = {
+    /*let input = {
       moveUp: player.moveUp,
       moveLeft: player.moveLeft,
       moveDown: player.moveDown,
       moveRight: player.moveRight
     };
     
-    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
+    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});*/
   }
     //if the person is dead, make sure that they aren't moving anymore
     else {
@@ -123,14 +123,14 @@ const keyDownHandler = (e) => {
       player.moveLeft = false;
       player.moveRight = false;
         
-    let input = {
+    /*let input = {
       moveUp: player.moveUp,
       moveLeft: player.moveLeft,
       moveDown: player.moveDown,
       moveRight: player.moveRight
     }
-      if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
-    };
+      if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});*/
+    }
 };
 
 //handler for key up events
@@ -158,15 +158,6 @@ const keyUpHandler = (e) => {
       // stop character from moving right
       player.moveRight = false;
     }
-    
-    let input = {
-      moveUp: player.moveUp,
-      moveLeft: player.moveLeft,
-      moveDown: player.moveDown,
-      moveRight: player.moveRight
-    };
-    
-    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
   }
 };
 
