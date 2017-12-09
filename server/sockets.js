@@ -122,6 +122,7 @@ const setupSockets = (ioServer) => {
         if (rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`]) {
           const newHostID = rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`];
           rooms[`room${socket.roomNum}`].host = newHostID;
+          socket.to(rooms[`room${socket.roomNum}`].host).emit('setHost', {});
         } else {
           console.log('cannot migrate to new host. deprecating room');
           delete rooms[`room${socket.roomNum}`];
