@@ -235,15 +235,17 @@ const gameUpdateLoop = () => {
   //drawPlaceholder();
   
   // non-host clients send key updates to server
-  let input = {
-    moveUp: players[hash].moveUp,
-    moveLeft: players[hash].moveLeft,
-    moveDown: players[hash].moveDown,
-    moveRight: players[hash].moveRight
-  };
+  if(players[hash]){
   
-  if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
-  
+    let input = {
+      moveUp: players[hash].moveUp,
+      moveLeft: players[hash].moveLeft,
+      moveDown: players[hash].moveDown,
+      moveRight: players[hash].moveRight
+    };
+    
+    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});
+  }
   //update game
   if(isHost){
     // updates players movement
