@@ -206,6 +206,8 @@ const stateHandler = () => {
   if(cursor != undefined){
     playAnim(ctx_overlay ,cursor);
   } 
+  
+  animationFrame = requestAnimationFrame(stateHandler);
 }
 
 const init = () => {
@@ -218,7 +220,9 @@ const init = () => {
   
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
+  
   animationFrame = requestAnimationFrame(stateHandler);
+  
   playBgAudio();
  
   color = undefined;

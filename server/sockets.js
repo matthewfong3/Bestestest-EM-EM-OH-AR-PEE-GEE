@@ -36,12 +36,6 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('join', (data) => {
-      /* if (!rooms[`room${roomNum}`]) {
-        rooms[`room${roomNum}`] = {};
-      }
-
-      socket.join(`room${roomNum}`); */
-
       console.log('user has joined');
 
       if (data.color === 'red') {

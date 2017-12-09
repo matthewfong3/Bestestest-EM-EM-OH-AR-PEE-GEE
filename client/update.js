@@ -30,7 +30,7 @@ const update = (data) => {
     players[data.hash].moveRight = data.input.moveRight;
   } else{
     console.log('updatedPos');
-    players[data.player.hash] = data.player;
+    players = data.players;
   }
 };
 
@@ -126,8 +126,9 @@ const updatePosition = () => {
     plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
     plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
     
-    socket.emit("updatePos", {player: plr});
-  }    
+    //socket.emit("updatePos", {player: plr});
+  }   
+  socket.emit("updatePos", {players: players});
 };
 
 const resetGame = () => {

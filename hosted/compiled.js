@@ -1482,6 +1482,8 @@ var stateHandler = function stateHandler() {
   if (cursor != undefined) {
     playAnim(ctx_overlay, cursor);
   }
+
+  animationFrame = requestAnimationFrame(stateHandler);
 };
 
 var init = function init() {
@@ -1494,7 +1496,9 @@ var init = function init() {
 
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
+
   animationFrame = requestAnimationFrame(stateHandler);
+
   playBgAudio();
 
   color = undefined;
@@ -2282,7 +2286,7 @@ var update = function update(data) {
     players[data.hash].moveRight = data.input.moveRight;
   } else {
     console.log('updatedPos');
-    players[data.player.hash] = data.player;
+    players = data.players;
   }
 };
 
@@ -2360,8 +2364,9 @@ var updatePosition = function updatePosition() {
     plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
     plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
 
-    socket.emit("updatePos", { player: plr });
+    //socket.emit("updatePos", {player: plr});
   }
+  socket.emit("updatePos", { players: players });
 };
 
 var resetGame = function resetGame() {
