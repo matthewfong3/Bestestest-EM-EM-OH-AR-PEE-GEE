@@ -24,7 +24,7 @@ const setupSockets = (ioServer) => {
       socket.join(`room${roomNum}`);
       socket.roomNum = roomNum;
       socket.roomMember = roomMember;
-
+      rooms[`room${roomNum}`][`${roomMember}`] = socket.id;
       socket.emit('initialJoined', {
         Red: rooms[`room${roomNum}`].Red, Blue: rooms[`room${roomNum}`].Blue, Green: rooms[`room${roomNum}`].Green, Purple: rooms[`room${roomNum}`].Purple,
       });
@@ -119,7 +119,13 @@ const setupSockets = (ioServer) => {
     socket.on('disconnect', () => {
       console.log(`${socket.id} has left`);
       if (socket.id === rooms[`room${socket.roomNum}`].host) {
-        rooms[`room${socket.roomNum}`].host = socket.roomMember+ 1;
+        if (rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`]) {
+          const newHostID = rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`];
+          rooms[`room${socket.roomNum}`].host = newHostID;
+        } else {
+          console.log('cannot migrate to new host. deprecating room');
+          delete rooms[`room${socket.roomNum}`];
+        }
       }
       socket.leave(`room${socket.roomNum}`);
     });
