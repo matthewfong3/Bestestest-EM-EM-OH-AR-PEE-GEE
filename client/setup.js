@@ -61,7 +61,7 @@ const setupSockets = () => {
   socket.on('updatedPos', update);
   
   socket.on('updatedFireProps', (data) => {
-    canFire = data.canFire;
+    canFire = data.playersProps[hash].canFire;
     //console.log('receveied: ' + canFire);
   });
   
@@ -88,12 +88,12 @@ const setupSockets = () => {
   });
     
   socket.on('reviveTohost',(data) => {
-    console.log("someone is getting revived")
+    console.log("someone is getting revived");
      revive(data.Hash); 
   });
     
   socket.on('revivedtoSer',(data) => {
-      console.log("revived message recieved from host")
+      console.log("revived message recieved from host");
       players[data.Hash] = data;
   })
 };

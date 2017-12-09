@@ -101,7 +101,7 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('updateFireProps', (data) => {
-      io.sockets.connected[data.id].emit('updatedFireProps', data);
+      socket.broadcast.emit('updatedFireProps', data);
     });
 
     socket.on('updateBullets', (data) => {

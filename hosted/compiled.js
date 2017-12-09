@@ -1003,9 +1003,10 @@ var otherClientFire = function otherClientFire() {
       var bullet = new Bullet(playerPos, normVec);
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
-      socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
     }
   }
+  //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+  socket.emit('updateFireProps', { playersProps: playersProps });
 };
 
 var otherClientFireCD = function otherClientFireCD() {
@@ -1017,11 +1018,12 @@ var otherClientFireCD = function otherClientFireCD() {
       if (playersProps[keys[i]].bufferTime >= 0.5) {
         playersProps[keys[i]].canFire = true;
         playersProps[keys[i]].bufferTime = 0;
-        socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
+        //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
         delete playersProps[keys[i]];
       }
     }
   }
+  socket.emit('updateFireProps', { playersProps: playersProps });
 };
 //endregion
 
@@ -2108,7 +2110,7 @@ var setupSockets = function setupSockets() {
   socket.on('updatedPos', update);
 
   socket.on('updatedFireProps', function (data) {
-    canFire = data.canFire;
+    canFire = data.playersProps[hash].canFire;
     //console.log('receveied: ' + canFire);
   });
 
