@@ -103,33 +103,14 @@ const keyDownHandler = (e) => {
                 revive(reviving);
             }
         }
-    
     }
-    
-    /*let input = {
-      moveUp: player.moveUp,
-      moveLeft: player.moveLeft,
-      moveDown: player.moveDown,
-      moveRight: player.moveRight
-    };
-    
-    if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});*/
   }
     //if the person is dead, make sure that they aren't moving anymore
     else {
-        
       player.moveUp = false;
       player.moveDown = false;
       player.moveLeft = false;
       player.moveRight = false;
-        
-    /*let input = {
-      moveUp: player.moveUp,
-      moveLeft: player.moveLeft,
-      moveDown: player.moveDown,
-      moveRight: player.moveRight
-    }
-      if(!isHost && gameState === STATES.game) socket.emit('updateKeys', {hash: hash, input: input});*/
     }
 };
 
@@ -239,8 +220,8 @@ const init = () => {
   
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
-  animationFrame = requestAnimationFrame(stateHandler);
-  
+  //animationFrame = requestAnimationFrame(stateHandler);
+  stateHandler();
   playBgAudio();
  
   color = undefined;

@@ -8,6 +8,13 @@ let room_0 = { };
 let room_1 = { };
 let room_2 = { };
 let room_3 = { };
+let room_4 = { };
+let room_5 = { };
+let room_6 = { };
+let room_7 = { };
+let room_8 = { };
+let room_9 = { };
+let room_10 = { };
 
 const setupDungeonAssets = () => {
   doors.top = {
@@ -37,33 +44,16 @@ const setupDungeonAssets = () => {
   
   room_0 = new Room({
     ID: 'room_0',
-    name: 'first room',
+    name: 'lobby',
     bg_music: 'exploration',
     bg_image: 'room_0',
     
     entrances: {
-      top: {
-        ID: 'room_1',
-        name: 'roof',
-        location: {x: width/2-doors.top.width/2, y: 0},
-        object: doors.top,
-        open: true,
-        visited: false,
-        conditions: [ goal_defeatAllEnemies ]
-      },
-      bottom: {
-        ID: 'room_2',
-        name: 'basement',
-        location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
-        open: true,
-        visited: false,
-        object: doors.bottom,
-      },
       right: {
-        ID: 'room_3',
+        ID: 'room_1',
         name: 'hall',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
-        open: false,
+        open: true,
         visited: false,
         object: doors.right,
       },
@@ -76,26 +66,34 @@ const setupDungeonAssets = () => {
   
   room_1 = new Room({
     ID: 'room_1',
-    name: 'roof',
+    name: 'hall 1',
     bg_music: 'exploration',
-    bg_image: 'room_1',
+    bg_image: 'room_0',
     
     entrances: {
       bottom: {
-        ID: 'room_0',
-        name: 'first room',
+        ID: 'room_2',
+        name: 'basement',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
         object: doors.bottom,
       },
-      right: {
+      top: {
         ID: 'room_4',
-        name: 'balcony',
-        location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
-        open: false,
+        name: 'roof',
+        location: {x: width/2-doors.top.width/2, y: 0},
+        open: true,
         visited: false,
-        object: doors.right,
+        object: doors.top,
+      },
+      left: {
+        ID: 'room_0',
+        name: 'lobby',
+        location: {x: 0, y: height/2-doors.right.height/2},
+        open: true,
+        visited: true,
+        object: doors.left,
       },
     },
     
@@ -106,24 +104,24 @@ const setupDungeonAssets = () => {
   
   room_2 = new Room({
     ID: 'room_2',
-    name: 'basement',
+    name: 'basement 2',
     bg_music: 'exploration',
     bg_image: 'room_2',
     
     entrances: {
       top: {
-        ID: 'room_0',
-        name: 'first room',
+        ID: 'room_1',
+        name: 'hall',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
-        visited: false,
+        visited: true,
       },
       left: {
-        ID: 'room_5',
+        ID: 'room_3',
         name: 'storage',
         location: {x: 0, y: height/2-doors.right.height/2},
-        open: false,
+        open: true,
         visited: false,
         object: doors.left,
       },
@@ -133,6 +131,230 @@ const setupDungeonAssets = () => {
     
     
   }); ROOMS['room_2'] = room_2;
+  
+  room_3 = new Room({
+    ID: 'room_3',
+    name: 'storage 3',
+    bg_music: 'exploration',
+    bg_image: 'room_2',
+    
+    entrances: {
+      right: {
+        ID: 'room_2',
+        name: 'basement',
+        location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
+        open: true,
+        visited: true,
+        object: doors.right,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_3'] = room_3;
+  
+  room_4 = new Room({
+    ID: 'room_4',
+    name: 'roof 4',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+    
+    entrances: {
+      right: {
+        ID: 'room_5',
+        name: 'roof',
+        location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
+        open: true,
+        visited: false,
+        object: doors.right,
+      },
+      bottom: {
+        ID: 'room_1',
+        name: 'hall',
+        location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
+        open: true,
+        visited: true,
+        object: doors.bottom,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_4'] = room_4;
+  
+  room_5 = new Room({
+    ID: 'room_5',
+    name: 'roof 5',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+    
+    entrances: {
+      right: {
+        ID: 'room_6',
+        name: 'roof',
+        location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
+        open: true,
+        visited: false,
+        object: doors.right,
+      },
+      bottom: {
+        ID: 'room_7',
+        name: 'hall',
+        location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
+        open: true,
+        visited: false,
+        object: doors.bottom,
+      },
+      left: {
+        ID: 'room_4',
+        name: 'roof',
+        location: {x: 0, y: height/2-doors.right.height/2},
+        open: true,
+        visited: true,
+        object: doors.left,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_5'] = room_5;
+  
+  room_6 = new Room({
+    ID: 'room_6',
+    name: 'roof 6',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+    
+    entrances: {
+      left: {
+        ID: 'room_5',
+        name: 'roof',
+        location: {x: 0, y: height/2-doors.right.height/2},
+        open: true,
+        visited: true,
+        object: doors.left,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_6'] = room_6;
+  
+  room_7 = new Room({
+    ID: 'room_7',
+    name: 'hall 7',
+    bg_music: 'exploration',
+    bg_image: 'room_0',
+    
+    entrances: {
+      bottom: {
+        ID: 'room_8',
+        name: 'basement',
+        location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
+        open: true,
+        visited: false,
+        object: doors.bottom,
+      },
+      top: {
+        ID: 'room_5',
+        name: 'roof',
+        location: {x: width/2-doors.top.width/2, y: 0},
+        object: doors.top,
+        open: true,
+        visited: true,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_7'] = room_7;
+  
+  room_8 = new Room({
+    ID: 'room_8',
+    name: 'basement 8',
+    bg_music: 'exploration',
+    bg_image: 'room_2',
+    
+    entrances: {
+      right: {
+        ID: 'room_9',
+        name: 'hall',
+        location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
+        open: true,
+        visited: false,
+        object: doors.right,
+      },
+      top: {
+        ID: 'room_7',
+        name: 'hall',
+        location: {x: width/2-doors.top.width/2, y: 0},
+        object: doors.top,
+        open: true,
+        visited: true,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_8'] = room_8;
+  
+  room_9 = new Room({
+    ID: 'room_9',
+    name: 'hall 9',
+    bg_music: 'exploration',
+    bg_image: 'room_0',
+    
+    entrances: {
+      right: {
+        ID: 'room_10',
+        name: 'hall',
+        location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
+        open: true,
+        visited: false,
+        object: doors.right,
+      },
+      bottom: {
+        ID: 'room_8',
+        name: 'basement',
+        location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
+        open: true,
+        visited: true,
+        object: doors.bottom,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_9'] = room_9;
+  
+  room_10 = new Room({
+    ID: 'room_10',
+    name: 'hall 10',
+    bg_music: 'exploration',
+    bg_image: 'room_0',
+    
+    entrances: {
+      left: {
+        ID: 'room_9',
+        name: 'hall',
+        location: {x: 0, y: height/2-doors.right.height/2},
+        open: true,
+        visited: true,
+        object: doors.left,
+      },
+    },
+    
+    goals: goal_defeatAllEnemies,
+    
+    
+  }); ROOMS['room_10'] = room_10;
   
   ROOMS.current = room_0;
   enterRoom(room_0);

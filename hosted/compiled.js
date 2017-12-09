@@ -562,6 +562,13 @@ var room_0 = {};
 var room_1 = {};
 var room_2 = {};
 var room_3 = {};
+var room_4 = {};
+var room_5 = {};
+var room_6 = {};
+var room_7 = {};
+var room_8 = {};
+var room_9 = {};
+var room_10 = {};
 
 var setupDungeonAssets = function setupDungeonAssets() {
   doors.top = {
@@ -591,33 +598,16 @@ var setupDungeonAssets = function setupDungeonAssets() {
 
   room_0 = new Room({
     ID: 'room_0',
-    name: 'first room',
+    name: 'lobby',
     bg_music: 'exploration',
     bg_image: 'room_0',
 
     entrances: {
-      top: {
-        ID: 'room_1',
-        name: 'roof',
-        location: { x: width / 2 - doors.top.width / 2, y: 0 },
-        object: doors.top,
-        open: true,
-        visited: false,
-        conditions: [goal_defeatAllEnemies]
-      },
-      bottom: {
-        ID: 'room_2',
-        name: 'basement',
-        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
-        open: true,
-        visited: false,
-        object: doors.bottom
-      },
       right: {
-        ID: 'room_3',
+        ID: 'room_1',
         name: 'hall',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
-        open: false,
+        open: true,
         visited: false,
         object: doors.right
       }
@@ -629,26 +619,34 @@ var setupDungeonAssets = function setupDungeonAssets() {
 
   room_1 = new Room({
     ID: 'room_1',
-    name: 'roof',
+    name: 'hall 1',
     bg_music: 'exploration',
-    bg_image: 'room_1',
+    bg_image: 'room_0',
 
     entrances: {
       bottom: {
-        ID: 'room_0',
-        name: 'first room',
+        ID: 'room_2',
+        name: 'basement',
         location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
         open: true,
         visited: false,
         object: doors.bottom
       },
-      right: {
+      top: {
         ID: 'room_4',
-        name: 'balcony',
-        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
-        open: false,
+        name: 'roof',
+        location: { x: width / 2 - doors.top.width / 2, y: 0 },
+        open: true,
         visited: false,
-        object: doors.right
+        object: doors.top
+      },
+      left: {
+        ID: 'room_0',
+        name: 'lobby',
+        location: { x: 0, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: true,
+        object: doors.left
       }
     },
 
@@ -658,24 +656,24 @@ var setupDungeonAssets = function setupDungeonAssets() {
 
   room_2 = new Room({
     ID: 'room_2',
-    name: 'basement',
+    name: 'basement 2',
     bg_music: 'exploration',
     bg_image: 'room_2',
 
     entrances: {
       top: {
-        ID: 'room_0',
-        name: 'first room',
+        ID: 'room_1',
+        name: 'hall',
         location: { x: width / 2 - doors.top.width / 2, y: 0 },
         object: doors.top,
         open: true,
-        visited: false
+        visited: true
       },
       left: {
-        ID: 'room_5',
+        ID: 'room_3',
         name: 'storage',
         location: { x: 0, y: height / 2 - doors.right.height / 2 },
-        open: false,
+        open: true,
         visited: false,
         object: doors.left
       }
@@ -684,6 +682,222 @@ var setupDungeonAssets = function setupDungeonAssets() {
     goals: goal_defeatAllEnemies
 
   });ROOMS['room_2'] = room_2;
+
+  room_3 = new Room({
+    ID: 'room_3',
+    name: 'storage 3',
+    bg_music: 'exploration',
+    bg_image: 'room_2',
+
+    entrances: {
+      right: {
+        ID: 'room_2',
+        name: 'basement',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: true,
+        object: doors.right
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_3'] = room_3;
+
+  room_4 = new Room({
+    ID: 'room_4',
+    name: 'roof 4',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+
+    entrances: {
+      right: {
+        ID: 'room_5',
+        name: 'roof',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: false,
+        object: doors.right
+      },
+      bottom: {
+        ID: 'room_1',
+        name: 'hall',
+        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
+        open: true,
+        visited: true,
+        object: doors.bottom
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_4'] = room_4;
+
+  room_5 = new Room({
+    ID: 'room_5',
+    name: 'roof 5',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+
+    entrances: {
+      right: {
+        ID: 'room_6',
+        name: 'roof',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: false,
+        object: doors.right
+      },
+      bottom: {
+        ID: 'room_7',
+        name: 'hall',
+        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
+        open: true,
+        visited: false,
+        object: doors.bottom
+      },
+      left: {
+        ID: 'room_4',
+        name: 'roof',
+        location: { x: 0, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: true,
+        object: doors.left
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_5'] = room_5;
+
+  room_6 = new Room({
+    ID: 'room_6',
+    name: 'roof 6',
+    bg_music: 'exploration',
+    bg_image: 'room_1',
+
+    entrances: {
+      left: {
+        ID: 'room_5',
+        name: 'roof',
+        location: { x: 0, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: true,
+        object: doors.left
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_6'] = room_6;
+
+  room_7 = new Room({
+    ID: 'room_7',
+    name: 'hall 7',
+    bg_music: 'exploration',
+    bg_image: 'room_0',
+
+    entrances: {
+      bottom: {
+        ID: 'room_8',
+        name: 'basement',
+        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
+        open: true,
+        visited: false,
+        object: doors.bottom
+      },
+      top: {
+        ID: 'room_5',
+        name: 'roof',
+        location: { x: width / 2 - doors.top.width / 2, y: 0 },
+        object: doors.top,
+        open: true,
+        visited: true
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_7'] = room_7;
+
+  room_8 = new Room({
+    ID: 'room_8',
+    name: 'basement 8',
+    bg_music: 'exploration',
+    bg_image: 'room_2',
+
+    entrances: {
+      right: {
+        ID: 'room_9',
+        name: 'hall',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: false,
+        object: doors.right
+      },
+      top: {
+        ID: 'room_7',
+        name: 'hall',
+        location: { x: width / 2 - doors.top.width / 2, y: 0 },
+        object: doors.top,
+        open: true,
+        visited: true
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_8'] = room_8;
+
+  room_9 = new Room({
+    ID: 'room_9',
+    name: 'hall 9',
+    bg_music: 'exploration',
+    bg_image: 'room_0',
+
+    entrances: {
+      right: {
+        ID: 'room_10',
+        name: 'hall',
+        location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: false,
+        object: doors.right
+      },
+      bottom: {
+        ID: 'room_8',
+        name: 'basement',
+        location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
+        open: true,
+        visited: true,
+        object: doors.bottom
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_9'] = room_9;
+
+  room_10 = new Room({
+    ID: 'room_10',
+    name: 'hall 10',
+    bg_music: 'exploration',
+    bg_image: 'room_0',
+
+    entrances: {
+      left: {
+        ID: 'room_9',
+        name: 'hall',
+        location: { x: 0, y: height / 2 - doors.right.height / 2 },
+        open: true,
+        visited: true,
+        object: doors.left
+      }
+    },
+
+    goals: goal_defeatAllEnemies
+
+  });ROOMS['room_10'] = room_10;
 
   ROOMS.current = room_0;
   enterRoom(room_0);
@@ -1163,32 +1377,14 @@ var keyDownHandler = function keyDownHandler(e) {
                 }
               }
             }
-
-    var input = {
-      moveUp: player.moveUp,
-      moveLeft: player.moveLeft,
-      moveDown: player.moveDown,
-      moveRight: player.moveRight
-    };
-
-    if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
   }
   //if the person is dead, make sure that they aren't moving anymore
   else {
-
       player.moveUp = false;
       player.moveDown = false;
       player.moveLeft = false;
       player.moveRight = false;
-
-      var _input = {
-        moveUp: player.moveUp,
-        moveLeft: player.moveLeft,
-        moveDown: player.moveDown,
-        moveRight: player.moveRight
-      };
-      if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: _input });
-    };
+    }
 };
 
 //handler for key up events
@@ -1216,15 +1412,6 @@ var keyUpHandler = function keyUpHandler(e) {
             // stop character from moving right
             player.moveRight = false;
           }
-
-    var input = {
-      moveUp: player.moveUp,
-      moveLeft: player.moveLeft,
-      moveDown: player.moveDown,
-      moveRight: player.moveRight
-    };
-
-    if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
   }
 };
 
@@ -1309,8 +1496,8 @@ var init = function init() {
 
   preloadImages(toLoadImgs, IMAGES);
   preloadImages(toLoadAnims, ANIMATIONS);
-  animationFrame = requestAnimationFrame(stateHandler);
-
+  //animationFrame = requestAnimationFrame(stateHandler);
+  stateHandler();
   playBgAudio();
 
   color = undefined;
@@ -1365,7 +1552,9 @@ var bgTracks = {
 };
 var currentTrack = bgTracks.exploration;
 
-var effectSounds = ["1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"];
+var effectSounds = {
+  //"1.mp3" ,"2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"
+};
 
 //image preloading vv
 var loadQueue = -1;
@@ -1680,10 +1869,10 @@ var stopBgAudio = function stopBgAudio(reset) {
   if (reset) bgAudio.currentTime = 0;
 };
 
-var playEffect = function playEffect() {
-  currentEffect = Math.round(Math.random() * 8) - 1;
-  if (currentEffect < 0) currentEffect = 0;
-  effectAudio.src = "assets/audio/" + effectSounds[currentEffect];
+var playEffect = function playEffect(fileName) {
+  //currentEffect = Math.round(Math.random()*8)-1;
+  //if(currentEffect<0)currentEffect=0;
+  effectAudio.src = effectSounds.fileName.src; //"assets/audio/" + effectSounds[currentEffect];
   //console.log(currentEffect);
   effectAudio.play();
 };
@@ -2281,6 +2470,16 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   //drawPlaceholder();
+
+  // non-host clients send key updates to server
+  var input = {
+    moveUp: players[hash].moveUp,
+    moveLeft: players[hash].moveLeft,
+    moveDown: players[hash].moveDown,
+    moveRight: players[hash].moveRight
+  };
+
+  if (!isHost && gameState === STATES.game) socket.emit('updateKeys', { hash: hash, input: input });
 
   //update game
   if (isHost) {

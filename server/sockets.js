@@ -125,7 +125,7 @@ const setupSockets = (ioServer) => {
     socket.on('disconnect', () => {
       console.log(`${socket.id} has left`);
       if (socket.id === rooms[`room${socket.roomNum}`].host) {
-        // rooms[`room${socket.roomNum}`].host = ;
+        rooms[`room${socket.roomNum}`].host = socket.roomMember+ 1;
       }
       socket.leave(`room${socket.roomNum}`);
     });
