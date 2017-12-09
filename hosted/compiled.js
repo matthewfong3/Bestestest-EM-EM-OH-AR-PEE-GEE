@@ -2257,7 +2257,7 @@ var removeStartupEvents = function removeStartupEvents() {
   }
 }; //remove those events
 //endregion
-"use strict";
+'use strict';
 
 //-- init & spawn enemies --region
 var initEnemies = function initEnemies(numEnemies) {
@@ -2290,7 +2290,7 @@ var update = function update(data) {
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else {
-    //console.log('updatedPos');
+    console.log('updatedPos');
     var keys = Object.keys(data.players);
     for (var i = 0; i < keys.length; i++) {
       if (players[data.players[keys[i]].hash]) {

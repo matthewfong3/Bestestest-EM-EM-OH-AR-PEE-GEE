@@ -29,7 +29,7 @@ const update = (data) => {
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else{
-    //console.log('updatedPos');
+    console.log('updatedPos');
     let keys = Object.keys(data.players);
     for(let i = 0; i < keys.length; i++){
       if(players[data.players[keys[i]].hash]){
