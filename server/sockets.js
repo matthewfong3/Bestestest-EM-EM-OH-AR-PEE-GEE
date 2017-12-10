@@ -77,8 +77,8 @@ const setupSockets = (ioServer) => {
         mouse: data.mouse,
         bufferTime: data.bufferTime,
       };
-      console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
-      console.log(`${socket.roomMember} sent this to server`);
+      //console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
+      //console.log(`${socket.roomMember} sent this to server`);
       // io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
       socket.to(rooms[`room${socket.roomNum}`].host).emit('updatedFire', newData);
     });
@@ -117,9 +117,10 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('disconnect', () => {
-      console.log(`${socket.id} has left`);
+      console.log(socket.roomNum);
       if (socket.id === rooms[`room${socket.roomNum}`].host) {
         if (rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`]) {
+          
           const newHostID = rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`];
           rooms[`room${socket.roomNum}`].host = newHostID;
           socket.to(rooms[`room${socket.roomNum}`].host).emit('setHost', {});
@@ -129,6 +130,7 @@ const setupSockets = (ioServer) => {
           delete rooms[`room${socket.roomNum}`];
         }
       }
+      console.log(`${socket.id} has left`);
       socket.leave(`room${socket.roomNum}`);
     });
   });
