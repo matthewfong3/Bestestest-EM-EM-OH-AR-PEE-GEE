@@ -2,6 +2,20 @@ let editMode = true; //maybe if we make a room 'editor'
 
 let doors = { };
 
+/* [dungeon map]
+     ___  ___  ___
+     |4|--|5|--|6|
+     ---  ---  ---
+      |    |
+___  ___  ___  ___  ____
+|0|--|1|  |7|  |9|--|10|
+---  ---  ---  ---  ----
+      |    |    |
+___  ___  ___   |
+|3|--|2|  |8|---/
+---  ---  ---  
+*/
+
 //test rooms
 let ROOMS = { };
 let room_0 = { };
@@ -361,17 +375,20 @@ const setupDungeonAssets = () => {
 };
 
 const enterRoom = (newRoom) => {
+  //set visited bool, and store 
   ROOMS.current.visited = true;
-  
+  const lastRoom = ROOMS.current;
   
   ROOMS.current = newRoom;
+  ROOMS.current.entered_from = lastRoom;
+  ROOMS.current.loadRoom();
 }
 
 //room clear goals
-const goal_defeatAllEnemies = (room) => {
-  const keys = Object.keys(room.enemies);
+const goal_defeatAllEnemies = () => {
+  const keys = Object.keys(ROOMS.current.enemies);
   for(let i = 0; i< keys.length; i++){
-    if(room.enemies[keys[i]].hp > 0) return false
+    if(ROOMS.current.enemies[keys[i]].hp > 0) return false
   } 
   return true;
 }

@@ -30,26 +30,79 @@ class Room {
     
   }
   
+  loadRoom(){
+    //players = {};
+    //bulletArray = [];
+    //enemies = [];
+    console.log(`Loading room [${this.name}] ...`);
+  }
+  
+  unlockDoors(){
+    const keys = Object.keys(this.entrances);
+    for(let i = 0; i<keys.length; i++){
+      const door = this.entrances[keys[i]];
+      door.open = true;
+    }
+  }
+  
+  checkGoals(){
+    const keys = Object.keys(this.goals);
+    for(let i = 0; i<keys.length; i++){
+      const goal = this.goals[keys[i]];
+      if(goal() === false) return false;
+    }
+    this.completeRoom();
+  }
+  
+  completeRoom(){
+    console.log(`Room [${this.name}] cleared!`);
+    this.unlockDoors();
+  }
+  
   drawDoors() {
     const keys = Object.keys(this.entrances);
     for(let i = 0; i<keys.length; i++){
       const door = this.entrances[keys[i]];
       if(door.open)
-      ctx.drawImage(door.object.img_open.img, door.location.x, door.location.y);
+        ctx.drawImage(door.object.img_open.img, door.location.x, door.location.y);
       else
-      ctx.drawImage(door.object.img_lock.img, door.location.x, door.location.y);
+        ctx.drawImage(door.object.img_lock.img, door.location.x, door.location.y);
+    }
+  }
+  
+  drawItems() {
+    const keys = Object.keys(this.items);
+    for(let i = 0; i<keys.length; i++){
+      const item = this.items[keys[i]];
+      if(item.active)
+        ctx.drawImage(item.object.active.img, item.location.x, item.location.y);
+      else
+        ctx.drawImage(item.object.inactive.img, item.location.x, item.location.y);
+    }
+  }
+   
+  drawEnemies() {
+    const keys = Object.keys(this.mobs);
+    for(let i = 0; i<keys.length; i++){
+      const mob = this.mobs[keys[i]];
+      if(mob.isAlive)
+        ctx.drawImage(mob.object.active.img, mob.x-mob.object.width/2, mob.y -mob.object.height/2);
+      else
+        ctx.drawImage(mob.object.inactive.img, mob.x-mob.object.width/2, mob.y -mob.object.height/2);  
     }
   }
   
   drawRoom() {
+    //draw bg -> doors -> items
     if(this.bg_image) ctx.drawImage(IMAGES[this.bg_image].img, 0, 0);
     else ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
     this.drawDoors();
+    this.drawItems();
+    
+    //placeholder label for room name
     ctx_overlay.textAlign = 'left';
     fillText(ctx_overlay, this.name, 60, height - 15, '15pt courier', 'black');
   }
-  
-  
 };
 
 
