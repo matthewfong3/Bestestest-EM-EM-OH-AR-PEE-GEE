@@ -60,7 +60,7 @@ const setupSockets = (ioServer) => {
       }
 
       socket.emit('joined', { hash });
-      socket.broadcast.emit('otherConnects', { hash, id: socket.id, color: data.color });
+      socket.broadcast.to(`room${socket.roomNum}`).emit('otherConnects', { hash, id: socket.id, color: data.color });
     });
 
     // server listens to non-host clients for key updates and sends them to host client
@@ -77,8 +77,8 @@ const setupSockets = (ioServer) => {
         mouse: data.mouse,
         bufferTime: data.bufferTime,
       };
-      //console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
-      //console.log(`${socket.roomMember} sent this to server`);
+      // console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
+      // console.log(`${socket.roomMember} sent this to server`);
       // io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
       socket.to(rooms[`room${socket.roomNum}`].host).emit('updatedFire', newData);
     });
@@ -89,7 +89,7 @@ const setupSockets = (ioServer) => {
 
     // server listens to host client for player position updates and sends them to non-host clients
     socket.on('updatePos', (data) => {
-      socket.broadcast.emit('updatedPos', data);
+      socket.broadcast.to(`room${socket.roomNum}`).emit('updatedPos', data);
     });
 
     socket.on('spawnEnemies', (data) => {
@@ -97,38 +97,37 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('updateEnemies', (data) => {
-      socket.broadcast.emit('updatedEnemies', data);
+      socket.broadcast.to(`room${socket.roomNum}`).emit('updatedEnemies', data);
     });
 
     socket.on('updateFireProps', (data) => {
-      socket.broadcast.emit('updatedFireProps', data);
+      socket.broadcast.to(`room${socket.roomNum}`).emit('updatedFireProps', data);
     });
 
     socket.on('updateBullets', (data) => {
-      socket.broadcast.emit('updatedBullets', data);
+      socket.broadcast.to(`room${socket.roomNum}`).emit('updatedBullets', data);
     });
 
     socket.on('playerCollide', (data) => {
-      socket.broadcast.emit('playerCollided', data);
+      socket.broadcast.to(`room${socket.roomNum}`).emit('playerCollided', data);
     });
 
     socket.on('revivedtoSer', (data) => {
-      socket.broadcast.emit('revivedtoClients', data);
+      socket.broadcast.to(`room${socket.roomNum}`).emit('revivedtoClients', data);
     });
-      
-    socket.on("revivedAlltoSer", () => {
-       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {}); 
+
+    socket.on('revivedAlltoSer', () => {
+      socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {});
     });
 
     socket.on('disconnect', () => {
       console.log(socket.roomNum);
       if (socket.id === rooms[`room${socket.roomNum}`].host) {
         if (rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`]) {
-          
           const newHostID = rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`];
           rooms[`room${socket.roomNum}`].host = newHostID;
           socket.to(rooms[`room${socket.roomNum}`].host).emit('setHost', {});
-          socket.broadcast.emit('deleteDisconnect', {hash: socket.hash});
+          socket.broadcast.to(`room${socket.roomNum}`).emit('deleteDisconnect', { hash: socket.hash });
         } else {
           console.log('cannot migrate to new host. deprecating room');
           delete rooms[`room${socket.roomNum}`];

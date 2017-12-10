@@ -8,6 +8,25 @@ let currentTrack = bgTracks.exploration;
 
 let effectSounds = {
   //"1.mp3" ,"2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"
+  BarrelBreakBasement: {src:'assets/audio/barrel-break-basement.wav', lastTime:0},
+  BarrelBreakHall: {src:'assets/audio/barrel-break-hall.wav', lastTime:0},
+  BirdChirp: {src:'assets/audio/bird_chirp.wav', lastTime:0},
+  Coin: {src:'assets/audio/coin.wav', lastTime:0},
+  DeathGrunt: {src:'assets/audio/death_grunt.wav', lastTime:0},
+  FireCracking: {src:'assets/audio/fire_cracking_ambience.wav', lastTime:0},
+  HeartBeat: {src:'assets/audio/heartbeat.wav', lastTime:0},
+  OnHit: {src:'assets/audio/hit_final.wav', lastTime:0},
+  MonsterOnHit: {src:'assets/audio/monster_onHit.wav', lastTime:0},
+  Pop: {src:'assets/audio/pop.wav', lastTime:0},
+  PotBreakBasement: {src:'assets/audio/pot_break_basement.wav', lastTime:0},
+  PotBreakHall: {src:'assets/audio/pot_break_hall.wav', lastTime:0},
+  Reload: {src:'assets/audio/reload.WAV', lastTime:0},
+  Rumble: {src:'assets/audio/rumble.wav', lastTime:0},
+  Shooting: {src:'assets/audio/shooting.wav', lastTime:0},
+  SlimeShotAtk: {src:'assets/audio/slime_shot_atk.wav', lastTime:0},
+  UIButton: {src:'assets/audio/ui_button_sound.wav', lastTime:0},
+  Unlock: {src:'assets/audio/unlock_final.WAV', lastTime:0},
+  Wind: {src:'assets/audio/wind_ambience.wav', lastTime:0},
 };
 
 //image preloading vv
@@ -345,7 +364,7 @@ const stopBgAudio = (reset) => {
 const playEffect = (fileName) => {
   //currentEffect = Math.round(Math.random()*8)-1;
   //if(currentEffect<0)currentEffect=0;
-  effectAudio.src = effectSounds.fileName.src; //"assets/audio/" + effectSounds[currentEffect];
+  effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
   //console.log(currentEffect);
   effectAudio.play();
 };

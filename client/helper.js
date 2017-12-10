@@ -15,6 +15,7 @@ const fire = (e) => {
     let bullet = new Bullet(playerPos,normVec);
     bulletArray.push(bullet);
     canFire = false;
+    playEffect("Shooting");
   }
 };
 
