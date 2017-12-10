@@ -293,6 +293,39 @@ var Room = function () {
   }
 
   _createClass(Room, [{
+    key: 'loadRoom',
+    value: function loadRoom() {
+      //players = {};
+      //bulletArray = [];
+      //enemies = [];
+      console.log('Loading room [' + this.name + '] ...');
+    }
+  }, {
+    key: 'unlockDoors',
+    value: function unlockDoors() {
+      var keys = Object.keys(this.entrances);
+      for (var i = 0; i < keys.length; i++) {
+        var door = this.entrances[keys[i]];
+        door.open = true;
+      }
+    }
+  }, {
+    key: 'checkGoals',
+    value: function checkGoals() {
+      var keys = Object.keys(this.goals);
+      for (var i = 0; i < keys.length; i++) {
+        var goal = this.goals[keys[i]];
+        if (goal() === false) return false;
+      }
+      this.completeRoom();
+    }
+  }, {
+    key: 'completeRoom',
+    value: function completeRoom() {
+      console.log('Room [' + this.name + '] cleared!');
+      this.unlockDoors();
+    }
+  }, {
     key: 'drawDoors',
     value: function drawDoors() {
       var keys = Object.keys(this.entrances);
@@ -302,10 +335,32 @@ var Room = function () {
       }
     }
   }, {
+    key: 'drawItems',
+    value: function drawItems() {
+      var keys = Object.keys(this.items);
+      for (var i = 0; i < keys.length; i++) {
+        var item = this.items[keys[i]];
+        if (item.active) ctx.drawImage(item.object.active.img, item.location.x, item.location.y);else ctx.drawImage(item.object.inactive.img, item.location.x, item.location.y);
+      }
+    }
+  }, {
+    key: 'drawEnemies',
+    value: function drawEnemies() {
+      var keys = Object.keys(this.mobs);
+      for (var i = 0; i < keys.length; i++) {
+        var mob = this.mobs[keys[i]];
+        if (mob.isAlive) ctx.drawImage(mob.object.active.img, mob.x - mob.object.width / 2, mob.y - mob.object.height / 2);else ctx.drawImage(mob.object.inactive.img, mob.x - mob.object.width / 2, mob.y - mob.object.height / 2);
+      }
+    }
+  }, {
     key: 'drawRoom',
     value: function drawRoom() {
+      //draw bg -> doors -> items
       if (this.bg_image) ctx.drawImage(IMAGES[this.bg_image].img, 0, 0);else ctx.drawImage(IMAGES.dungeon_walls.img, 0, 0);
       this.drawDoors();
+      this.drawItems();
+
+      //placeholder label for room name
       ctx_overlay.textAlign = 'left';
       fillText(ctx_overlay, this.name, 60, height - 15, '15pt courier', 'black');
     }
@@ -555,6 +610,20 @@ var drawcolorOptions = function drawcolorOptions() {
 var editMode = true; //maybe if we make a room 'editor'
 
 var doors = {};
+
+/* [dungeon map]
+     ___  ___  ___
+     |4|--|5|--|6|
+     ---  ---  ---
+      |    |
+___  ___  ___  ___  ____
+|0|--|1|  |7|  |9|--|10|
+---  ---  ---  ---  ----
+      |    |    |
+___  ___  ___   |
+|3|--|2|  |8|---/
+---  ---  ---  
+*/
 
 //test rooms
 var ROOMS = {};
@@ -904,16 +973,23 @@ var setupDungeonAssets = function setupDungeonAssets() {
 };
 
 var enterRoom = function enterRoom(newRoom) {
+  //set visited bool, and store 
   ROOMS.current.visited = true;
+  var lastRoom = ROOMS.current;
 
+  if (lastRoom != newRoom) {
+    reviveAll();
+  }
   ROOMS.current = newRoom;
+  ROOMS.current.entered_from = lastRoom;
+  ROOMS.current.loadRoom();
 };
 
 //room clear goals
-var goal_defeatAllEnemies = function goal_defeatAllEnemies(room) {
-  var keys = Object.keys(room.enemies);
+var goal_defeatAllEnemies = function goal_defeatAllEnemies() {
+  var keys = Object.keys(ROOMS.current.enemies);
   for (var i = 0; i < keys.length; i++) {
-    if (room.enemies[keys[i]].hp > 0) return false;
+    if (ROOMS.current.enemies[keys[i]].hp > 0) return false;
   }
   return true;
 };
@@ -1257,6 +1333,21 @@ var revive = function revive(hashRevive) {
   var player = players[hashRevive];
   socket.emit('revivedtoSer', { player: player });
 };
+
+var reviveAll = function reviveAll() {
+  //host revives all players as they transition into a new room.
+  if (isHost) {
+    var keys = Object.keys(players);
+    for (var i = 0; i < keys.length; i++) {
+      var player = players[keys[i]];
+      if (player.hp <= 0) {
+        revive(player.hash);
+      }
+    }
+  } else {
+    socket.emit("revivedAlltoSer", {});
+  }
+};
 'use strict';
 
 var canvas = void 0,
@@ -1373,7 +1464,7 @@ var keyDownHandler = function keyDownHandler(e) {
               if (reviving != undefined) {
                 //tell the host to revive this player if not the host
                 if (!isHost) {
-                  socket.emit('revivetoSer', { Hash: reviving });
+                  socket.emit('revivetoSer', { hash: reviving });
                 } else {
                   //revive this player 
                   revive(reviving);
@@ -2086,8 +2177,8 @@ var setupSockets = function setupSockets() {
   socket.on('setHost', function () {
     isHost = true;
     console.log('I am the host');
-    //initEnemies(2);
-    //spawnEnemies();
+    initEnemies(2);
+    spawnEnemies();
   });
 
   // once this user successfully joins
@@ -2133,7 +2224,7 @@ var setupSockets = function setupSockets() {
 
   socket.on('playerCollided', function (data) {
     console.log('received: player collision detected with enemy');
-    players[data.hash] = data;
+    players[data.player.hash] = data.player;
   });
 
   socket.on('reconnect', function () {
@@ -2146,12 +2237,22 @@ var setupSockets = function setupSockets() {
 
   socket.on('reviveTohost', function (data) {
     console.log("someone is getting revived");
-    revive(data.Hash);
+    revive(data.hash);
   });
 
   socket.on('revivedtoSer', function (data) {
     console.log("revived message recieved from host");
-    players[data.Hash] = data;
+    players[data.hash] = data;
+  });
+
+  socket.on('revivedtoClients', function (data) {
+    console.log("revived members being recieved by host");
+    players[data.player.hash] = data.player;
+  });
+
+  socket.on("reviveAllTohost", function () {
+    console.log("revive everyone since we are transitioning");
+    reviveAll();
   });
 };
 

@@ -115,6 +115,10 @@ const setupSockets = (ioServer) => {
     socket.on('revivedtoSer', (data) => {
       socket.broadcast.emit('revivedtoClients', data);
     });
+      
+    socket.on("revivedAlltoSer", () => {
+       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {}); 
+    });
 
     socket.on('disconnect', () => {
       console.log(socket.roomNum);

@@ -36,8 +36,8 @@ const setupSockets = () => {
   socket.on('setHost', () => {
     isHost = true;
     console.log('I am the host');
-    //initEnemies(2);
-    //spawnEnemies();
+    initEnemies(2);
+    spawnEnemies();
   });
   
   // once this user successfully joins
@@ -83,7 +83,7 @@ const setupSockets = () => {
   
   socket.on('playerCollided', (data) => {
     console.log('received: player collision detected with enemy');
-    players[data.hash] = data;
+    players[data.player.hash] = data.player;
   });
   
   socket.on('reconnect', () => {
@@ -96,13 +96,24 @@ const setupSockets = () => {
     
   socket.on('reviveTohost',(data) => {
     console.log("someone is getting revived");
-     revive(data.Hash); 
+     revive(data.hash); 
   });
     
   socket.on('revivedtoSer',(data) => {
       console.log("revived message recieved from host");
-      players[data.Hash] = data;
-  })
+      players[data.hash] = data;
+  });
+    
+  socket.on('revivedtoClients', (data) => {
+      console.log("revived members being recieved by host");
+      players[data.player.hash] = data.player;
+  });
+    
+  socket.on("reviveAllTohost", () => {
+     console.log("revive everyone since we are transitioning");
+      reviveAll();
+      
+  });
 };
 
 const setupGame = () => {

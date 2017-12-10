@@ -348,3 +348,23 @@ const revive = (hashRevive) => {
     let player = players[hashRevive];
     socket.emit('revivedtoSer',{player});
 }
+
+const reviveAll = () => {
+    //host revives all players as they transition into a new room.
+    if(isHost)
+    {
+        let keys = Object.keys(players);
+        for(let i = 0; i < keys.length; i++)
+            {
+                let player = players[keys[i]];
+                if(player.hp <= 0)
+                {
+                    revive(player.hash);
+                }
+            }
+    }
+    else
+    {
+        socket.emit("revivedAlltoSer",{});
+    }
+}

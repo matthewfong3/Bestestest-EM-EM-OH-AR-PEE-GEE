@@ -379,6 +379,11 @@ const enterRoom = (newRoom) => {
   ROOMS.current.visited = true;
   const lastRoom = ROOMS.current;
   
+    
+  if(lastRoom != newRoom)
+  {
+    reviveAll();
+  }
   ROOMS.current = newRoom;
   ROOMS.current.entered_from = lastRoom;
   ROOMS.current.loadRoom();

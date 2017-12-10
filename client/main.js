@@ -95,7 +95,7 @@ const keyDownHandler = (e) => {
             //tell the host to revive this player if not the host
             if(!isHost)
             {
-                socket.emit('revivetoSer', {Hash:reviving});
+                socket.emit('revivetoSer', {hash:reviving});
             }
             else
             {
