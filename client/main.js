@@ -100,7 +100,7 @@ const keyDownHandler = (e) => {
             else
             {
                 //revive this player 
-                revive(reviving);
+                revive(reviving,"moving");
             }
         }
     }

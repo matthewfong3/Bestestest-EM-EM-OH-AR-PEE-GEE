@@ -978,7 +978,7 @@ var enterRoom = function enterRoom(newRoom) {
   var lastRoom = ROOMS.current;
 
   if (lastRoom != newRoom) {
-    reviveAll();
+    reviveAll("restart");
   }
   ROOMS.current = newRoom;
   ROOMS.current.entered_from = lastRoom;
@@ -1328,25 +1328,47 @@ var checkdeadtoplayerRadius = function checkdeadtoplayerRadius() {
   return undefined;
 };
 
-var revive = function revive(hashRevive) {
+var revive = function revive(hashRevive, casein) {
 
-  players[hashRevive].hp = players[hashRevive].maxHP / 2;
+  if (casein == "moving") {
+    players[hashRevive].hp = players[hashRevive].maxHP / 2;
+  } else if (casein == "restart") {
+    players[hashRevive].hp = players[hashRevive].maxHP;
+  }
   var player = players[hashRevive];
   socket.emit('revivedtoSer', { player: player });
 };
 
-var reviveAll = function reviveAll() {
+var reviveAll = function reviveAll(casein) {
   //host revives all players as they transition into a new room.
   if (isHost) {
     var keys = Object.keys(players);
     for (var i = 0; i < keys.length; i++) {
       var player = players[keys[i]];
       if (player.hp <= 0) {
-        revive(player.hash);
+        revive(player.hash, casein);
       }
     }
   } else {
     socket.emit("revivedAlltoSer", {});
+  }
+};
+
+var emptyEnemies = function emptyEnemies() {
+  enemies = [];
+  socket.emit('updateEnemies', { enemies: enemies });
+};
+
+var PositionReset = function PositionReset() {
+  var keys = Object.keys(players);
+  for (var i = 0; i < keys.length; i++) {
+    var player = players[keys[i]];
+    player.x = canvas.width / 2;
+    player.y = canvas.height / 2;
+    player.prevX = canvas.width / 2;
+    player.prevY = canvas.height / 2;
+    player.destX = canvas.width / 2;
+    player.destY = canvas.height / 2;
   }
 };
 'use strict';
@@ -1468,7 +1490,7 @@ var keyDownHandler = function keyDownHandler(e) {
                   socket.emit('revivetoSer', { hash: reviving });
                 } else {
                   //revive this player 
-                  revive(reviving);
+                  revive(reviving, "moving");
                 }
               }
             }
@@ -2257,7 +2279,7 @@ var setupSockets = function setupSockets() {
 
   socket.on('reviveTohost', function (data) {
     console.log("someone is getting revived");
-    revive(data.hash);
+    revive(data.hash, "moving");
   });
 
   socket.on('revivedtoSer', function (data) {
@@ -2272,7 +2294,7 @@ var setupSockets = function setupSockets() {
 
   socket.on("reviveAllTohost", function () {
     console.log("revive everyone since we are transitioning");
-    reviveAll();
+    reviveAll("moving");
   });
 };
 
@@ -2665,6 +2687,9 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
+
+    //see if we need to restart 
+    restart();
   }
 
   ROOMS.current.drawRoom();
@@ -2686,6 +2711,28 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   checkMenu();
   drawMenu();
+};
+
+//function to revive all if everyone is dead
+var restart = function restart() {
+  var keys = Object.keys(players);
+  var count = keys.length;
+  var playersdead = 0;
+  for (var i = 0; i < keys.length; i++) {
+    var player = players[keys[i]];
+    if (player.hp == 0) {
+      playersdead += 1;
+    }
+  }
+  if (count == playersdead) {
+    //get rid of enemies
+    //revive everyone
+    reviveAll("restart");
+    emptyEnemies();
+    initEnemies(2);
+    spawnEnemies();
+    PositionReset();
+  }
 };
 
 //endregion

@@ -296,6 +296,9 @@ const gameUpdateLoop = () => {
     
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
+      
+    //see if we need to restart 
+    restart();
   }
   
   ROOMS.current.drawRoom();
@@ -317,6 +320,31 @@ const gameUpdateLoop = () => {
   
   checkMenu();
   drawMenu();
+};
+
+//function to revive all if everyone is dead
+const restart = () => {
+    let keys = Object.keys(players);
+    let count = keys.length;
+    let playersdead = 0;
+    for(let i =0; i < keys.length;i++)
+    {
+        let player = players[keys[i]];
+        if(player.hp == 0)
+        {
+            playersdead += 1;
+        }
+    }
+    if(count == playersdead)
+    {
+        //get rid of enemies
+        //revive everyone
+        reviveAll("restart");
+        emptyEnemies();
+        initEnemies(2);
+        spawnEnemies();
+        PositionReset();
+    }
 };
 
 

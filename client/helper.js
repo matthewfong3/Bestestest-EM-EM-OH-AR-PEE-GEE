@@ -343,14 +343,21 @@ const checkdeadtoplayerRadius = () => {
     return undefined;
 };
 
-const revive = (hashRevive) => {
+const revive = (hashRevive,casein) => {
 
-    players[hashRevive].hp = players[hashRevive].maxHP/2;
+    if(casein == "moving")
+    {
+        players[hashRevive].hp = players[hashRevive].maxHP/2;
+    }
+    else if(casein == "restart")
+    {
+        players[hashRevive].hp = players[hashRevive].maxHP;
+    }
     let player = players[hashRevive];
     socket.emit('revivedtoSer',{player});
-}
+};
 
-const reviveAll = () => {
+const reviveAll = (casein) => {
     //host revives all players as they transition into a new room.
     if(isHost)
     {
@@ -360,7 +367,7 @@ const reviveAll = () => {
                 let player = players[keys[i]];
                 if(player.hp <= 0)
                 {
-                    revive(player.hash);
+                    revive(player.hash,casein);
                 }
             }
     }
@@ -368,4 +375,24 @@ const reviveAll = () => {
     {
         socket.emit("revivedAlltoSer",{});
     }
+}
+
+
+const emptyEnemies = () => {
+     enemies = [];
+     socket.emit('updateEnemies', {enemies: enemies});
+};
+
+const PositionReset = () => {
+    let keys = Object.keys(players);
+    for(let i = 0; i < keys.length; i++)
+        {
+            let player = players[keys[i]];
+            player.x = canvas.width/2;
+            player.y = canvas.height/2;
+            player.prevX = canvas.width/2;
+            player.prevY = canvas.height/2;
+            player.destX = canvas.width/2;
+            player.destY = canvas.height/2;
+        }
 }

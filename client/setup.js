@@ -96,7 +96,7 @@ const setupSockets = () => {
     
   socket.on('reviveTohost',(data) => {
     console.log("someone is getting revived");
-     revive(data.hash); 
+     revive(data.hash,"moving"); 
   });
     
   socket.on('revivedtoSer',(data) => {
@@ -111,7 +111,7 @@ const setupSockets = () => {
     
   socket.on("reviveAllTohost", () => {
      console.log("revive everyone since we are transitioning");
-      reviveAll();
+      reviveAll("moving");
       
   });
 };
