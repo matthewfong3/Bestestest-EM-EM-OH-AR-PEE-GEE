@@ -131,6 +131,7 @@ const setupSockets = (ioServer) => {
         } else {
           console.log('cannot migrate to new host. deprecating room');
           delete rooms[`room${socket.roomNum}`];
+          roomMember = 1;
         }
       }
       console.log(`${socket.id} has left`);
