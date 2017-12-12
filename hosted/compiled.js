@@ -972,17 +972,118 @@ var setupDungeonAssets = function setupDungeonAssets() {
   enterRoom(room_0);
 };
 
+// setup spawn locations
+var spawnLeft = {
+  player1: { x: 77.5, y: 280.5 },
+  player2: { x: 77.5, y: 312.5 },
+  player3: { x: 77.5, y: 342.5 },
+  player4: { x: 77.5, y: 372.5 }
+};
+
+var spawnTop = {
+  player1: { x: 526.5, y: 66.5 },
+  player2: { x: 556.5, y: 66.5 },
+  player3: { x: 586.5, y: 66.5 },
+  player4: { x: 616.5, y: 66.5 }
+};
+
+var spawnBottom = {
+  player1: { x: 534, y: 578.5 },
+  player2: { x: 564, y: 578.5 },
+  player3: { x: 594, y: 578.5 },
+  player4: { x: 624, y: 578.5 }
+};
+
+var spawnRight = {
+  player1: { x: 1071.5, y: 280.5 },
+  player2: { x: 1071.5, y: 312.5 },
+  player3: { x: 1071.5, y: 342.5 },
+  player4: { x: 1071.5, y: 372.5 }
+};
+
 var enterRoom = function enterRoom(newRoom) {
   //set visited bool, and store 
   ROOMS.current.visited = true;
   var lastRoom = ROOMS.current;
 
-  if (lastRoom != newRoom) {
-    reviveAll("restart");
-  }
   ROOMS.current = newRoom;
   ROOMS.current.entered_from = lastRoom;
+
+  if (lastRoom != newRoom) {
+    reviveAll("restart");
+
+    positionInNextRoom(lastRoom, ROOMS.current);
+  }
+
   ROOMS.current.loadRoom();
+};
+
+//position chars in new room
+var positionInNextRoom = function positionInNextRoom(lastRoom, currentRoom) {
+  //try to find which direction we came from
+  if (isHost) {
+    var entrances = lastRoom.entrances;
+    var direction = void 0;
+    for (var i in entrances) {
+      if (entrances[i].ID == currentRoom.ID) {
+        direction = i;
+      }
+    }
+    //put each player in the right position after the program finds where party came from
+    if (direction == "right") {
+      var spawnKeys = Object.keys(spawnLeft);
+      var playerKeys = Object.keys(players);
+      for (var _i = 0; _i < playerKeys.length; _i++) {
+        var player = players[playerKeys[_i]];
+        var newLocation = spawnLeft[spawnKeys[_i]];
+        player.x = newLocation.x;
+        player.y = newLocation.y;
+        player.prevX = newLocation.x;
+        player.prevY = newLocation.y;
+        player.destX = newLocation.x;
+        player.destY = newLocation.y;
+      }
+    } else if (direction == "left") {
+      var _spawnKeys = Object.keys(spawnRight);
+      var _playerKeys = Object.keys(players);
+      for (var _i2 = 0; _i2 < _playerKeys.length; _i2++) {
+        var _player = players[_playerKeys[_i2]];
+        var _newLocation = spawnRight[_spawnKeys[_i2]];
+        _player.x = _newLocation.x;
+        _player.y = _newLocation.y;
+        _player.prevX = _newLocation.x;
+        _player.prevY = _newLocation.y;
+        _player.destX = _newLocation.x;
+        _player.destY = _newLocation.y;
+      }
+    } else if (direction == "bottom") {
+      var _spawnKeys2 = Object.keys(spawnTop);
+      var _playerKeys2 = Object.keys(players);
+      for (var _i3 = 0; _i3 < _playerKeys2.length; _i3++) {
+        var _player2 = players[_playerKeys2[_i3]];
+        var _newLocation2 = spawnTop[_spawnKeys2[_i3]];
+        _player2.x = _newLocation2.x;
+        _player2.y = _newLocation2.y;
+        _player2.prevX = _newLocation2.x;
+        _player2.prevY = _newLocation2.y;
+        _player2.destX = _newLocation2.x;
+        _player2.destY = _newLocation2.y;
+      }
+    } else if (direction == "top") {
+      var _spawnKeys3 = Object.keys(spawnBottom);
+      var _playerKeys3 = Object.keys(players);
+      for (var _i4 = 0; _i4 < _playerKeys3.length; _i4++) {
+        var _player3 = players[_playerKeys3[_i4]];
+        var _newLocation3 = spawnBottom[_spawnKeys3[_i4]];
+        _player3.x = _newLocation3.x;
+        _player3.y = _newLocation3.y;
+        _player3.prevX = _newLocation3.x;
+        _player3.prevY = _newLocation3.y;
+        _player3.destX = _newLocation3.x;
+        _player3.destY = _newLocation3.y;
+      }
+    }
+  }
 };
 
 //room clear goals
@@ -2531,6 +2632,8 @@ var updatePosition = function updatePosition() {
 
     plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
     plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
+
+    console.log(plr.y);
 
     //socket.emit("updatePos", {player: plr});
   }

@@ -9,6 +9,7 @@ const setupCanvas = () => {
   
   width = canvas.width;
   height = canvas.height;
+    
 };
 
 const playersProps = {};

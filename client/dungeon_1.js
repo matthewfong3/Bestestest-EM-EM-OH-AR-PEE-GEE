@@ -2,6 +2,7 @@ let editMode = true; //maybe if we make a room 'editor'
 
 let doors = { };
 
+
 /* [dungeon map]
      ___  ___  ___
      |4|--|5|--|6|
@@ -374,19 +375,135 @@ const setupDungeonAssets = () => {
   enterRoom(room_0);
 };
 
+// setup spawn locations
+const spawnLeft = {
+    player1:{x: 77.5, y: 280.5},
+    player2:{x: 77.5, y: 312.5},
+    player3:{x: 77.5, y: 342.5},
+    player4:{x: 77.5, y: 372.5},
+};
+
+
+const spawnTop = {
+    player1:{x:526.5,y:66.5},
+    player2:{x:556.5,y:66.5},
+    player3:{x:586.5,y:66.5},
+    player4:{x:616.5,y:66.5},
+};
+
+const spawnBottom = {
+    player1:{x:534,y:578.5},
+    player2:{x:564,y:578.5},
+    player3:{x:594,y:578.5},
+    player4:{x:624,y:578.5},
+};
+
+const spawnRight = {
+    player1: {x: 1071.5, y: 280.5},
+    player2: {x: 1071.5, y: 312.5},
+    player3: {x: 1071.5, y: 342.5},
+    player4: {x: 1071.5, y: 372.5},
+};
+
 const enterRoom = (newRoom) => {
   //set visited bool, and store 
   ROOMS.current.visited = true;
   const lastRoom = ROOMS.current;
-  
+    
+  ROOMS.current = newRoom;
+  ROOMS.current.entered_from = lastRoom;
     
   if(lastRoom != newRoom)
   {
     reviveAll("restart");
+
+    positionInNextRoom(lastRoom,ROOMS.current);
+
   }
-  ROOMS.current = newRoom;
-  ROOMS.current.entered_from = lastRoom;
+    
   ROOMS.current.loadRoom();
+}
+
+//position chars in new room
+const positionInNextRoom = (lastRoom,currentRoom) => {
+      //try to find which direction we came from
+  if(isHost)
+  {
+    let entrances = lastRoom.entrances;
+    let direction;
+    for(let i in entrances)
+        {
+            if(entrances[i].ID == currentRoom.ID)
+            {
+                direction = i;
+            }
+        }
+    //put each player in the right position after the program finds where party came from
+    if(direction == "right")
+    {
+        let spawnKeys = Object.keys(spawnLeft);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnLeft[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    else if(direction == "left")
+    {
+        let spawnKeys = Object.keys(spawnRight);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnRight[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    else if(direction == "bottom")
+    {
+        let spawnKeys = Object.keys(spawnTop);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnTop[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    else if(direction == "top")
+    {
+        let spawnKeys = Object.keys(spawnBottom);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnBottom[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+  }
 }
 
 //room clear goals

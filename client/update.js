@@ -140,6 +140,8 @@ const updatePosition = () => {
 
     plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
     plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
+      
+    console.log(plr.y);
     
     //socket.emit("updatePos", {player: plr});
   }   
