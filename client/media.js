@@ -363,7 +363,7 @@ const setupSound = () => {
 
 const playBgAudio = (reset) => {
   if(reset) bgAudio.currentTime = 0;
-  bgAudio.play();
+  //bgAudio.play();
 };
 
 const swapBg = (track, reset) => {

@@ -1,3 +1,26 @@
+let particles = [];
+
+const rpcCall = () => {
+  for(let i = 0; i < 20; i++){
+    let randX = Math.random() * canvas_overlay.width;
+    let randY = Math.random() * -200; 
+    let randColor = getRandomColor(Math.random() * ((1 - 0.4) + 0.4));
+    particles.push(new Particle(randX, randY, randColor));
+  }
+};
+
+const drawParticles = () => {
+  for(let i = 0; i < particles.length; i++){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(particles[i].x, particles[i].y, particles[i].radius, 0, Math.PI*2, true)
+    ctx.closePath();
+    ctx.fillStyle = particles[i].fillStyle;
+    ctx.fill();
+    ctx.restore();
+  }
+};
+
 const drawPlayers = (time) => {
   //draw things
   let keys = Object.keys(players);
@@ -93,14 +116,6 @@ const drawEnemies = () => {
 };
 
 const drawEnemy = (enemy) => {
-  /*
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2, false);
-  ctx.closePath();
-  ctx.fillStyle = 'red';
-  ctx.fill();
-  ctx.restore(); */
   ctx.drawImage(IMAGES.mob_blue.img, enemy.x-enemy.radius/2, enemy.y -enemy.radius/2)
 };
 
@@ -146,7 +161,7 @@ const drawTitle = () => {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'white';
   ctx.font = '30pt Courier';
-  ctx.fillText('Besteststs MMORPG evar', canvas.width/2,canvas.height/2-10);
+  ctx.fillText('Dungeon Explorers Online', canvas.width/2,canvas.height/2-10);
   ctx.font = '15pt Courier';
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton,"Start","Color");
@@ -251,7 +266,6 @@ const drawcolorOptions = () => {
     
     ctx.drawImage(IMAGES.player_blue.img, colorOptionblue.x + colorOptionblue.width/2 - plr_width/2 * 2.9, colorOptionblue.y + colorOptionblue.height/2 -plr_height/2 * 2.9, plr_width*2.9, plr_height*2.9);
   }
-  
-  
+
   ctx.restore();
 }

@@ -268,6 +268,25 @@ var Enemy = function () {
 
   return Enemy;
 }();
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Particle = function Particle(x, y, color) {
+  _classCallCheck(this, Particle);
+
+  this.prevX = x;
+  this.prevY = y;
+  this.x = x;
+  this.y = y;
+  this.destX = x;
+  this.destY = y;
+  this.alpha = 0.05;
+  this.radius = 10;
+  this.fillStyle = color;
+};
+
+;
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -398,6 +417,29 @@ var Room = function () {
 ;
 "use strict";
 
+var particles = [];
+
+var rpcCall = function rpcCall() {
+  for (var i = 0; i < 20; i++) {
+    var randX = Math.random() * canvas_overlay.width;
+    var randY = Math.random() * -200;
+    var randColor = getRandomColor(Math.random() * (1 - 0.4 + 0.4));
+    particles.push(new Particle(randX, randY, randColor));
+  }
+};
+
+var drawParticles = function drawParticles() {
+  for (var i = 0; i < particles.length; i++) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(particles[i].x, particles[i].y, particles[i].radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = particles[i].fillStyle;
+    ctx.fill();
+    ctx.restore();
+  }
+};
+
 var drawPlayers = function drawPlayers(time) {
   //draw things
   var keys = Object.keys(players);
@@ -491,14 +533,6 @@ var drawEnemies = function drawEnemies() {
 };
 
 var drawEnemy = function drawEnemy(enemy) {
-  /*
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2, false);
-  ctx.closePath();
-  ctx.fillStyle = 'red';
-  ctx.fill();
-  ctx.restore(); */
   ctx.drawImage(IMAGES.mob_blue.img, enemy.x - enemy.radius / 2, enemy.y - enemy.radius / 2);
 };
 
@@ -544,7 +578,7 @@ var drawTitle = function drawTitle() {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'white';
   ctx.font = '30pt Courier';
-  ctx.fillText('Besteststs MMORPG evar', canvas.width / 2, canvas.height / 2 - 10);
+  ctx.fillText('Dungeon Explorers Online', canvas.width / 2, canvas.height / 2 - 10);
   ctx.font = '15pt Courier';
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton, "Start", "Color");
@@ -1222,6 +1256,25 @@ var OutofBoundbullet = function OutofBoundbullet() {
   }
 };
 
+var moveParticles = function moveParticles() {
+  for (var i = 0; i < particles.length; i++) {
+    var particle = particles[i];
+
+    if (particle.y > canvas_overlay.height) {
+      particle.y = Math.random() * -200;
+    }
+    particle.prevX = particle.x;
+    particle.prevY = particle.y;
+    var velX = Math.random() * 0;
+    var velY = Math.random() * (40 - 20);
+    particle.destX = particle.x + velX;
+    particle.destY = particle.y + velY;
+    particle.alpha = 0.05;
+    particle.x = lerp(particle.prevX, particle.destX, particle.alpha);
+    particle.y = lerp(particle.prevY, particle.destY, particle.alpha);
+  }
+};
+
 // -----------------------------------------------------------------endregion
 
 // -- fire logic for other clients that only host will calculate ----- region
@@ -1261,6 +1314,15 @@ var otherClientFireCD = function otherClientFireCD() {
   //socket.emit('updateFireProps', {playersProps: playersProps});
 };
 //endregion
+
+var getRandomColor = function getRandomColor(a) {
+  var red = Math.round(Math.random() * 254 + 1);
+  var green = Math.round(Math.random() * 254 + 1);
+  var blue = Math.round(Math.random() * 254 + 1);
+  var a = a;
+  var color = 'rgba(' + red + ',' + green + ',' + blue + ',' + a + ')';
+  return color;
+};
 
 var lerp = function lerp(v0, v1, alpha) {
   return (1 - alpha) * v0 + alpha * v1;
@@ -2230,7 +2292,7 @@ var setupSound = function setupSound() {
 
 var playBgAudio = function playBgAudio(reset) {
   if (reset) bgAudio.currentTime = 0;
-  bgAudio.play();
+  //bgAudio.play();
 };
 
 var swapBg = function swapBg(track, reset) {
@@ -2556,6 +2618,8 @@ var setupSockets = function setupSockets() {
     console.log("revive everyone since we are transitioning");
     reviveAll("moving");
   });
+
+  socket.on('rpcCalled', rpcCall);
 };
 
 var setupGame = function setupGame() {
@@ -2929,13 +2993,13 @@ var characterSelectLoop = function characterSelectLoop() {
 
   //console.log('select a character');
 };
-
+var endGame = 0;
 var gameUpdateLoop = function gameUpdateLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   //drawPlaceholder();
-
+  ROOMS.current = room_10;
   // non-host clients send key updates to server
   if (players[hash]) {
 
@@ -2985,6 +3049,21 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
     //see if we need to restart 
     restart();
+
+    // if in last room, make call to RPC
+    if (ROOMS.current === room_10) {
+      if (endGame === 0) {
+        rpcCall();
+        socket.emit('rpcCall', {});
+        endGame = 1;
+      }
+    }
+  }
+
+  // move particles
+  if (particles.length > 0) {
+    console.log(particles.length);
+    moveParticles();
   }
 
   ROOMS.current.drawRoom();
@@ -2995,6 +3074,10 @@ var gameUpdateLoop = function gameUpdateLoop() {
   drawPlayers();
   // draw bullets
   drawBullets();
+
+  // draw particles
+  drawParticles();
+
   //draw Health
   drawHealthbar();
 

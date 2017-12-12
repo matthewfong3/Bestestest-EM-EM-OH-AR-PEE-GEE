@@ -131,8 +131,9 @@ const setupSockets = () => {
   socket.on("reviveAllTohost", () => {
      console.log("revive everyone since we are transitioning");
       reviveAll("moving");
-      
   });
+  
+  socket.on('rpcCalled', rpcCall);
 };
 
 const setupGame = () => {

@@ -282,13 +282,13 @@ const characterSelectLoop = () => {
   
   //console.log('select a character');
 };
-
+let endGame = 0;
 const gameUpdateLoop = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
   //drawPlaceholder();
-  
+  ROOMS.current = room_10;
   // non-host clients send key updates to server
   if(players[hash]){
   
@@ -338,6 +338,21 @@ const gameUpdateLoop = () => {
       
     //see if we need to restart 
     restart();
+    
+    // if in last room, make call to RPC
+    if(ROOMS.current === room_10){
+      if(endGame === 0){
+        rpcCall();
+        socket.emit('rpcCall', {});
+        endGame = 1;
+      }
+    }
+  }
+  
+  // move particles
+  if(particles.length > 0){
+    console.log(particles.length);
+    moveParticles();
   }
   
   ROOMS.current.drawRoom();
@@ -348,6 +363,10 @@ const gameUpdateLoop = () => {
   drawPlayers();
   // draw bullets
   drawBullets();
+  
+  // draw particles
+  drawParticles();
+    
   //draw Health
   drawHealthbar();
   
@@ -365,9 +384,13 @@ const gameUpdateLoop = () => {
   {
       let player = players[keys[i]];
       console.log( i + ": has killed " + player.enemiesKilled);
+<<<<<<< HEAD
   }
   
   ROOMS.current.checkGoals();
+=======
+  }  
+>>>>>>> 39133cf15a8e0720b4064e0933a95baf09af79c9
 };
 
 //function to revive all if everyone is dead
