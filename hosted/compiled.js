@@ -2781,7 +2781,7 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('playedCoin', function () {
-    playerEffect("Coin", false);
+    playEffect("Coin", false);
   });
 };
 

@@ -170,7 +170,7 @@ const setupSockets = () => {
   });
   
   socket.on('playedCoin', () => {
-    playerEffect("Coin", false);
+    playEffect("Coin", false);
   });
 };
 
