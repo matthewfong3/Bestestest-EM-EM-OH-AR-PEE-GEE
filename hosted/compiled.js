@@ -417,22 +417,6 @@ var Room = function () {
 ;
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var shopOption = function shopOption(x, y, width, height, text1, text2) {
-    _classCallCheck(this, shopOption);
-
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.text1 = text1;
-    this.text2 - text2;
-    this.text1positionY = this.y + 20;
-    this.text1positionX = this.x + this.width / 2;
-};
-"use strict";
-
 var particles = [];
 
 var rpcCall = function rpcCall() {
