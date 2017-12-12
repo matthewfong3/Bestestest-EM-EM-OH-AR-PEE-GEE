@@ -104,11 +104,11 @@ const setupSockets = () => {
   
   socket.on('gainedCoins', (data) => {
     //console.log('in gain coin');
-    if(isHost){
+    //if(isHost){
       coins += data.coinGain;
       ////console.log(`coins: ${coins}`);
       socket.emit('updateCoins', {coins: coins});
-    }
+    //}
   });
   
   socket.on('updatedCoins', (data) => {
