@@ -119,6 +119,10 @@ const setupSockets = (ioServer) => {
     socket.on('revivedAlltoSer', () => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {});
     });
+    
+    socket.on('rpcCall', () => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('rpcCalled', {});
+    });
 
     socket.on('disconnect', () => {
       console.log(socket.roomNum);

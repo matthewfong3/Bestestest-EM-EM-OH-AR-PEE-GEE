@@ -59,6 +59,25 @@ const OutofBoundbullet = () => {
   }
 };
 
+const moveParticles = () => {
+  for(let i = 0; i < particles.length; i++){
+      let particle = particles[i];
+    
+      if(particle.y > canvas_overlay.height){
+        particle.y = Math.random() * -200;
+      }
+      particle.prevX = particle.x;
+      particle.prevY = particle.y;
+      let velX = Math.random() * (0);
+      let velY = Math.random() * (40 - 20);
+      particle.destX = particle.x + velX;
+      particle.destY = particle.y + velY;
+      particle.alpha = 0.05;
+      particle.x = lerp(particle.prevX, particle.destX, particle.alpha);
+      particle.y = lerp(particle.prevY, particle.destY, particle.alpha);
+  }
+};
+
 // -----------------------------------------------------------------endregion
 
 // -- fire logic for other clients that only host will calculate ----- region
@@ -100,6 +119,15 @@ const otherClientFireCD = () => {
   //socket.emit('updateFireProps', {playersProps: playersProps});
 };
 //endregion
+
+const getRandomColor = (a) => {
+	var red = Math.round(Math.random()*254+1);
+	var green = Math.round(Math.random()*254+1);
+	var blue=Math.round(Math.random()*254+1);
+    var a = a;
+	var color='rgba('+red+','+green+','+blue+','+a+')';
+	return color;
+};
 
 const lerp = (v0, v1, alpha) => {
   return (1 - alpha) * v0 + alpha * v1;
