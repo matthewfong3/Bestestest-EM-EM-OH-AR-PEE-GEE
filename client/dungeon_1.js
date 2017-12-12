@@ -61,14 +61,14 @@ const setupDungeonAssets = () => {
   
   room_0 = new Room({
     ID: 'room_0',
-    name: 'lobby',
+    name: 'entrance hall',
     bg_music: 'exploration',
     bg_image: 'room_0',
     
     entrances: {
       right: {
         ID: 'room_1',
-        name: 'hall',
+        name: 'main hall',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -83,14 +83,14 @@ const setupDungeonAssets = () => {
   
   room_1 = new Room({
     ID: 'room_1',
-    name: 'hall 1',
+    name: 'main hall',
     bg_music: 'exploration',
     bg_image: 'room_0',
     
     entrances: {
       bottom: {
         ID: 'room_2',
-        name: 'basement',
+        name: 'basement A',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
@@ -98,7 +98,7 @@ const setupDungeonAssets = () => {
       },
       top: {
         ID: 'room_4',
-        name: 'roof',
+        name: 'roof A',
         location: {x: width/2-doors.top.width/2, y: 0},
         open: true,
         visited: false,
@@ -106,7 +106,7 @@ const setupDungeonAssets = () => {
       },
       left: {
         ID: 'room_0',
-        name: 'lobby',
+        name: 'entrance hall',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -121,14 +121,14 @@ const setupDungeonAssets = () => {
   
   room_2 = new Room({
     ID: 'room_2',
-    name: 'basement 2',
+    name: 'basement',
     bg_music: 'exploration',
     bg_image: 'room_2',
     
     entrances: {
       top: {
         ID: 'room_1',
-        name: 'hall',
+        name: 'main hall',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
@@ -136,7 +136,7 @@ const setupDungeonAssets = () => {
       },
       left: {
         ID: 'room_3',
-        name: 'storage',
+        name: 'storage room',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -151,7 +151,7 @@ const setupDungeonAssets = () => {
   
   room_3 = new Room({
     ID: 'room_3',
-    name: 'storage 3',
+    name: 'storage room',
     bg_music: 'exploration',
     bg_image: 'room_2',
     
@@ -173,14 +173,14 @@ const setupDungeonAssets = () => {
   
   room_4 = new Room({
     ID: 'room_4',
-    name: 'roof 4',
+    name: 'roof A',
     bg_music: 'exploration',
     bg_image: 'room_1',
     
     entrances: {
       right: {
         ID: 'room_5',
-        name: 'roof',
+        name: 'roof B',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -188,7 +188,7 @@ const setupDungeonAssets = () => {
       },
       bottom: {
         ID: 'room_1',
-        name: 'hall',
+        name: 'main hall',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: true,
@@ -203,14 +203,14 @@ const setupDungeonAssets = () => {
   
   room_5 = new Room({
     ID: 'room_5',
-    name: 'roof 5',
+    name: 'roof B',
     bg_music: 'exploration',
     bg_image: 'room_1',
     
     entrances: {
       right: {
         ID: 'room_6',
-        name: 'roof',
+        name: 'balcony',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -218,7 +218,7 @@ const setupDungeonAssets = () => {
       },
       bottom: {
         ID: 'room_7',
-        name: 'hall',
+        name: 'hall B',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
@@ -226,7 +226,7 @@ const setupDungeonAssets = () => {
       },
       left: {
         ID: 'room_4',
-        name: 'roof',
+        name: 'roof A',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -241,14 +241,14 @@ const setupDungeonAssets = () => {
   
   room_6 = new Room({
     ID: 'room_6',
-    name: 'roof 6',
+    name: 'balcony',
     bg_music: 'exploration',
     bg_image: 'room_1',
     
     entrances: {
       left: {
         ID: 'room_5',
-        name: 'roof',
+        name: 'roof B' ,
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -263,14 +263,14 @@ const setupDungeonAssets = () => {
   
   room_7 = new Room({
     ID: 'room_7',
-    name: 'hall 7',
+    name: 'hall B',
     bg_music: 'exploration',
     bg_image: 'room_0',
     
     entrances: {
       bottom: {
         ID: 'room_8',
-        name: 'basement',
+        name: 'basement B',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
@@ -278,7 +278,7 @@ const setupDungeonAssets = () => {
       },
       top: {
         ID: 'room_5',
-        name: 'roof',
+        name: 'roof B',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
@@ -293,14 +293,14 @@ const setupDungeonAssets = () => {
   
   room_8 = new Room({
     ID: 'room_8',
-    name: 'basement 8',
+    name: 'basement B',
     bg_music: 'exploration',
     bg_image: 'room_2',
     
     entrances: {
       right: {
         ID: 'room_9',
-        name: 'hall',
+        name: 'hall C',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -308,7 +308,7 @@ const setupDungeonAssets = () => {
       },
       top: {
         ID: 'room_7',
-        name: 'hall',
+        name: 'hall B',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
@@ -323,14 +323,14 @@ const setupDungeonAssets = () => {
   
   room_9 = new Room({
     ID: 'room_9',
-    name: 'hall 9',
+    name: 'hall C',
     bg_music: 'exploration',
     bg_image: 'room_0',
     
     entrances: {
       right: {
         ID: 'room_10',
-        name: 'hall',
+        name: 'Throne room',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -338,7 +338,7 @@ const setupDungeonAssets = () => {
       },
       bottom: {
         ID: 'room_8',
-        name: 'basement',
+        name: 'basement B',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: true,
@@ -353,14 +353,14 @@ const setupDungeonAssets = () => {
   
   room_10 = new Room({
     ID: 'room_10',
-    name: 'hall 10',
+    name: 'Throne room',
     bg_music: 'exploration',
     bg_image: 'room_0',
     
     entrances: {
       left: {
         ID: 'room_9',
-        name: 'hall',
+        name: 'hall C',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
