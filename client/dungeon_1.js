@@ -437,7 +437,7 @@ const enterRoom = (newRoom) => {
 const setRoom = (room) => {
   ROOMS.current = ROOMS[room] || ROOMS[room_0];
   ROOMS.current.lockDoors();
-  console.log('set room');
+  //console.log('set room');
 };
 
 //position chars in new room

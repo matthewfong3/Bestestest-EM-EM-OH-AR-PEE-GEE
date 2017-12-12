@@ -112,14 +112,14 @@ const openMenu = () => {
   //suspendPlayerControls();
   
   menu.open = true;
-  console.log('open menu');
+  //console.log('open menu');
 }
 
 const closeMenu = () => {
   //restorePlayerControls();
   
   menu.open = false;
-  console.log('close menu');
+  //console.log('close menu');
   
   //toremove: reset menu for testing
   resetMenu();

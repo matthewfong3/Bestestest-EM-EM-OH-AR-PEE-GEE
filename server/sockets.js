@@ -26,7 +26,7 @@ const setupSockets = (ioServer) => {
         rooms[`room${roomNum}`].Blue = true;
         rooms[`room${roomNum}`].Green = true;
         rooms[`room${roomNum}`].Purple = true;
-        console.log(`created room: room${roomNum}`);
+        //console.log(`created room: room${roomNum}`);
       }
 
       socket.emit('initialJoined', {
@@ -65,10 +65,10 @@ const setupSockets = (ioServer) => {
       if (socket.roomMember === 1) {
         rooms[`room${socket.roomNum}`].host = socket.id;
         socket.isHost = true;
-        console.log(`host has joined room${roomNum}`);
+        //console.log(`host has joined room${roomNum}`);
 
         socket.emit('setHost', {});
-      } else console.log(`user has joined room${roomNum}`);
+      } else //console.log(`user has joined room${roomNum}`);
 
       socket.emit('joined', { hash });
       socket.broadcast.to(`room${socket.roomNum}`).emit('otherConnects', { hash, id: socket.id, color: data.color });
@@ -88,8 +88,8 @@ const setupSockets = (ioServer) => {
         mouse: data.mouse,
         bufferTime: data.bufferTime,
       };
-      // console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
-      // console.log(`${socket.roomMember} sent this to server`);
+      // //console.log(`${rooms[`room${socket.roomNum}`].host} is the host`);
+      // //console.log(`${socket.roomMember} sent this to server`);
       // io.sockets.connected[rooms[`room${socket.roomNum}`].host].emit('updatedFire', newData);
       socket.to(rooms[`room${socket.roomNum}`].host).emit('updatedFire', newData);
     });
@@ -100,24 +100,24 @@ const setupSockets = (ioServer) => {
 
     socket.on('getRoomData', () => {
       io.sockets.in(`room${socket.roomNum}`).emit('sendRoomData', {});
-      console.log('recieved room data request');
+      //console.log('recieved room data request');
     });
 
     socket.on('updateRoom', (data) => {
       io.sockets.in(`room${socket.roomNum}`).emit('updatedRoom', data);
-      //console.log(`updated ${data.room.name} data.`);
+      ////console.log(`updated ${data.room.name} data.`);
     });
 
     // coin stuff
     socket.on('gainCoins', (data) => {
       io.sockets.in(`room${socket.roomNum}`).emit('gainedCoins', data);
-      // console.log(`got ${data.coinGain} coins.`);
+      // //console.log(`got ${data.coinGain} coins.`);
     });
 
 
     socket.on('updateCoins', (data) => {
       io.sockets.in(`room${socket.roomNum}`).emit('updatedCoins', data);
-      // console.log('got coin total update');
+      // //console.log('got coin total update');
     });
 
     // server listens to host client for player position updates and sends them to non-host clients
@@ -187,9 +187,9 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('disconnect', () => {
-      // console.log(socket.roomNum);
+      // //console.log(socket.roomNum);
 
-      // if(socket.isHost) console.log('host left');
+      // if(socket.isHost) //console.log('host left');
 
       if (socket.id === rooms[`room${socket.roomNum}`].host) {
         if (rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`]) {
@@ -198,12 +198,12 @@ const setupSockets = (ioServer) => {
           socket.to(rooms[`room${socket.roomNum}`].host).emit('setHost', {});
           socket.broadcast.to(`room${socket.roomNum}`).emit('deleteDisconnect', { hash: socket.hash });
         } else {
-          console.log('cannot migrate to new host. deprecating room');
+          //console.log('cannot migrate to new host. deprecating room');
           delete rooms[`room${socket.roomNum}`];
           roomMember = 1;
         }
       }
-      console.log(`${socket.id} has left`);
+      //console.log(`${socket.id} has left`);
       socket.leave(`room${socket.roomNum}`);
     });
   });

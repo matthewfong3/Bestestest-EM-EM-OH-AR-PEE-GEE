@@ -61,13 +61,13 @@ const spawnEnemies = () => {
 // when we receive character updates from the server
 const update = (data) => {
   if(isHost){
-    console.log('keys updated');
+   //console.log('keys updated');
     players[data.hash].moveUp = data.input.moveUp;
     players[data.hash].moveLeft = data.input.moveLeft;
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else{
-    console.log('updatedPos');
+   //console.log('updatedPos');
     let keys = Object.keys(data.players);
     for(let i = 0; i < keys.length; i++){
       if(players[data.players[keys[i]].hash]){
@@ -106,15 +106,15 @@ const setUser = (data) => {
   {
     players[hash] = new Character(hash, IMAGES.player_purple);
   }
-  console.log(`id: ${data.id}`);
-  console.log('joined server');
+ //console.log(`id: ${data.id}`);
+ //console.log('joined server');
   //gameState = STATES.preload // start animating;
 };
 
 const setOtherplayers = (data) => {
   if(data.hash === hash)
     return;
-  console.log('another user joined');
+ //console.log('another user joined');
   if(data.color == "green")
   {
     players[data.hash] = new Character(data.hash, IMAGES.player_green);
@@ -195,7 +195,7 @@ const startGame = () => {
   //assign game key/mouse events
   setupEvents();
   
-  console.log('starting up game');
+ //console.log('starting up game');
   
   //game setup
   //TODO setup game stuff
@@ -210,7 +210,7 @@ const startGame = () => {
 }; //setup and start the game
 
 const doOnPreloadDone = () => {
-  console.log('done loading images');
+ //console.log('done loading images');
   startButton = new button(canvas.width/2-100,canvas.height * .75);
   selectButton = new button(canvas.width/2-100,canvas.height * .75);
   shopButton = new button(canvas.width/2-100,canvas.height * .75 + 75);
@@ -254,7 +254,7 @@ const restorePlayerControls = () => {
 //--GAME LOOPS---------------------region
 const waitLoop = () => {
   drawWait();
-  console.log('waiting for connection to server...');
+ //console.log('waiting for connection to server...');
 } //wait until client joined the server
 
 const preloadLoop = () => {
@@ -267,7 +267,7 @@ const preloadLoop = () => {
   
   drawPreload();
   
-  console.log('loading game...');
+ //console.log('loading game...');
 };
 
 const titleLoop = () => {
@@ -287,7 +287,7 @@ const shopLoop = () => {
 const gameOverLoop = () => {
   drawGameOver();
   
-  console.log('game over');
+ //console.log('game over');
 };
 
 const characterSelectLoop = () => {

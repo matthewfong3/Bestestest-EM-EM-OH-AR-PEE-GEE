@@ -36,7 +36,7 @@ class Room {
     //players = {};
     //bulletArray = [];
     //enemies = [];
-    console.log(`Loading room [${this.name}] ...`);
+    //console.log(`Loading room [${this.name}] ...`);
     this.lockDoors();
   }
   

@@ -41,7 +41,7 @@ const setupSockets = () => {
   // only runs if it's this user is the first to join a room
   socket.on('setHost', () => {
     isHost = true;
-    console.log('I am the host');
+    //console.log('I am the host');
     initEnemies(0);
     spawnEnemies();
   });
@@ -62,7 +62,7 @@ const setupSockets = () => {
   
   socket.on('updatedFire', (data) => {
     playersProps[hash] = data;
-    //console.log(playersProps[data.hash]);
+    ////console.log(playersProps[data.hash]);
   });
   
   // should only run on clients that are not the host
@@ -72,7 +72,7 @@ const setupSockets = () => {
     if(gameState === STATES.game){
       canFire = data.canFire; 
     }
-    //console.log('receveied: ' + canFire);
+    ////console.log('receveied: ' + canFire);
   });
   
   socket.on('updatedBullets', (data) => {
@@ -80,7 +80,7 @@ const setupSockets = () => {
   });
   
   socket.on('spawnedEnemies', (data) => {
-    //console.log('received');
+    ////console.log('received');
     enemies = data.enemies;
   });
   
@@ -92,39 +92,39 @@ const setupSockets = () => {
     if(!isHost){
       setRoom(data.room);
       coins = data.coins;
-      console.log(`set room: ${data.room}`);
+      //console.log(`set room: ${data.room}`);
     }
-    console.log('got room update');
+    //console.log('got room update');
   });
   
   socket.on('sendRoomData', () => {
-    console.log('got send room req');
+    //console.log('got send room req');
     if(isHost) socket.emit('updateRoom', { room: ROOMS.current.ID, coins: coins });
   });
   
   socket.on('gainedCoins', (data) => {
-    console.log('in gain coin');
+    //console.log('in gain coin');
     if(isHost){
       coins += data.coinGain;
-      //console.log(`coins: ${coins}`);
+      ////console.log(`coins: ${coins}`);
       socket.emit('updateCoins', {coins: coins});
     }
   });
   
   socket.on('updatedCoins', (data) => {
     coins = data.coins;
-    console.log(`coins: ${coins}`);
+    //console.log(`coins: ${coins}`);
   });
   
   socket.on('playerCollided', (data) => {
-    //console.log('received: player collision detected with enemy');
+    ////console.log('received: player collision detected with enemy');
     playEffect("SlimeShotAtk", false);
     playEffect("OnHit", false);
     players[data.player.hash] = data.player;
   });
   
   socket.on('reconnect', () => {
-    console.log('reconnected');
+    //console.log('reconnected');
   });
   
   socket.on('deleteDisconnect', (data) => {
@@ -132,22 +132,22 @@ const setupSockets = () => {
   });
     
   socket.on('reviveTohost',(data) => {
-    console.log("someone is getting revived");
+    //console.log("someone is getting revived");
      revive(data.hash,"moving"); 
   });
     
   socket.on('revivedtoSer',(data) => {
-      console.log("revived message recieved from host");
+      //console.log("revived message recieved from host");
       players[data.hash] = data;
   });
     
   socket.on('revivedtoClients', (data) => {
-      console.log("revived members being recieved by host");
+      //console.log("revived members being recieved by host");
       players[data.player.hash] = data.player;
   });
     
   socket.on("reviveAllTohost", () => {
-     console.log("revive everyone since we are transitioning");
+     //console.log("revive everyone since we are transitioning");
       reviveAll("moving");
   });
   
@@ -178,7 +178,7 @@ const setupGame = () => {
   //assign game key/mouse events
   setupEvents();
   
-  console.log('starting up game');
+  //console.log('starting up game');
   
   //game setup
   //TODO setup game stuff
@@ -235,7 +235,7 @@ const setupEvents = () => {
   //find the mouse position
   //canvas_overlay.onmousemove = doOnMouseMove;
   //canvas_overlay.onmousedown = doOnMouseDown;
-  //console.log('assigned startup game keys');
+  ////console.log('assigned startup game keys');
 }; //events for gameplay
 
 const assignStartupEvents = () => {
@@ -244,7 +244,7 @@ const assignStartupEvents = () => {
     document.onkeyup = () => {
       removeStartupEvents();
       gameState = STATES.setupGame;
-      console.log('setting up game')
+      //console.log('setting up game')
     }
     */
     canvas_overlay.onmousedown = () => {
@@ -255,14 +255,14 @@ const assignStartupEvents = () => {
       {
         gameState = STATES.characterSelect; 
         assignStartupEvents();
-        console.log('setting up game');
+        //console.log('setting up game');
       }
         
       if(shopBool)
       {
           gameState = STATES.shop;
           assignStartupEvents();
-          console.log("going to shop");
+          //console.log("going to shop");
       }
       checkButton();
       setAnim(cursor, 'click', 'once' );
@@ -278,7 +278,7 @@ const assignStartupEvents = () => {
             {
                 gameState = STATES.title;
                 assignStartupEvents();
-                console.log("back to title screen")
+                //console.log("back to title screen")
             }
             checkButton();
             setAnim(cursor, 'click', 'once' );
@@ -295,17 +295,17 @@ const assignStartupEvents = () => {
       {
         removeStartupEvents();
         gameState = STATES.setupGame; 
-        console.log('setting up game');
+        //console.log('setting up game');
         socket.emit('join', {color});
       }
       checkButton();
       setAnim(cursor, 'click', 'once' );
     }
   }
-  //console.log('assigned pregame keys');
+  ////console.log('assigned pregame keys');
 } //event to start game
 const removeStartupEvents = () => {
-  //console.log('removed pregame keys');
+  ////console.log('removed pregame keys');
   if(gameState === STATES.title){
     document.onkeyup = undefined;
     canvas_overlay.onmousedown = undefined;

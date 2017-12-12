@@ -230,7 +230,7 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
         } else {
           // what happens to player when they 'die'
 
-          console.log('player should be dead');
+          //console.log('player should be dead');
           playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
         }

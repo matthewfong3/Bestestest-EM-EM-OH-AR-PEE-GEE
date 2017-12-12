@@ -334,7 +334,7 @@ var Room = function () {
       //players = {};
       //bulletArray = [];
       //enemies = [];
-      console.log('Loading room [' + this.name + '] ...');
+      //console.log(`Loading room [${this.name}] ...`);
       this.lockDoors();
     }
   }, {
@@ -1186,7 +1186,7 @@ var enterRoom = function enterRoom(newRoom) {
 var setRoom = function setRoom(room) {
   ROOMS.current = ROOMS[room] || ROOMS[room_0];
   ROOMS.current.lockDoors();
-  console.log('set room');
+  //console.log('set room');
 };
 
 //position chars in new room
@@ -1511,7 +1511,7 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
         } else {
           // what happens to player when they 'die'
 
-          console.log('player should be dead');
+          //console.log('player should be dead');
           playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
         }
@@ -2570,14 +2570,14 @@ var openMenu = function openMenu() {
   //suspendPlayerControls();
 
   menu.open = true;
-  console.log('open menu');
+  //console.log('open menu');
 };
 
 var closeMenu = function closeMenu() {
   //restorePlayerControls();
 
   menu.open = false;
-  console.log('close menu');
+  //console.log('close menu');
 
   //toremove: reset menu for testing
   resetMenu();
@@ -2652,7 +2652,7 @@ var setupSockets = function setupSockets() {
   // only runs if it's this user is the first to join a room
   socket.on('setHost', function () {
     isHost = true;
-    console.log('I am the host');
+    //console.log('I am the host');
     initEnemies(0);
     spawnEnemies();
   });
@@ -2673,7 +2673,7 @@ var setupSockets = function setupSockets() {
 
   socket.on('updatedFire', function (data) {
     playersProps[hash] = data;
-    //console.log(playersProps[data.hash]);
+    ////console.log(playersProps[data.hash]);
   });
 
   // should only run on clients that are not the host
@@ -2683,7 +2683,7 @@ var setupSockets = function setupSockets() {
     if (gameState === STATES.game) {
       canFire = data.canFire;
     }
-    //console.log('receveied: ' + canFire);
+    ////console.log('receveied: ' + canFire);
   });
 
   socket.on('updatedBullets', function (data) {
@@ -2691,7 +2691,7 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('spawnedEnemies', function (data) {
-    //console.log('received');
+    ////console.log('received');
     enemies = data.enemies;
   });
 
@@ -2703,39 +2703,39 @@ var setupSockets = function setupSockets() {
     if (!isHost) {
       setRoom(data.room);
       coins = data.coins;
-      console.log('set room: ' + data.room);
+      //console.log(`set room: ${data.room}`);
     }
-    console.log('got room update');
+    //console.log('got room update');
   });
 
   socket.on('sendRoomData', function () {
-    console.log('got send room req');
+    //console.log('got send room req');
     if (isHost) socket.emit('updateRoom', { room: ROOMS.current.ID, coins: coins });
   });
 
   socket.on('gainedCoins', function (data) {
-    console.log('in gain coin');
+    //console.log('in gain coin');
     if (isHost) {
       coins += data.coinGain;
-      //console.log(`coins: ${coins}`);
+      ////console.log(`coins: ${coins}`);
       socket.emit('updateCoins', { coins: coins });
     }
   });
 
   socket.on('updatedCoins', function (data) {
     coins = data.coins;
-    console.log('coins: ' + coins);
+    //console.log(`coins: ${coins}`);
   });
 
   socket.on('playerCollided', function (data) {
-    //console.log('received: player collision detected with enemy');
+    ////console.log('received: player collision detected with enemy');
     playEffect("SlimeShotAtk", false);
     playEffect("OnHit", false);
     players[data.player.hash] = data.player;
   });
 
   socket.on('reconnect', function () {
-    console.log('reconnected');
+    //console.log('reconnected');
   });
 
   socket.on('deleteDisconnect', function (data) {
@@ -2743,22 +2743,22 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('reviveTohost', function (data) {
-    console.log("someone is getting revived");
+    //console.log("someone is getting revived");
     revive(data.hash, "moving");
   });
 
   socket.on('revivedtoSer', function (data) {
-    console.log("revived message recieved from host");
+    //console.log("revived message recieved from host");
     players[data.hash] = data;
   });
 
   socket.on('revivedtoClients', function (data) {
-    console.log("revived members being recieved by host");
+    //console.log("revived members being recieved by host");
     players[data.player.hash] = data.player;
   });
 
   socket.on("reviveAllTohost", function () {
-    console.log("revive everyone since we are transitioning");
+    //console.log("revive everyone since we are transitioning");
     reviveAll("moving");
   });
 
@@ -2789,7 +2789,7 @@ var setupGame = function setupGame() {
   //assign game key/mouse events
   setupEvents();
 
-  console.log('starting up game');
+  //console.log('starting up game');
 
   //game setup
   //TODO setup game stuff
@@ -2844,7 +2844,7 @@ var setupEvents = function setupEvents() {
   //find the mouse position
   //canvas_overlay.onmousemove = doOnMouseMove;
   //canvas_overlay.onmousedown = doOnMouseDown;
-  //console.log('assigned startup game keys');
+  ////console.log('assigned startup game keys');
 }; //events for gameplay
 
 var assignStartupEvents = function assignStartupEvents() {
@@ -2853,7 +2853,7 @@ var assignStartupEvents = function assignStartupEvents() {
     document.onkeyup = () => {
       removeStartupEvents();
       gameState = STATES.setupGame;
-      console.log('setting up game')
+      //console.log('setting up game')
     }
     */
     canvas_overlay.onmousedown = function () {
@@ -2863,13 +2863,13 @@ var assignStartupEvents = function assignStartupEvents() {
       if (startBool) {
         gameState = STATES.characterSelect;
         assignStartupEvents();
-        console.log('setting up game');
+        //console.log('setting up game');
       }
 
       if (shopBool) {
         gameState = STATES.shop;
         assignStartupEvents();
-        console.log("going to shop");
+        //console.log("going to shop");
       }
       checkButton();
       setAnim(cursor, 'click', 'once');
@@ -2884,7 +2884,7 @@ var assignStartupEvents = function assignStartupEvents() {
       if (backBool) {
         gameState = STATES.title;
         assignStartupEvents();
-        console.log("back to title screen");
+        //console.log("back to title screen")
       }
       checkButton();
       setAnim(cursor, 'click', 'once');
@@ -2900,24 +2900,24 @@ var assignStartupEvents = function assignStartupEvents() {
       if (selectBool && color != undefined) {
         removeStartupEvents();
         gameState = STATES.setupGame;
-        console.log('setting up game');
+        //console.log('setting up game');
         socket.emit('join', { color: color });
       }
       checkButton();
       setAnim(cursor, 'click', 'once');
     };
   }
-  //console.log('assigned pregame keys');
+  ////console.log('assigned pregame keys');
 }; //event to start game
 var removeStartupEvents = function removeStartupEvents() {
-  //console.log('removed pregame keys');
+  ////console.log('removed pregame keys');
   if (gameState === STATES.title) {
     document.onkeyup = undefined;
     canvas_overlay.onmousedown = undefined;
   }
 }; //remove those events
 //endregion
-'use strict';
+"use strict";
 
 //-- init & spawn enemies --region
 var initEnemies = function initEnemies(numEnemies) {
@@ -2979,13 +2979,13 @@ var spawnEnemies = function spawnEnemies() {
 // when we receive character updates from the server
 var update = function update(data) {
   if (isHost) {
-    console.log('keys updated');
+    //console.log('keys updated');
     players[data.hash].moveUp = data.input.moveUp;
     players[data.hash].moveLeft = data.input.moveLeft;
     players[data.hash].moveDown = data.input.moveDown;
     players[data.hash].moveRight = data.input.moveRight;
   } else {
-    console.log('updatedPos');
+    //console.log('updatedPos');
     var keys = Object.keys(data.players);
     for (var i = 0; i < keys.length; i++) {
       if (players[data.players[keys[i]].hash]) {
@@ -3020,14 +3020,14 @@ var setUser = function setUser(data) {
   if (color == "purple") {
     players[hash] = new Character(hash, IMAGES.player_purple);
   }
-  console.log('id: ' + data.id);
-  console.log('joined server');
+  //console.log(`id: ${data.id}`);
+  //console.log('joined server');
   //gameState = STATES.preload // start animating;
 };
 
 var setOtherplayers = function setOtherplayers(data) {
   if (data.hash === hash) return;
-  console.log('another user joined');
+  //console.log('another user joined');
   if (data.color == "green") {
     players[data.hash] = new Character(data.hash, IMAGES.player_green);
   } else if (data.color == "blue") {
@@ -3094,7 +3094,7 @@ var startGame = function startGame() {
   //assign game key/mouse events
   setupEvents();
 
-  console.log('starting up game');
+  //console.log('starting up game');
 
   //game setup
   //TODO setup game stuff
@@ -3109,7 +3109,7 @@ var startGame = function startGame() {
 }; //setup and start the game
 
 var doOnPreloadDone = function doOnPreloadDone() {
-  console.log('done loading images');
+  //console.log('done loading images');
   startButton = new button(canvas.width / 2 - 100, canvas.height * .75);
   selectButton = new button(canvas.width / 2 - 100, canvas.height * .75);
   shopButton = new button(canvas.width / 2 - 100, canvas.height * .75 + 75);
@@ -3153,7 +3153,7 @@ var restorePlayerControls = function restorePlayerControls() {
 //--GAME LOOPS---------------------region
 var waitLoop = function waitLoop() {
   drawWait();
-  console.log('waiting for connection to server...');
+  //console.log('waiting for connection to server...');
 }; //wait until client joined the server
 
 var preloadLoop = function preloadLoop() {
@@ -3166,7 +3166,7 @@ var preloadLoop = function preloadLoop() {
 
   drawPreload();
 
-  console.log('loading game...');
+  //console.log('loading game...');
 };
 
 var titleLoop = function titleLoop() {
@@ -3185,7 +3185,7 @@ var shopLoop = function shopLoop() {
 var gameOverLoop = function gameOverLoop() {
   drawGameOver();
 
-  console.log('game over');
+  //console.log('game over');
 };
 
 var characterSelectLoop = function characterSelectLoop() {
