@@ -1,5 +1,5 @@
 class Bullet {
-    constructor(characterpoint, direction) {
+    constructor(characterpoint, direction, hash) {
     // position variables
     this.prevX = characterpoint.x;
     this.prevY = characterpoint.y;
@@ -11,6 +11,7 @@ class Bullet {
     this.bulletSpeed = 60;
     this.radius = 10;
     this.style = "yellow";
+    this.firedfrom = hash;
     //need to work on this
     this.direction = direction;
     }

@@ -2,7 +2,7 @@
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Bullet = function Bullet(characterpoint, direction) {
+var Bullet = function Bullet(characterpoint, direction, hash) {
     _classCallCheck(this, Bullet);
 
     // position variables
@@ -16,6 +16,7 @@ var Bullet = function Bullet(characterpoint, direction) {
     this.bulletSpeed = 60;
     this.radius = 10;
     this.style = "yellow";
+    this.firedfrom = hash;
     //need to work on this
     this.direction = direction;
 };
@@ -101,6 +102,8 @@ var Character = function Character(hash, image) {
 
   image = image || {};
   this.object = image;
+
+  this.enemiesKilled = 0;
 };
 "use strict";
 
@@ -638,7 +641,7 @@ var editMode = true; //maybe if we make a room 'editor'
 
 var doors = {};
 
-var direction = void 0;
+var direction = "right";
 
 /* [dungeon map]
      ___  ___  ___
@@ -997,6 +1000,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
 
   });ROOMS['room_10'] = room_10;
 
+  room_0.enemiesCount = 2;
   ROOMS.current = room_0;
   enterRoom(room_0);
 };
@@ -1160,7 +1164,7 @@ var fire = function fire(e) {
     var vector = { x: mouse.x - playerPos.x, y: mouse.y - playerPos.y };
     var mag = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
     var normVec = { x: vector.x / mag, y: vector.y / mag };
-    var bullet = new Bullet(playerPos, normVec);
+    var bullet = new Bullet(playerPos, normVec, hash);
     bulletArray.push(bullet);
     canFire = false;
     playEffect("Shooting");
@@ -1214,7 +1218,7 @@ var otherClientFire = function otherClientFire() {
       var vector = { x: playersProps[keys[i]].mouse.x - playerPos.x, y: playersProps[keys[i]].mouse.y - playerPos.y };
       var mag = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
       var normVec = { x: vector.x / mag, y: vector.y / mag };
-      var bullet = new Bullet(playerPos, normVec);
+      var bullet = new Bullet(playerPos, normVec, players[playersProps[keys[i]].hash].hash);
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
       socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
@@ -1298,12 +1302,14 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
       if (arr1[i] && arr2[j]) {
         if (circlesIntersect(arr1[i], arr2[j])) {
           console.log('collision b/w bullet and enemy detected');
-          arr1.splice(i, 1);
+          var bullet = arr1.splice(i, 1);
           // deal dmg to enemy here
           if (arr2[j].hp > 0) {
             arr2[j].hp -= 2;
           } else {
             arr2.splice(j, 1);
+            var hashout = bullet[0].firedfrom;
+            players[hashout].enemiesKilled += 1;
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
           socket.emit('updateEnemies', { enemies: enemies });
@@ -2767,8 +2773,6 @@ var updatePosition = function updatePosition() {
     plr.x = lerp(plr.prevX, plr.destX, plr.alpha);
     plr.y = lerp(plr.prevY, plr.destY, plr.alpha);
 
-    console.log(plr.y);
-
     //socket.emit("updatePos", {player: plr});
   }
   socket.emit("updatePos", { players: players });
@@ -2948,6 +2952,12 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   checkMenu();
   drawMenu();
+
+  var keys = Object.keys(players);
+  for (var _i = 0; _i < keys.length; _i++) {
+    var player = players[keys[_i]];
+    console.log(_i + ": has killed " + player.enemiesKilled);
+  }
 };
 
 //function to revive all if everyone is dead

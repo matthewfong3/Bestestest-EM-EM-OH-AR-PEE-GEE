@@ -2,7 +2,7 @@ let editMode = true; //maybe if we make a room 'editor'
 
 let doors = { };
 
-let direction;
+let direction = "right";
 
 
 /* [dungeon map]
@@ -373,6 +373,7 @@ const setupDungeonAssets = () => {
     
   }); ROOMS['room_10'] = room_10;
   
+  room_0.enemiesCount = 2;    
   ROOMS.current = room_0;
   enterRoom(room_0);
 };

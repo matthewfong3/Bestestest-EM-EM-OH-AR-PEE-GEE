@@ -28,5 +28,7 @@ class Character {
     
     image = image || {};
     this.object = image;
+      
+    this.enemiesKilled = 0;
   }
 }

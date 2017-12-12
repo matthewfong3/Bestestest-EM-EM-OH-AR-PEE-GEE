@@ -12,7 +12,7 @@ const fire = (e) => {
     let vector = {x:mouse.x - playerPos.x, y: mouse.y - playerPos.y};
     let mag = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
     let normVec = {x:vector.x/mag, y:vector.y/mag};
-    let bullet = new Bullet(playerPos,normVec);
+    let bullet = new Bullet(playerPos,normVec,hash);
     bulletArray.push(bullet);
     canFire = false;
     playEffect("Shooting");
@@ -71,7 +71,7 @@ const otherClientFire = () => {
       let vector = {x:playersProps[keys[i]].mouse.x - playerPos.x, y: playersProps[keys[i]].mouse.y - playerPos.y};
       let mag = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
       let normVec = {x:vector.x/mag, y:vector.y/mag};
-      let bullet = new Bullet(playerPos,normVec);
+      let bullet = new Bullet(playerPos,normVec,players[playersProps[keys[i]].hash].hash);
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
       socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
@@ -157,12 +157,14 @@ const checkCollisions = (arr1, arr2) => {
       if(arr1[i] && arr2[j]){
         if(circlesIntersect(arr1[i], arr2[j])){
           console.log('collision b/w bullet and enemy detected');
-          arr1.splice(i, 1);
+          let bullet = arr1.splice(i, 1);
           // deal dmg to enemy here
           if(arr2[j].hp > 0){
             arr2[j].hp -= 2;
           } else {
             arr2.splice(j, 1);
+            let hashout = bullet[0].firedfrom;
+            players[hashout].enemiesKilled += 1;
           }
           socket.emit('updateBullets', {bulletArray: arr1});
           socket.emit('updateEnemies', {enemies: enemies});
