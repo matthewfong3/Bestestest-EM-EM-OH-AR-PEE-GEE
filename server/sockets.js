@@ -3,7 +3,7 @@ const xxh = require('xxhashjs');
 let io;
 
 const rooms = {
-  lobby: {}
+  lobby: {},
 };
 let roomNum = 1;
 let roomMember = 1;
@@ -15,13 +15,12 @@ const setupSockets = (ioServer) => {
     const socket = sock;
 
     socket.on('initialJoin', () => {
-      
       const room = 'lobby';
       socket.join(room);
       socket.room = room;
       socket.roomMember = roomMember;
 
-      
+
       if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
         rooms[`room${roomNum}`].Red = true;
@@ -30,26 +29,24 @@ const setupSockets = (ioServer) => {
         rooms[`room${roomNum}`].Purple = true;
         console.log(`created room: room${roomNum}`);
       }
-      
+
       socket.emit('initialJoined', {
         Red: rooms[`room${roomNum}`].Red, Blue: rooms[`room${roomNum}`].Blue, Green: rooms[`room${roomNum}`].Green, Purple: rooms[`room${roomNum}`].Purple,
       });
-      
+
       if (roomMember === 4) {
         roomMember = 1;
         roomNum++;
-      }
-      else roomMember++;
+      } else roomMember++;
     });
 
     socket.on('join', (data) => {
-      
       socket.leave('lobby');
-      
+
       socket.join(`room${roomNum}`);
       socket.roomNum = roomNum;
       rooms[`room${roomNum}`][`${socket.roomMember}`] = socket.id;
-      
+
       if (data.color === 'red') {
         rooms[`room${socket.roomNum}`].Red = false;
       } else if (data.color === 'purple') {
@@ -70,7 +67,7 @@ const setupSockets = (ioServer) => {
         rooms[`room${socket.roomNum}`].host = socket.id;
         socket.isHost = true;
         console.log(`host has joined room${roomNum}`);
-        
+
         socket.emit('setHost', {});
       } else console.log(`user has joined room${roomNum}`);
 
@@ -101,29 +98,29 @@ const setupSockets = (ioServer) => {
     socket.on('revivetoSer', (data) => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveTohost', data);
     });
-  
+
     socket.on('getRoomData', () => {
-      io.sockets.in(`room${socket.roomNum}`).emit('sendRoomData', {} );
-      console.log(`recieved room data request`);
+      io.sockets.in(`room${socket.roomNum}`).emit('sendRoomData', {});
+      console.log('recieved room data request');
     });
-    
+
     socket.on('updateRoom', (data) => {
-      io.sockets.in(`room${socket.roomNum}`).emit('updatedRoom', data );
+      io.sockets.in(`room${socket.roomNum}`).emit('updatedRoom', data);
       console.log(`updated ${data.room.name} data.`);
     });
 
-    //coin stuff
+    // coin stuff
     socket.on('gainCoins', (data) => {
-      io.sockets.in(`room${socket.roomNum}`).emit('gainedCoins', data );
-      //console.log(`got ${data.coinGain} coins.`);
+      io.sockets.in(`room${socket.roomNum}`).emit('gainedCoins', data);
+      // console.log(`got ${data.coinGain} coins.`);
     });
-    
-    
+
+
     socket.on('updateCoins', (data) => {
-      io.sockets.in(`room${socket.roomNum}`).emit('updatedCoins', data );
-      //console.log('got coin total update');
+      io.sockets.in(`room${socket.roomNum}`).emit('updatedCoins', data);
+      // console.log('got coin total update');
     });
-    
+
     // server listens to host client for player position updates and sends them to non-host clients
     socket.on('updatePos', (data) => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('updatedPos', data);
@@ -156,7 +153,6 @@ const setupSockets = (ioServer) => {
     socket.on('revivedAlltoSer', () => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {});
     });
-
 
     socket.on('gainCoins', (data) => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('gainedCoins', data);
@@ -192,10 +188,10 @@ const setupSockets = (ioServer) => {
     });
 
     socket.on('disconnect', () => {
-      //console.log(socket.roomNum);
-      
-      //if(socket.isHost) console.log('host left');
-      
+      // console.log(socket.roomNum);
+
+      // if(socket.isHost) console.log('host left');
+
       if (socket.id === rooms[`room${socket.roomNum}`].host) {
         if (rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`]) {
           const newHostID = rooms[`room${socket.roomNum}`][`${socket.roomMember + 1}`];

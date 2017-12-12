@@ -431,11 +431,12 @@ const enterRoom = (newRoom) => {
   }
   
   ROOMS.current.loadRoom();
-  if(isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins })
+  if(isHost) socket.emit('updateRoom', { room: ROOMS.current.ID, coins: coins })
 }
 
 const setRoom = (room) => {
-  ROOMS.current = room;
+  ROOMS.current = ROOMS[room];
+  console.log('set room');
 };
 
 //position chars in new room

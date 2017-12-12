@@ -1180,11 +1180,12 @@ var enterRoom = function enterRoom(newRoom) {
   }
 
   ROOMS.current.loadRoom();
-  if (isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins });
+  if (isHost) socket.emit('updateRoom', { room: ROOMS.current.ID, coins: coins });
 };
 
 var setRoom = function setRoom(room) {
-  ROOMS.current = room;
+  ROOMS.current = ROOMS[room];
+  console.log('set room');
 };
 
 //position chars in new room
@@ -2698,17 +2699,17 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('updatedRoom', function (data) {
-    if (!host) {
+    if (!isHost) {
       setRoom(data.room);
       coins = data.coins;
-      console.log('set room: ' + data.room.name);
+      console.log('set room: ' + data.room);
     }
     console.log('got room update');
   });
 
   socket.on('sendRoomData', function () {
     console.log('got send room req');
-    if (isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins });
+    if (isHost) socket.emit('updateRoom', { room: ROOMS.current.ID, coins: coins });
   });
 
   socket.on('gainedCoins', function (data) {

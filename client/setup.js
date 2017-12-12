@@ -89,17 +89,17 @@ const setupSockets = () => {
   });
   
   socket.on('updatedRoom', (data) => {
-    if(!host){
+    if(!isHost){
       setRoom(data.room);
       coins = data.coins;
-      console.log(`set room: ${data.room.name}`);
+      console.log(`set room: ${data.room}`);
     }
     console.log('got room update');
   });
   
   socket.on('sendRoomData', () => {
     console.log('got send room req');
-    if(isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins });
+    if(isHost) socket.emit('updateRoom', { room: ROOMS.current.ID, coins: coins });
   });
   
   socket.on('gainedCoins', (data) => {
