@@ -99,6 +99,10 @@ const toLoadImgs = [
     url: 'assets/img/plr-purple.png'
   }, //purple player
   {
+    name: 'mob_blue',
+    url: 'assets/img/mob-blue.png'
+  }, //blue slime
+  {
     name: 'logo',
     url: 'assets/img/test.png'
   },

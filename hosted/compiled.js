@@ -486,13 +486,15 @@ var drawEnemies = function drawEnemies() {
 };
 
 var drawEnemy = function drawEnemy(enemy) {
+  /*
   ctx.save();
   ctx.beginPath();
   ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2, false);
   ctx.closePath();
   ctx.fillStyle = 'red';
   ctx.fill();
-  ctx.restore();
+  ctx.restore(); */
+  ctx.drawImage(IMAGES.mob_blue.img, enemy.x - enemy.radius / 2, enemy.y - enemy.radius / 2);
 };
 
 //--draw game screens-------------
@@ -584,6 +586,9 @@ var drawGameOver = function drawGameOver() {
 var drawcolorOptions = function drawcolorOptions() {
   ctx.save();
 
+  var plr_width = IMAGES.player_red.width;
+  var plr_height = IMAGES.player_red.height;
+
   ctx.strokeStyle = "black";
 
   ctx.font = '30pt Courier';
@@ -593,28 +598,36 @@ var drawcolorOptions = function drawcolorOptions() {
     ctx.fillRect(colorOptionred.x, colorOptionred.y, colorOptionred.width, colorOptionred.height);
     ctx.strokeRect(colorOptionred.x, colorOptionred.y, colorOptionred.width, colorOptionred.height);
     ctx.fillStyle = "black";
-    ctx.fillText("Red", colorOptionred.x + 75, colorOptionred.y + 150);
+    ctx.fillText("Red", colorOptionred.x + 75, colorOptionred.y + colorOptionred.height - 40);
+
+    ctx.drawImage(IMAGES.player_red.img, colorOptionred.x + colorOptionred.width / 2 - plr_width / 2 * 2.9, colorOptionred.y + colorOptionred.height / 2 - plr_height / 2 * 2.9, plr_width * 2.9, plr_height * 2.9);
   }
   if (canBepurple) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionpurple.x, colorOptionpurple.y, colorOptionpurple.width, colorOptionpurple.height);
     ctx.strokeRect(colorOptionpurple.x, colorOptionpurple.y, colorOptionpurple.width, colorOptionpurple.height);
     ctx.fillStyle = "black";
-    ctx.fillText("Purple", colorOptionpurple.x + 75, colorOptionpurple.y + 150);
+    ctx.fillText("Purple", colorOptionpurple.x + 75, colorOptionpurple.y + colorOptionpurple.height - 40);
+
+    ctx.drawImage(IMAGES.player_purple.img, colorOptionpurple.x + colorOptionpurple.width / 2 - plr_width / 2 * 2.9, colorOptionpurple.y + colorOptionpurple.height / 2 - plr_height / 2 * 2.9, plr_width * 2.9, plr_height * 2.9);
   }
   if (canBegreen) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptiongreen.x, colorOptiongreen.y, colorOptiongreen.width, colorOptiongreen.height);
     ctx.strokeRect(colorOptiongreen.x, colorOptiongreen.y, colorOptiongreen.width, colorOptiongreen.height);
     ctx.fillStyle = "black";
-    ctx.fillText("Green", colorOptiongreen.x + 75, colorOptiongreen.y + 150);
+    ctx.fillText("Green", colorOptiongreen.x + 75, colorOptiongreen.y + colorOptiongreen.height - 40);
+
+    ctx.drawImage(IMAGES.player_green.img, colorOptiongreen.x + colorOptiongreen.width / 2 - plr_width / 2 * 2.9, colorOptiongreen.y + colorOptiongreen.height / 2 - plr_height / 2 * 2.9, plr_width * 2.9, plr_height * 2.9);
   }
   if (canBeblue) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionblue.x, colorOptionblue.y, colorOptionblue.width, colorOptionblue.height);
     ctx.strokeRect(colorOptionblue.x, colorOptionblue.y, colorOptionblue.width, colorOptionblue.height);
     ctx.fillStyle = "black";
-    ctx.fillText("Blue", colorOptionblue.x + 75, colorOptionblue.y + 150);
+    ctx.fillText("Blue", colorOptionblue.x + 75, colorOptionblue.y + colorOptionblue.height - 40);
+
+    ctx.drawImage(IMAGES.player_blue.img, colorOptionblue.x + colorOptionblue.width / 2 - plr_width / 2 * 2.9, colorOptionblue.y + colorOptionblue.height / 2 - plr_height / 2 * 2.9, plr_width * 2.9, plr_height * 2.9);
   }
 
   ctx.restore();
@@ -1944,6 +1957,10 @@ var toLoadImgs = [{
   name: 'player_purple',
   url: 'assets/img/plr-purple.png'
 }, //purple player
+{
+  name: 'mob_blue',
+  url: 'assets/img/mob-blue.png'
+}, //blue slime
 {
   name: 'logo',
   url: 'assets/img/test.png'
