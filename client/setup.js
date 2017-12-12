@@ -102,8 +102,8 @@ const setupSockets = () => {
   
   socket.on('playerCollided', (data) => {
     //console.log('received: player collision detected with enemy');
-    playEffect("SlimeShotAtk");
-    playEffect("OnHit");
+    playEffect("SlimeShotAtk", false);
+    playEffect("OnHit", false);
     players[data.player.hash] = data.player;
   });
   
@@ -138,19 +138,23 @@ const setupSockets = () => {
   socket.on('rpcCalled', rpcCall);
   
   socket.on('playedShootEffect', () => {
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   });
   
   socket.on('playedMonsterOnHitEffect', () => {
-    playEffect("MonsterOnHit");
+    playEffect("MonsterOnHit", false);
   });
   
   socket.on('playedPop', () => {
-    playEffect("Pop");
+    playEffect("Pop", false);
   });
   
   socket.on('playedDeathGrunt', () => {
-    playEffect("DeathGrunt");
+    playEffect("DeathGrunt", false);
+  });
+  
+  socket.on('playedCoin', () => {
+    playerEffect("Coin", false);
   });
 };
 
@@ -199,7 +203,10 @@ const setupCursor= () => {
 };
 
 const checkButton = () => {
-  if(cursor.over !== false ) cursor.over.callback();
+  if(cursor.over !== false ) {
+    cursor.over.callback();
+    playEffect("UIButton", false);
+  }
 }
 
 //endregion

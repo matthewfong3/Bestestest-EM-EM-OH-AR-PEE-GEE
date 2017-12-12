@@ -2,7 +2,7 @@ let canvas, ctx, canvas_overlay, ctx_overlay, canvas_back, ctx_back, width, heig
 
 let socket, hash, isHost = false, hosted = {}, roomName;
 
-let bgAudio = undefined, effectAudio = undefined, currentEffect = 0, currentDirection = 1;
+let bgAudio = undefined, effectAudio = undefined, ambienceAudio = undefined, currentEffect = 0, currentDirection = 1;
 
 let mouse = {x:0,y:0};
 let cursor = undefined;
@@ -46,6 +46,7 @@ let bulletArray = [];
 let enemies = [];
 let rooms = {};
 let coins = 0;
+let endGame = 0;
 
 const directions = {
   DOWNLEFT: 0,

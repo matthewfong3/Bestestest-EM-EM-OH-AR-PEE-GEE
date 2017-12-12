@@ -15,7 +15,7 @@ const fire = (e) => {
     let bullet = new Bullet(playerPos,normVec,hash);
     bulletArray.push(bullet);
     canFire = false;
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   }
 };
 
@@ -190,18 +190,20 @@ const checkCollisions = (arr1, arr2) => {
           // deal dmg to enemy here
           if(arr2[j].hp > 0){
             arr2[j].hp -= 2;
-            playEffect("MonsterOnHit");
+            playEffect("MonsterOnHit", false);
             socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             let hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
 
-            playEffect("Pop");
+            //playEffect("Pop", false);
             socket.emit('playPop', {});
 
             let coinGain = getRandomRange(10, 100);
             socket.emit('gainCoins', {coinGain: coinGain});
+            playEffect("Coin", false);
+            socket.emit('playCoin', {});
 
           }
           socket.emit('updateBullets', {bulletArray: arr1});
@@ -219,14 +221,14 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
     for(let j = 0; j < array.length; j++){
       if(circlesIntersect(plrObj[keys[i]], array[j])){
         //console.log('collision b/w character and enemy detected');
-        playEffect("SlimeShotAtk");
+        playEffect("SlimeShotAtk", false);
         if(plrObj[keys[i]].hp > 0){
           plrObj[keys[i]].hp -= 2;
-          playEffect("OnHit");
+          playEffect("OnHit", false);
         } else {
           // what happens to player when they 'die'
           console.log('player should be dead');
-          playEffect("DeathGrunt");
+          playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', {player: plrObj[keys[i]]});

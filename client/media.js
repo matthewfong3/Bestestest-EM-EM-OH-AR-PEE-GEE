@@ -354,9 +354,11 @@ const playAnim = (ctx, targetSprite, freeze) => {
 //--sound---------------------------region
 const setupSound = () => {
   bgAudio = document.querySelector("#bgAudio");
-  bgAudio.volume=0.25;
+  bgAudio.volume = 0.05;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
+  ambienceAudio = document.querySelector("#ambienceAudio");
+  ambienceAudio.volume = 0.3;
   bgAudio.current = bgTracks.exploration;
   bgAudio.src = bgAudio.current.src;
 };
@@ -381,11 +383,34 @@ const stopBgAudio = (reset) => {
   if(reset) bgAudio.currentTime = 0;
 };
 
-const playEffect = (fileName) => {
+const playEffect = (fileName, loop) => {
+  //effectAudio.loop = loop;
   //currentEffect = Math.round(Math.random()*8)-1;
   //if(currentEffect<0)currentEffect=0;
-  effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
+
+  if(effectAudio.paused){
+    effectAudio.current = effectSounds[fileName];
+    effectAudio.src = effectAudio.current.src;
+    effectAudio.load();
+    effectAudio.play();
+  }
+  
+  //effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
   //console.log(currentEffect);
-  effectAudio.play();
+  
+};
+
+const playAmbience = (fileName) => {
+  if(fileName === "none"){
+    ambienceAudio.pause();
+    return;
+  }
+  
+  if(ambienceAudio.paused){
+    ambienceAudio.current = effectSounds[fileName];
+    ambienceAudio.src = ambienceAudio.current.src;
+    ambienceAudio.load();
+    ambienceAudio.play(); 
+  }
 };
 //endregion

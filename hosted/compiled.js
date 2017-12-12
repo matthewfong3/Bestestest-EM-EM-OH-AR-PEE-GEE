@@ -1087,7 +1087,7 @@ var enterRoom = function enterRoom(newRoom) {
 
   ROOMS.current = newRoom;
   ROOMS.current.entered_from = lastRoom;
-
+  playEffect("Unlock", false);
   if (lastRoom != newRoom) {
     reviveAll("restart");
 
@@ -1217,7 +1217,7 @@ var fire = function fire(e) {
     var bullet = new Bullet(playerPos, normVec, hash);
     bulletArray.push(bullet);
     canFire = false;
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   }
 };
 
@@ -1385,18 +1385,20 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
           // deal dmg to enemy here
           if (arr2[j].hp > 0) {
             arr2[j].hp -= 2;
-            playEffect("MonsterOnHit");
+            playEffect("MonsterOnHit", false);
             socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
 
-            playEffect("Pop");
+            //playEffect("Pop", false);
             socket.emit('playPop', {});
 
             var coinGain = getRandomRange(10, 100);
             socket.emit('gainCoins', { coinGain: coinGain });
+            playEffect("Coin", false);
+            socket.emit('playCoin', {});
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
           socket.emit('updateEnemies', { enemies: enemies });
@@ -1413,14 +1415,14 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
     for (var j = 0; j < array.length; j++) {
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
         //console.log('collision b/w character and enemy detected');
-        playEffect("SlimeShotAtk");
+        playEffect("SlimeShotAtk", false);
         if (plrObj[keys[i]].hp > 0) {
           plrObj[keys[i]].hp -= 2;
-          playEffect("OnHit");
+          playEffect("OnHit", false);
         } else {
           // what happens to player when they 'die'
           console.log('player should be dead');
-          playEffect("DeathGrunt");
+          playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', { player: plrObj[keys[i]] });
@@ -1684,6 +1686,7 @@ var socket = void 0,
 
 var bgAudio = undefined,
     effectAudio = undefined,
+    ambienceAudio = undefined,
     currentEffect = 0,
     currentDirection = 1;
 
@@ -1733,6 +1736,7 @@ var bulletArray = [];
 var enemies = [];
 var rooms = {};
 var coins = 0;
+var endGame = 0;
 
 var directions = {
   DOWNLEFT: 0,
@@ -2294,9 +2298,11 @@ var playAnim = function playAnim(ctx, targetSprite, freeze) {
 //--sound---------------------------region
 var setupSound = function setupSound() {
   bgAudio = document.querySelector("#bgAudio");
-  bgAudio.volume = 0.25;
+  bgAudio.volume = 0.05;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
+  ambienceAudio = document.querySelector("#ambienceAudio");
+  ambienceAudio.volume = 0.3;
   bgAudio.current = bgTracks.exploration;
   bgAudio.src = bgAudio.current.src;
 };
@@ -2321,12 +2327,34 @@ var stopBgAudio = function stopBgAudio(reset) {
   if (reset) bgAudio.currentTime = 0;
 };
 
-var playEffect = function playEffect(fileName) {
+var playEffect = function playEffect(fileName, loop) {
+  //effectAudio.loop = loop;
   //currentEffect = Math.round(Math.random()*8)-1;
   //if(currentEffect<0)currentEffect=0;
-  effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
+
+  if (effectAudio.paused) {
+    effectAudio.current = effectSounds[fileName];
+    effectAudio.src = effectAudio.current.src;
+    effectAudio.load();
+    effectAudio.play();
+  }
+
+  //effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
   //console.log(currentEffect);
-  effectAudio.play();
+};
+
+var playAmbience = function playAmbience(fileName) {
+  if (fileName === "none") {
+    ambienceAudio.pause();
+    return;
+  }
+
+  if (ambienceAudio.paused) {
+    ambienceAudio.current = effectSounds[fileName];
+    ambienceAudio.src = ambienceAudio.current.src;
+    ambienceAudio.load();
+    ambienceAudio.play();
+  }
 };
 //endregion
 'use strict';
@@ -2599,8 +2627,8 @@ var setupSockets = function setupSockets() {
 
   socket.on('playerCollided', function (data) {
     //console.log('received: player collision detected with enemy');
-    playEffect("SlimeShotAtk");
-    playEffect("OnHit");
+    playEffect("SlimeShotAtk", false);
+    playEffect("OnHit", false);
     players[data.player.hash] = data.player;
   });
 
@@ -2635,19 +2663,23 @@ var setupSockets = function setupSockets() {
   socket.on('rpcCalled', rpcCall);
 
   socket.on('playedShootEffect', function () {
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   });
 
   socket.on('playedMonsterOnHitEffect', function () {
-    playEffect("MonsterOnHit");
+    playEffect("MonsterOnHit", false);
   });
 
   socket.on('playedPop', function () {
-    playEffect("Pop");
+    playEffect("Pop", false);
   });
 
   socket.on('playedDeathGrunt', function () {
-    playEffect("DeathGrunt");
+    playEffect("DeathGrunt", false);
+  });
+
+  socket.on('playedCoin', function () {
+    playerEffect("Coin", false);
   });
 };
 
@@ -2694,7 +2726,10 @@ var setupCursor = function setupCursor() {
 };
 
 var checkButton = function checkButton() {
-  if (cursor.over !== false) cursor.over.callback();
+  if (cursor.over !== false) {
+    cursor.over.callback();
+    playEffect("UIButton", false);
+  }
 };
 
 //endregion
@@ -3022,7 +3057,7 @@ var characterSelectLoop = function characterSelectLoop() {
 
   //console.log('select a character');
 };
-var endGame = 0;
+
 var gameUpdateLoop = function gameUpdateLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
@@ -3091,11 +3126,19 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   // move particles
   if (particles.length > 0) {
-    console.log(particles.length);
     moveParticles();
   }
 
   ROOMS.current.drawRoom();
+
+  // play ambience depending on room
+  if (ROOMS.current === room_4 || ROOMS.current === room_5 || ROOMS.current === room_6) {
+    playAmbience("BirdChirp");
+  } else if (ROOMS.current === room_2 || ROOMS.current === room_3 || ROOMS.current === room_8) {
+    playAmbience("FireCracking");
+  } else {
+    playAmbience("none");
+  }
 
   // draw enemies
   drawEnemies();
