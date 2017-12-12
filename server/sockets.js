@@ -134,6 +134,23 @@ const setupSockets = (ioServer) => {
     socket.on('rpcCall', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('rpcCalled', {});
     });
+    
+    // sound related events on server
+    socket.on('playShootEffect', () =>{
+      socket.broadcast.to(`room${socket.roomNum}`).emit('playedShootEffect', {});
+    });
+    
+    socket.on('playMonsterOnHit', () => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('playedMonsterOnHitEffect', {});
+    });
+    
+    socket.on('playPop', () => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('playedPop', {});
+    });
+    
+    socket.on('playDeathGrunt', () => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('playedDeathGrunt', {});
+    });
 
     socket.on('disconnect', () => {
       console.log(socket.roomNum);

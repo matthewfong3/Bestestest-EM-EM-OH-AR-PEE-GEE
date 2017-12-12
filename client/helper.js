@@ -94,6 +94,7 @@ const otherClientFire = () => {
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
       socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+      socket.emit('playShootEffect', {});
     }
   }
   //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
@@ -189,13 +190,17 @@ const checkCollisions = (arr1, arr2) => {
           // deal dmg to enemy here
           if(arr2[j].hp > 0){
             arr2[j].hp -= 2;
+            playEffect("MonsterOnHit");
+            socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             let hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
             
+            playEffect("Pop");
+            socket.emit('playPop', {});
+
             let coinGain = Math.floor(getRandomRange(10, 100));
-            //console.log(`gained: ${coinGain}`);
             socket.emit('gainCoins', {coinGain: coinGain});
           }
           socket.emit('updateBullets', {bulletArray: arr1});
@@ -213,11 +218,17 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
     for(let j = 0; j < array.length; j++){
       if(circlesIntersect(plrObj[keys[i]], array[j])){
         //console.log('collision b/w character and enemy detected');
+
+        playEffect("SlimeShotAtk");
         if(plrObj[keys[i]].hp > 0){
           plrObj[keys[i]].hp -= 2;
+          playEffect("OnHit");
         } else {
           // what happens to player when they 'die'
-          //console.log('player should be dead');
+
+          console.log('player should be dead');
+          playEffect("DeathGrunt");
+          socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', {player: plrObj[keys[i]]});
       }
@@ -346,7 +357,7 @@ const colorOptiontap = () => {
 
 }
 
-const checkdeadtoplayerRadius = () => {
+const checkdeadtoplayerRadius = (hash) => {
   
     let player = players[hash];
     let keys = Object.keys(players);

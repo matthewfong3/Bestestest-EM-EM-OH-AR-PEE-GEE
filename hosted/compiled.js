@@ -688,6 +688,8 @@ var drawcolorOptions = function drawcolorOptions() {
 };
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var editMode = true; //maybe if we make a room 'editor'
 
 var doors = {};
@@ -723,6 +725,8 @@ var room_9 = {};
 var room_10 = {};
 
 var setupDungeonAssets = function setupDungeonAssets() {
+  var _top;
+
   doors.top = {
     img_open: IMAGES.door_top,
     img_lock: IMAGES.door_top_lock,
@@ -784,14 +788,10 @@ var setupDungeonAssets = function setupDungeonAssets() {
         visited: false,
         object: doors.bottom
       },
-      top: {
+      top: (_top = {
         ID: 'room_4',
-        name: '[up] roof A',
-        location: { x: width / 2 - doors.top.width / 2, y: 0 },
-        open: true,
-        visited: false,
-        object: doors.top
-      },
+        name: '[up] roof A'
+      }, _defineProperty(_top, 'name', '[up] roof A'), _defineProperty(_top, 'location', { x: width / 2 - doors.top.width / 2, y: 0 }), _defineProperty(_top, 'open', true), _defineProperty(_top, 'visited', false), _defineProperty(_top, 'object', doors.top), _top),
       left: {
         ID: 'room_0',
         name: '[left] entrance hall',
@@ -1296,6 +1296,7 @@ var otherClientFire = function otherClientFire() {
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
       socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
+      socket.emit('playShootEffect', {});
     }
   }
   //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
@@ -1389,13 +1390,17 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
           // deal dmg to enemy here
           if (arr2[j].hp > 0) {
             arr2[j].hp -= 2;
+            playEffect("MonsterOnHit");
+            socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
 
+            playEffect("Pop");
+            socket.emit('playPop', {});
+
             var coinGain = Math.floor(getRandomRange(10, 100));
-            //console.log(`gained: ${coinGain}`);
             socket.emit('gainCoins', { coinGain: coinGain });
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
@@ -1413,11 +1418,17 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
     for (var j = 0; j < array.length; j++) {
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
         //console.log('collision b/w character and enemy detected');
+
+        playEffect("SlimeShotAtk");
         if (plrObj[keys[i]].hp > 0) {
           plrObj[keys[i]].hp -= 2;
+          playEffect("OnHit");
         } else {
           // what happens to player when they 'die'
-          //console.log('player should be dead');
+
+          console.log('player should be dead');
+          playEffect("DeathGrunt");
+          socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', { player: plrObj[keys[i]] });
       }
@@ -1535,7 +1546,7 @@ var colorOptiontap = function colorOptiontap() {
   }
 };
 
-var checkdeadtoplayerRadius = function checkdeadtoplayerRadius() {
+var checkdeadtoplayerRadius = function checkdeadtoplayerRadius(hash) {
 
   var player = players[hash];
   var keys = Object.keys(players);
@@ -1771,20 +1782,6 @@ var keyDownHandler = function keyDownHandler(e) {
             player.moveRight = true;
             e.preventDefault();
           }
-          // R for Revive
-          else if (keyPressed === 82) {
-
-              var reviving = checkdeadtoplayerRadius();
-              if (reviving != undefined) {
-                //tell the host to revive this player if not the host
-                if (!isHost) {
-                  socket.emit('revivetoSer', { hash: reviving });
-                } else {
-                  //revive this player 
-                  revive(reviving, "moving");
-                }
-              }
-            }
   }
   //if the person is dead, make sure that they aren't moving anymore
   else {
@@ -2595,7 +2592,9 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('playerCollided', function (data) {
-    console.log('received: player collision detected with enemy');
+    //console.log('received: player collision detected with enemy');
+    playEffect("SlimeShotAtk");
+    playEffect("OnHit");
     players[data.player.hash] = data.player;
   });
 
@@ -2628,6 +2627,22 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('rpcCalled', rpcCall);
+
+  socket.on('playedShootEffect', function () {
+    playEffect("Shooting");
+  });
+
+  socket.on('playedMonsterOnHitEffect', function () {
+    playEffect("MonsterOnHit");
+  });
+
+  socket.on('playedPop', function () {
+    playEffect("Pop");
+  });
+
+  socket.on('playedDeathGrunt', function () {
+    playEffect("DeathGrunt");
+  });
 };
 
 var setupGame = function setupGame() {
@@ -3007,7 +3022,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   //drawPlaceholder();
-  //ROOMS.current = room_10;
+
   // non-host clients send key updates to server
   if (players[hash]) {
 
@@ -3054,6 +3069,9 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
+
+    //check to see if people can revive the dead
+    reviveWhentouched();
 
     //see if we need to restart 
     restart();
@@ -3129,4 +3147,20 @@ var restart = function restart() {
   }
 };
 
+var reviveWhentouched = function reviveWhentouched() {
+
+  var keys = Object.keys(players);
+  for (var i = 0; i < keys.length; i++) {
+    var reviving = checkdeadtoplayerRadius(keys[i]);
+    if (reviving != undefined) {
+      //tell the host to revive this player if not the host
+      if (!isHost) {
+        socket.emit('revivetoSer', { hash: reviving });
+      } else {
+        //revive this player 
+        revive(reviving, "moving");
+      }
+    }
+  }
+};
 //endregion
