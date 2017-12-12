@@ -26,12 +26,14 @@ let colorOptionpurple;
 let colorOptionblue;
 let colorOptiongreen;
 
-let startButton, selectButton, debugButton, moveButton;
+let startButton, selectButton, debugButton, moveButton, shopButton, backButton, BuyButton;
+let BronzeOption, SilverOption, GoldOption;
 
 let STATES = {
   wait: 'wait',
   preload: 'preload',
   title: 'title',
+  shop: 'shop',
   setupGame: 'setupGame',
   game: 'game',
   gameover: 'gameover',
@@ -175,6 +177,9 @@ const stateHandler = () => {
       break;
     case STATES.title:
       titleLoop();
+      break;
+    case STATES.shop:
+      shopLoop();
       break;
     case STATES.characterSelect:
       characterSelectLoop();

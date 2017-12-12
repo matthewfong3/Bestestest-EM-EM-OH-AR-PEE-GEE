@@ -213,7 +213,12 @@ const doOnPreloadDone = () => {
   console.log('done loading images');
   startButton = new button(canvas.width/2-100,canvas.height * .75);
   selectButton = new button(canvas.width/2-100,canvas.height * .75);
-  
+  shopButton = new button(canvas.width/2-100,canvas.height * .75 + 75);
+  backButton = new button(canvas.width/2-100,canvas.height * .75);
+  BronzeOption = new shopOption(100,50,275,400,'BRONZE','Get Bronze Unique Cosmetics');
+  SilverOption = new shopOption(450,50,275,400,'SILVER','Get Silver Unqiue Cosmetics');
+  GoldOption = new shopOption(800,50,275,400,'GOLD','Get Gold Unqiue Cosmetics');
+    
   debugButton = new button(10,10, {width: 70, height: 35, text: '[debug]'});
   debugButton.callback = menu.toggle;
   
@@ -267,6 +272,14 @@ const titleLoop = () => {
   drawTitle();
   
   if( cursor.isOverButton(startButton) ) cursor.enterButton(startButton);
+  if( cursor.isOverButton(shopButton) ) cursor.enterButton(shopButton);
+};
+
+const shopLoop = () => {
+  drawShop();
+  
+  if( cursor.isOverButton(backButton) ) cursor.enterButton(backButton);
+    
 };
 
 const gameOverLoop = () => {
@@ -401,7 +414,7 @@ const restart = () => {
     for(let i =0; i < keys.length;i++)
     {
         let player = players[keys[i]];
-        if(player.hp == 0)
+        if(player.hp <= 0)
         {
             playersdead += 1;
         }

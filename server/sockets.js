@@ -89,7 +89,7 @@ const setupSockets = (ioServer) => {
 
     //coin stuff
     socket.on('gainCoins', (data) => {
-      socket.to(rooms[`room${socket.roomNum}`].host).emit('gainedCoins', data );
+      socket.to(rooms[`room${socket.roomNum}`].host).emit('a', data );
       console.log(`got ${data.coinGain} coins.`);
     });
     
