@@ -295,7 +295,7 @@ const characterSelectLoop = () => {
   
   //console.log('select a character');
 };
-let endGame = 0;
+
 const gameUpdateLoop = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
@@ -367,11 +367,19 @@ const gameUpdateLoop = () => {
   
   // move particles
   if(particles.length > 0){
-    //console.log(particles.length);
     moveParticles();
   }
   
   ROOMS.current.drawRoom();
+  
+  // play ambience depending on room
+  if(ROOMS.current === room_4 || ROOMS.current === room_5 || ROOMS.current === room_6){
+    playAmbience("BirdChirp");
+  } else if(ROOMS.current === room_2 || ROOMS.current === room_3 || ROOMS.current === room_8){
+    playAmbience("FireCracking");
+  } else {
+    playAmbience("none");
+  }
   
   // draw enemies
   drawEnemies();
