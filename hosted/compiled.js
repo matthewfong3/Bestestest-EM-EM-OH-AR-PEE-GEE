@@ -417,6 +417,22 @@ var Room = function () {
 ;
 "use strict";
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var shopOption = function shopOption(x, y, width, height, text1, text2) {
+    _classCallCheck(this, shopOption);
+
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.text1 = text1;
+    this.text2 - text2;
+    this.text1positionY = this.y + 20;
+    this.text1positionX = this.x + this.width / 2;
+};
+"use strict";
+
 var particles = [];
 
 var rpcCall = function rpcCall() {
@@ -683,6 +699,8 @@ var drawcolorOptions = function drawcolorOptions() {
 };
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var editMode = true; //maybe if we make a room 'editor'
 
 var doors = {};
@@ -718,6 +736,8 @@ var room_9 = {};
 var room_10 = {};
 
 var setupDungeonAssets = function setupDungeonAssets() {
+  var _top;
+
   doors.top = {
     img_open: IMAGES.door_top,
     img_lock: IMAGES.door_top_lock,
@@ -779,14 +799,10 @@ var setupDungeonAssets = function setupDungeonAssets() {
         visited: false,
         object: doors.bottom
       },
-      top: {
+      top: (_top = {
         ID: 'room_4',
-        name: '[up] roof A',
-        location: { x: width / 2 - doors.top.width / 2, y: 0 },
-        open: true,
-        visited: false,
-        object: doors.top
-      },
+        name: '[up] roof A'
+      }, _defineProperty(_top, 'name', '[up] roof A'), _defineProperty(_top, 'location', { x: width / 2 - doors.top.width / 2, y: 0 }), _defineProperty(_top, 'open', true), _defineProperty(_top, 'visited', false), _defineProperty(_top, 'object', doors.top), _top),
       left: {
         ID: 'room_0',
         name: '[left] entrance hall',
@@ -1528,7 +1544,7 @@ var colorOptiontap = function colorOptiontap() {
   }
 };
 
-var checkdeadtoplayerRadius = function checkdeadtoplayerRadius() {
+var checkdeadtoplayerRadius = function checkdeadtoplayerRadius(hash) {
 
   var player = players[hash];
   var keys = Object.keys(players);
@@ -1764,20 +1780,6 @@ var keyDownHandler = function keyDownHandler(e) {
             player.moveRight = true;
             e.preventDefault();
           }
-          // R for Revive
-          else if (keyPressed === 82) {
-
-              var reviving = checkdeadtoplayerRadius();
-              if (reviving != undefined) {
-                //tell the host to revive this player if not the host
-                if (!isHost) {
-                  socket.emit('revivetoSer', { hash: reviving });
-                } else {
-                  //revive this player 
-                  revive(reviving, "moving");
-                }
-              }
-            }
   }
   //if the person is dead, make sure that they aren't moving anymore
   else {
@@ -3047,6 +3049,9 @@ var gameUpdateLoop = function gameUpdateLoop() {
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
 
+    //check to see if people can revive the dead
+    reviveWhentouched();
+
     //see if we need to restart 
     restart();
 
@@ -3121,4 +3126,20 @@ var restart = function restart() {
   }
 };
 
+var reviveWhentouched = function reviveWhentouched() {
+
+  var keys = Object.keys(players);
+  for (var i = 0; i < keys.length; i++) {
+    var reviving = checkdeadtoplayerRadius(keys[i]);
+    if (reviving != undefined) {
+      //tell the host to revive this player if not the host
+      if (!isHost) {
+        socket.emit('revivetoSer', { hash: reviving });
+      } else {
+        //revive this player 
+        revive(reviving, "moving");
+      }
+    }
+  }
+};
 //endregion

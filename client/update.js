@@ -335,6 +335,9 @@ const gameUpdateLoop = () => {
     
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
+    
+    //check to see if people can revive the dead
+    reviveWhentouched();
       
     //see if we need to restart 
     restart();
@@ -415,5 +418,26 @@ const restart = () => {
     }
 };
 
-
+const reviveWhentouched = () => {
+    
+    
+        let keys = Object.keys(players);
+        for(let i =0; i < keys.length; i++)
+            {
+            let reviving = checkdeadtoplayerRadius(keys[i]);
+            if(reviving != undefined)
+            {
+                //tell the host to revive this player if not the host
+                if(!isHost)
+                {
+                    socket.emit('revivetoSer', {hash:reviving});
+                }
+                else
+                {
+                    //revive this player 
+                    revive(reviving,"moving");
+                }
+            }
+        }
+};
 //endregion

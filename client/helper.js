@@ -344,7 +344,7 @@ const colorOptiontap = () => {
 
 }
 
-const checkdeadtoplayerRadius = () => {
+const checkdeadtoplayerRadius = (hash) => {
   
     let player = players[hash];
     let keys = Object.keys(players);
