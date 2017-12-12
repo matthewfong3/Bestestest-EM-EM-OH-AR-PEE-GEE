@@ -89,24 +89,6 @@ const keyDownHandler = (e) => {
       player.moveRight = true;
       e.preventDefault();
     }
-    // R for Revive
-    else if(keyPressed === 82) {
-        
-        let reviving = checkdeadtoplayerRadius();
-        if(reviving != undefined)
-        {
-            //tell the host to revive this player if not the host
-            if(!isHost)
-            {
-                socket.emit('revivetoSer', {hash:reviving});
-            }
-            else
-            {
-                //revive this player 
-                revive(reviving,"moving");
-            }
-        }
-    }
   }
     //if the person is dead, make sure that they aren't moving anymore
     else {

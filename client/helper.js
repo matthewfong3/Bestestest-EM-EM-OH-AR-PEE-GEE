@@ -196,12 +196,12 @@ const checkCollisions = (arr1, arr2) => {
             arr2.splice(j, 1);
             let hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
-
             //playEffect("Pop", false);
             socket.emit('playPop', {});
 
-            let coinGain = getRandomRange(10, 100);
+            let coinGain = Math.floor(getRandomRange(10, 100));
             socket.emit('gainCoins', {coinGain: coinGain});
+
             playEffect("Coin", false);
             socket.emit('playCoin', {});
 
@@ -221,12 +221,15 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
     for(let j = 0; j < array.length; j++){
       if(circlesIntersect(plrObj[keys[i]], array[j])){
         //console.log('collision b/w character and enemy detected');
+
         playEffect("SlimeShotAtk", false);
+
         if(plrObj[keys[i]].hp > 0){
           plrObj[keys[i]].hp -= 2;
           playEffect("OnHit", false);
         } else {
           // what happens to player when they 'die'
+
           console.log('player should be dead');
           playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
@@ -358,7 +361,7 @@ const colorOptiontap = () => {
 
 }
 
-const checkdeadtoplayerRadius = () => {
+const checkdeadtoplayerRadius = (hash) => {
   
     let player = players[hash];
     let keys = Object.keys(players);

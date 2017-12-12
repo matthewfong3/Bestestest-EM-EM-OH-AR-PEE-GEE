@@ -99,6 +99,7 @@ const setupDungeonAssets = () => {
       top: {
         ID: 'room_4',
         name: '[up] roof A',
+        name: '[up] roof A',
         location: {x: width/2-doors.top.width/2, y: 0},
         open: true,
         visited: false,

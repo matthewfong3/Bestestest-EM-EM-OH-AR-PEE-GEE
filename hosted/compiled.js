@@ -417,6 +417,24 @@ var Room = function () {
 ;
 "use strict";
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var shopOption = function shopOption(x, y, width, height, text1, text2) {
+    _classCallCheck(this, shopOption);
+
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.text1 = text1;
+    this.text2 = text2;
+    this.text1positionX = this.x + this.width / 2;
+    this.text1positionY = this.y + 20;
+    this.text2positionX = this.x + this.width / 2;
+    this.text2positionY = this.y + this.height - 50;
+};
+"use strict";
+
 var particles = [];
 
 var rpcCall = function rpcCall() {
@@ -452,12 +470,13 @@ var drawPlayers = function drawPlayers(time) {
 var drawPlayer = function drawPlayer(playerdrawn) {
   if (playerdrawn.object) {
 
-    if (playerdrawn.hp > 0) playerdrawn.object.img = IMAGES[playerdrawn.object.name].img;else {
-      var ko = playerdrawn.object.name + '_ko';
-      playerdrawn.object.img = IMAGES[ko].img;
+    if (playerdrawn.hp > 0) ctx.drawImage(IMAGES[playerdrawn.object.name].img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);else {
+      var nm = playerdrawn.object.name;
+      var ko = nm + '_ko';
+      ctx.drawImage(IMAGES[ko].img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
     }
 
-    ctx.drawImage(playerdrawn.object.img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
+    //ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
   } else {
 
     ctx.save();
@@ -504,12 +523,16 @@ var drawHealthbar = function drawHealthbar() {
   ctx.strokeStyle = "black";
   ctx.fillStyle = "red";
 
-  ctx.strokeRect(900, 50, 200, 30);
-  ctx.fillRect(900, 50, playerhealthPercentage, 30);
+  ctx.strokeRect(875, 15, 200, 30);
+  ctx.fillRect(875, 15, playerhealthPercentage, 30);
 
+  ctx.textBaseline = 'top';
   ctx.font = "24px Arial";
   ctx.fillStyle = "black";
-  ctx.fillText("HP:", 925, 35);
+  ctx.fillText("HP:", 845, 15);
+
+  ctx.fillText("coins:", 875, height - 45);
+  ctx.fillText(coins, 915, height - 45);
 
   ctx.restore();
 };
@@ -683,6 +706,8 @@ var drawcolorOptions = function drawcolorOptions() {
 };
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var editMode = true; //maybe if we make a room 'editor'
 
 var doors = {};
@@ -718,6 +743,8 @@ var room_9 = {};
 var room_10 = {};
 
 var setupDungeonAssets = function setupDungeonAssets() {
+  var _top;
+
   doors.top = {
     img_open: IMAGES.door_top,
     img_lock: IMAGES.door_top_lock,
@@ -779,14 +806,10 @@ var setupDungeonAssets = function setupDungeonAssets() {
         visited: false,
         object: doors.bottom
       },
-      top: {
+      top: (_top = {
         ID: 'room_4',
-        name: '[up] roof A',
-        location: { x: width / 2 - doors.top.width / 2, y: 0 },
-        open: true,
-        visited: false,
-        object: doors.top
-      },
+        name: '[up] roof A'
+      }, _defineProperty(_top, 'name', '[up] roof A'), _defineProperty(_top, 'location', { x: width / 2 - doors.top.width / 2, y: 0 }), _defineProperty(_top, 'open', true), _defineProperty(_top, 'visited', false), _defineProperty(_top, 'object', doors.top), _top),
       left: {
         ID: 'room_0',
         name: '[left] entrance hall',
@@ -1391,12 +1414,12 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
-
             //playEffect("Pop", false);
             socket.emit('playPop', {});
 
-            var coinGain = getRandomRange(10, 100);
+            var coinGain = Math.floor(getRandomRange(10, 100));
             socket.emit('gainCoins', { coinGain: coinGain });
+
             playEffect("Coin", false);
             socket.emit('playCoin', {});
           }
@@ -1415,12 +1438,15 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
     for (var j = 0; j < array.length; j++) {
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
         //console.log('collision b/w character and enemy detected');
+
         playEffect("SlimeShotAtk", false);
+
         if (plrObj[keys[i]].hp > 0) {
           plrObj[keys[i]].hp -= 2;
           playEffect("OnHit", false);
         } else {
           // what happens to player when they 'die'
+
           console.log('player should be dead');
           playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
@@ -1541,7 +1567,7 @@ var colorOptiontap = function colorOptiontap() {
   }
 };
 
-var checkdeadtoplayerRadius = function checkdeadtoplayerRadius() {
+var checkdeadtoplayerRadius = function checkdeadtoplayerRadius(hash) {
 
   var player = players[hash];
   var keys = Object.keys(players);
@@ -1779,20 +1805,6 @@ var keyDownHandler = function keyDownHandler(e) {
             player.moveRight = true;
             e.preventDefault();
           }
-          // R for Revive
-          else if (keyPressed === 82) {
-
-              var reviving = checkdeadtoplayerRadius();
-              if (reviving != undefined) {
-                //tell the host to revive this player if not the host
-                if (!isHost) {
-                  socket.emit('revivetoSer', { hash: reviving });
-                } else {
-                  //revive this player 
-                  revive(reviving, "moving");
-                }
-              }
-            }
   }
   //if the person is dead, make sure that they aren't moving anymore
   else {
@@ -2567,7 +2579,7 @@ var setupSockets = function setupSockets() {
   socket.on('setHost', function () {
     isHost = true;
     console.log('I am the host');
-    initEnemies(2);
+    initEnemies(0);
     spawnEnemies();
   });
 
@@ -2613,6 +2625,7 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('gainedCoins', function (data) {
+    console.log('in gain coin');
     if (isHost) {
       coins += data.coinGain;
       console.log('coins: ' + coins);
@@ -2896,7 +2909,7 @@ var setUser = function setUser(data) {
   if (color == "purple") {
     players[hash] = new Character(hash, IMAGES.player_purple);
   }
-  console.log(data.id);
+  console.log('id: ' + data.id);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
 };
@@ -2915,7 +2928,7 @@ var setOtherplayers = function setOtherplayers(data) {
     players[data.hash] = new Character(data.hash, IMAGES.player_purple);
   }
 
-  if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: enemies });
+  if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: {} });
 };
 //endregion
 
@@ -3111,6 +3124,9 @@ var gameUpdateLoop = function gameUpdateLoop() {
     // check collisions b/w characters (players) and enemies
     checkCollisionsPlayersVEnemies(players, enemies);
 
+    //check to see if people can revive the dead
+    reviveWhentouched();
+
     //see if we need to restart 
     restart();
 
@@ -3165,7 +3181,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
   var keys = Object.keys(players);
   for (var _i = 0; _i < keys.length; _i++) {
     var player = players[keys[_i]];
-    console.log(_i + ": has killed " + player.enemiesKilled);
+    //console.log( i + ": has killed " + player.enemiesKilled);
   }
 
   ROOMS.current.checkGoals();
@@ -3193,4 +3209,20 @@ var restart = function restart() {
   }
 };
 
+var reviveWhentouched = function reviveWhentouched() {
+
+  var keys = Object.keys(players);
+  for (var i = 0; i < keys.length; i++) {
+    var reviving = checkdeadtoplayerRadius(keys[i]);
+    if (reviving != undefined) {
+      //tell the host to revive this player if not the host
+      if (!isHost) {
+        socket.emit('revivetoSer', { hash: reviving });
+      } else {
+        //revive this player 
+        revive(reviving, "moving");
+      }
+    }
+  }
+};
 //endregion
