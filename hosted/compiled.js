@@ -423,6 +423,24 @@ var Room = function () {
 ;
 "use strict";
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var shopOption = function shopOption(x, y, width, height, text1, text2) {
+    _classCallCheck(this, shopOption);
+
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.text1 = text1;
+    this.text2 = text2;
+    this.text1positionX = this.x + this.width / 2;
+    this.text1positionY = this.y + 20;
+    this.text2positionX = this.x + this.width / 2;
+    this.text2positionY = this.y + this.height - 50;
+};
+"use strict";
+
 var particles = [];
 
 var rpcCall = function rpcCall() {
@@ -594,8 +612,26 @@ var drawTitle = function drawTitle() {
   ctx.font = '15pt Courier';
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton, "Start", "Color");
+  drawButton(shopButton, "Shop", "Color");
   ctx.drawImage(IMAGES.logo.img, canvas.width / 2 - IMAGES.logo.width / 2, canvas.height / 2 - IMAGES.logo.height / 2 - 130);
 }; //app title screen
+
+var drawShop = function drawShop() {
+  ctx.fillStyle = '#242424';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'white';
+  ctx.font = '30pt Courier';
+  ctx.fillText('Shop', canvas.width / 2, canvas.height * .03);
+  ctx.font = '15pt Courier';
+  //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height * .10);
+  drawButton(backButton, "Back", "Color");
+  drawShopOptions();
+  //drawButton(shopButton,"Shop","Color");
+  //ctx.drawImage(IMAGES.logo.img, canvas.width/2-IMAGES.logo.width/2,canvas.height/2-IMAGES.logo.height/2 -130);
+};
 
 var drawCharacterselect = function drawCharacterselect() {
   ctx.fillStyle = '#242424';
@@ -690,6 +726,37 @@ var drawcolorOptions = function drawcolorOptions() {
 
     ctx.drawImage(IMAGES.player_blue.img, colorOptionblue.x + colorOptionblue.width / 2 - plr_width / 2 * 2.9, colorOptionblue.y + colorOptionblue.height / 2 - plr_height / 2 * 2.9, plr_width * 2.9, plr_height * 2.9);
   }
+
+  ctx.restore();
+};
+
+var drawShopOptions = function drawShopOptions() {
+  ctx.save();
+
+  ctx.lineWidth = 5;
+
+  ctx.strokeStyle = "black";
+
+  ctx.font = '12pt Courier';
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(BronzeOption.x, BronzeOption.y, BronzeOption.width, BronzeOption.height);
+  ctx.strokeRect(BronzeOption.x, BronzeOption.y, BronzeOption.width, BronzeOption.height);
+  ctx.fillStyle = "black";
+  ctx.fillText(BronzeOption.text1, BronzeOption.text1positionX, BronzeOption.text1positionY);
+  ctx.fillText(BronzeOption.text2, BronzeOption.text2positionX, BronzeOption.text2positionY);
+  ctx.fillStyle = "white";
+  ctx.fillRect(SilverOption.x, SilverOption.y, SilverOption.width, SilverOption.height);
+  ctx.strokeRect(SilverOption.x, SilverOption.y, SilverOption.width, SilverOption.height);
+  ctx.fillStyle = "black";
+  ctx.fillText(SilverOption.text1, SilverOption.text1positionX, SilverOption.text1positionY);
+  ctx.fillText(SilverOption.text2, SilverOption.text2positionX, SilverOption.text2positionY);
+  ctx.fillStyle = "white";
+  ctx.fillRect(GoldOption.x, GoldOption.y, GoldOption.width, GoldOption.height);
+  ctx.strokeRect(GoldOption.x, GoldOption.y, GoldOption.width, GoldOption.height);
+  ctx.fillStyle = "black";
+  ctx.fillText(GoldOption.text1, GoldOption.text1positionX, GoldOption.text1positionY);
+  ctx.fillText(GoldOption.text2, GoldOption.text2positionX, GoldOption.text2positionY);
 
   ctx.restore();
 };
@@ -1099,7 +1166,7 @@ var enterRoom = function enterRoom(newRoom) {
 
   ROOMS.current = newRoom;
   ROOMS.current.entered_from = lastRoom;
-
+  playEffect("Unlock", false);
   if (lastRoom != newRoom) {
     reviveAll("restart");
 
@@ -1235,7 +1302,7 @@ var fire = function fire(e) {
     var bullet = new Bullet(playerPos, normVec, hash);
     bulletArray.push(bullet);
     canFire = false;
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   }
 };
 
@@ -1403,18 +1470,20 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
           // deal dmg to enemy here
           if (arr2[j].hp > 0) {
             arr2[j].hp -= 2;
-            playEffect("MonsterOnHit");
+            playEffect("MonsterOnHit", false);
             socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
-
-            playEffect("Pop");
+            //playEffect("Pop", false);
             socket.emit('playPop', {});
 
             var coinGain = Math.floor(getRandomRange(10, 100));
             socket.emit('gainCoins', { coinGain: coinGain });
+
+            playEffect("Coin", false);
+            socket.emit('playCoin', {});
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
           socket.emit('updateEnemies', { enemies: enemies });
@@ -1432,15 +1501,16 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
         //console.log('collision b/w character and enemy detected');
 
-        playEffect("SlimeShotAtk");
+        playEffect("SlimeShotAtk", false);
+
         if (plrObj[keys[i]].hp > 0) {
           plrObj[keys[i]].hp -= 2;
-          playEffect("OnHit");
+          playEffect("OnHit", false);
         } else {
           // what happens to player when they 'die'
 
           console.log('player should be dead');
-          playEffect("DeathGrunt");
+          playEffect("DeathGrunt", false);
           socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', { player: plrObj[keys[i]] });
@@ -1704,6 +1774,7 @@ var socket = void 0,
 
 var bgAudio = undefined,
     effectAudio = undefined,
+    ambienceAudio = undefined,
     currentEffect = 0,
     currentDirection = 1;
 
@@ -1732,12 +1803,19 @@ var colorOptiongreen = void 0;
 var startButton = void 0,
     selectButton = void 0,
     debugButton = void 0,
-    moveButton = void 0;
+    moveButton = void 0,
+    shopButton = void 0,
+    backButton = void 0,
+    BuyButton = void 0;
+var BronzeOption = void 0,
+    SilverOption = void 0,
+    GoldOption = void 0;
 
 var STATES = {
   wait: 'wait',
   preload: 'preload',
   title: 'title',
+  shop: 'shop',
   setupGame: 'setupGame',
   game: 'game',
   gameover: 'gameover',
@@ -1753,6 +1831,7 @@ var bulletArray = [];
 var enemies = [];
 var rooms = {};
 var coins = 0;
+var endGame = 0;
 
 var directions = {
   DOWNLEFT: 0,
@@ -1885,6 +1964,9 @@ var stateHandler = function stateHandler() {
       break;
     case STATES.title:
       titleLoop();
+      break;
+    case STATES.shop:
+      shopLoop();
       break;
     case STATES.characterSelect:
       characterSelectLoop();
@@ -2300,9 +2382,11 @@ var playAnim = function playAnim(ctx, targetSprite, freeze) {
 //--sound---------------------------region
 var setupSound = function setupSound() {
   bgAudio = document.querySelector("#bgAudio");
-  bgAudio.volume = 0.25;
+  bgAudio.volume = 0.05;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
+  ambienceAudio = document.querySelector("#ambienceAudio");
+  ambienceAudio.volume = 0.3;
   bgAudio.current = bgTracks.exploration;
   bgAudio.src = bgAudio.current.src;
 };
@@ -2327,12 +2411,34 @@ var stopBgAudio = function stopBgAudio(reset) {
   if (reset) bgAudio.currentTime = 0;
 };
 
-var playEffect = function playEffect(fileName) {
+var playEffect = function playEffect(fileName, loop) {
+  //effectAudio.loop = loop;
   //currentEffect = Math.round(Math.random()*8)-1;
   //if(currentEffect<0)currentEffect=0;
-  effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
+
+  if (effectAudio.paused) {
+    effectAudio.current = effectSounds[fileName];
+    effectAudio.src = effectAudio.current.src;
+    effectAudio.load();
+    effectAudio.play();
+  }
+
+  //effectAudio.src = effectSounds[fileName].src; //"assets/audio/" + effectSounds[currentEffect];
   //console.log(currentEffect);
-  effectAudio.play();
+};
+
+var playAmbience = function playAmbience(fileName) {
+  if (fileName === "none") {
+    ambienceAudio.pause();
+    return;
+  }
+
+  if (ambienceAudio.paused) {
+    ambienceAudio.current = effectSounds[fileName];
+    ambienceAudio.src = ambienceAudio.current.src;
+    ambienceAudio.load();
+    ambienceAudio.play();
+  }
 };
 //endregion
 'use strict';
@@ -2621,8 +2727,8 @@ var setupSockets = function setupSockets() {
 
   socket.on('playerCollided', function (data) {
     //console.log('received: player collision detected with enemy');
-    playEffect("SlimeShotAtk");
-    playEffect("OnHit");
+    playEffect("SlimeShotAtk", false);
+    playEffect("OnHit", false);
     players[data.player.hash] = data.player;
   });
 
@@ -2657,19 +2763,23 @@ var setupSockets = function setupSockets() {
   socket.on('rpcCalled', rpcCall);
 
   socket.on('playedShootEffect', function () {
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   });
 
   socket.on('playedMonsterOnHitEffect', function () {
-    playEffect("MonsterOnHit");
+    playEffect("MonsterOnHit", false);
   });
 
   socket.on('playedPop', function () {
-    playEffect("Pop");
+    playEffect("Pop", false);
   });
 
   socket.on('playedDeathGrunt', function () {
-    playEffect("DeathGrunt");
+    playEffect("DeathGrunt", false);
+  });
+
+  socket.on('playedCoin', function () {
+    playerEffect("Coin", false);
   });
 };
 
@@ -2716,7 +2826,10 @@ var setupCursor = function setupCursor() {
 };
 
 var checkButton = function checkButton() {
-  if (cursor.over !== false) cursor.over.callback();
+  if (cursor.over !== false) {
+    cursor.over.callback();
+    playEffect("UIButton", false);
+  }
 };
 
 //endregion
@@ -2743,11 +2856,33 @@ var assignStartupEvents = function assignStartupEvents() {
     */
     canvas_overlay.onmousedown = function () {
       var startBool = buttonTap(startButton);
+      var shopBool = buttonTap(shopButton);
 
       if (startBool) {
         gameState = STATES.characterSelect;
         assignStartupEvents();
         console.log('setting up game');
+      }
+
+      if (shopBool) {
+        gameState = STATES.shop;
+        assignStartupEvents();
+        console.log("going to shop");
+      }
+      checkButton();
+      setAnim(cursor, 'click', 'once');
+    };
+  }
+
+  if (gameState === STATES.shop) {
+
+    canvas_overlay.onmousedown = function () {
+      var backBool = buttonTap(backButton);
+
+      if (backBool) {
+        gameState = STATES.title;
+        assignStartupEvents();
+        console.log("back to title screen");
       }
       checkButton();
       setAnim(cursor, 'click', 'once');
@@ -2975,6 +3110,11 @@ var doOnPreloadDone = function doOnPreloadDone() {
   console.log('done loading images');
   startButton = new button(canvas.width / 2 - 100, canvas.height * .75);
   selectButton = new button(canvas.width / 2 - 100, canvas.height * .75);
+  shopButton = new button(canvas.width / 2 - 100, canvas.height * .75 + 75);
+  backButton = new button(canvas.width / 2 - 100, canvas.height * .75);
+  BronzeOption = new shopOption(100, 50, 275, 400, 'BRONZE', 'Get Bronze Unique Cosmetics');
+  SilverOption = new shopOption(450, 50, 275, 400, 'SILVER', 'Get Silver Unqiue Cosmetics');
+  GoldOption = new shopOption(800, 50, 275, 400, 'GOLD', 'Get Gold Unqiue Cosmetics');
 
   debugButton = new button(10, 10, { width: 70, height: 35, text: '[debug]' });
   debugButton.callback = menu.toggle;
@@ -3031,6 +3171,13 @@ var titleLoop = function titleLoop() {
   drawTitle();
 
   if (cursor.isOverButton(startButton)) cursor.enterButton(startButton);
+  if (cursor.isOverButton(shopButton)) cursor.enterButton(shopButton);
+};
+
+var shopLoop = function shopLoop() {
+  drawShop();
+
+  if (cursor.isOverButton(backButton)) cursor.enterButton(backButton);
 };
 
 var gameOverLoop = function gameOverLoop() {
@@ -3046,7 +3193,7 @@ var characterSelectLoop = function characterSelectLoop() {
 
   //console.log('select a character');
 };
-var endGame = 0;
+
 var gameUpdateLoop = function gameUpdateLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
@@ -3118,11 +3265,19 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   // move particles
   if (particles.length > 0) {
-    //console.log(particles.length);
     moveParticles();
   }
 
   ROOMS.current.drawRoom();
+
+  // play ambience depending on room
+  if (ROOMS.current === room_4 || ROOMS.current === room_5 || ROOMS.current === room_6) {
+    playAmbience("BirdChirp");
+  } else if (ROOMS.current === room_2 || ROOMS.current === room_3 || ROOMS.current === room_8) {
+    playAmbience("FireCracking");
+  } else {
+    playAmbience("none");
+  }
 
   // draw enemies
   drawEnemies();
@@ -3163,7 +3318,7 @@ var restart = function restart() {
   var playersdead = 0;
   for (var i = 0; i < keys.length; i++) {
     var player = players[keys[i]];
-    if (player.hp == 0) {
+    if (player.hp <= 0) {
       playersdead += 1;
     }
   }

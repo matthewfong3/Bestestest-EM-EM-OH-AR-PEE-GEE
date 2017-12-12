@@ -118,8 +118,8 @@ const setupSockets = () => {
   
   socket.on('playerCollided', (data) => {
     //console.log('received: player collision detected with enemy');
-    playEffect("SlimeShotAtk");
-    playEffect("OnHit");
+    playEffect("SlimeShotAtk", false);
+    playEffect("OnHit", false);
     players[data.player.hash] = data.player;
   });
   
@@ -154,19 +154,23 @@ const setupSockets = () => {
   socket.on('rpcCalled', rpcCall);
   
   socket.on('playedShootEffect', () => {
-    playEffect("Shooting");
+    playEffect("Shooting", false);
   });
   
   socket.on('playedMonsterOnHitEffect', () => {
-    playEffect("MonsterOnHit");
+    playEffect("MonsterOnHit", false);
   });
   
   socket.on('playedPop', () => {
-    playEffect("Pop");
+    playEffect("Pop", false);
   });
   
   socket.on('playedDeathGrunt', () => {
-    playEffect("DeathGrunt");
+    playEffect("DeathGrunt", false);
+  });
+  
+  socket.on('playedCoin', () => {
+    playerEffect("Coin", false);
   });
 };
 
@@ -215,7 +219,10 @@ const setupCursor= () => {
 };
 
 const checkButton = () => {
-  if(cursor.over !== false ) cursor.over.callback();
+  if(cursor.over !== false ) {
+    cursor.over.callback();
+    playEffect("UIButton", false);
+  }
 }
 
 //endregion
@@ -242,18 +249,42 @@ const assignStartupEvents = () => {
     */
     canvas_overlay.onmousedown = () => {
       let startBool = buttonTap(startButton);
-
+      let shopBool = buttonTap(shopButton);
+        
       if(startBool)
       {
         gameState = STATES.characterSelect; 
         assignStartupEvents();
         console.log('setting up game');
       }
+        
+      if(shopBool)
+      {
+          gameState = STATES.shop;
+          assignStartupEvents();
+          console.log("going to shop");
+      }
       checkButton();
       setAnim(cursor, 'click', 'once' );
     }
   }
-
+    
+  if(gameState === STATES.shop){
+    
+      canvas_overlay.onmousedown = () => {
+          let backBool = buttonTap(backButton);
+          
+          if(backBool)
+            {
+                gameState = STATES.title;
+                assignStartupEvents();
+                console.log("back to title screen")
+            }
+            checkButton();
+            setAnim(cursor, 'click', 'once' );
+      }  
+  }
+    
   if(gameState === STATES.characterSelect){
 
     canvas_overlay.onmousedown = () => {

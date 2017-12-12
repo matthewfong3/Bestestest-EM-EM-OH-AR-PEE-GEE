@@ -415,11 +415,11 @@ const enterRoom = (newRoom) => {
     
   ROOMS.current = newRoom;
   ROOMS.current.entered_from = lastRoom;
-    
+  playEffect("Unlock", false);
   if(lastRoom != newRoom)
   {
     reviveAll("restart");
-
+  
     positionInNextRoom(lastRoom,ROOMS.current);
     
     if(ROOMS.current.visited == false)

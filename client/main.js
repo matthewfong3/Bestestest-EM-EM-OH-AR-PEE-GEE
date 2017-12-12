@@ -2,7 +2,7 @@ let canvas, ctx, canvas_overlay, ctx_overlay, canvas_back, ctx_back, width, heig
 
 let socket, hash, isHost = false, hosted = {}, roomName;
 
-let bgAudio = undefined, effectAudio = undefined, currentEffect = 0, currentDirection = 1;
+let bgAudio = undefined, effectAudio = undefined, ambienceAudio = undefined, currentEffect = 0, currentDirection = 1;
 
 let mouse = {x:0,y:0};
 let cursor = undefined;
@@ -26,12 +26,14 @@ let colorOptionpurple;
 let colorOptionblue;
 let colorOptiongreen;
 
-let startButton, selectButton, debugButton, moveButton;
+let startButton, selectButton, debugButton, moveButton, shopButton, backButton, BuyButton;
+let BronzeOption, SilverOption, GoldOption;
 
 let STATES = {
   wait: 'wait',
   preload: 'preload',
   title: 'title',
+  shop: 'shop',
   setupGame: 'setupGame',
   game: 'game',
   gameover: 'gameover',
@@ -46,6 +48,7 @@ let bulletArray = [];
 let enemies = [];
 let rooms = {};
 let coins = 0;
+let endGame = 0;
 
 const directions = {
   DOWNLEFT: 0,
@@ -175,6 +178,9 @@ const stateHandler = () => {
       break;
     case STATES.title:
       titleLoop();
+      break;
+    case STATES.shop:
+      shopLoop();
       break;
     case STATES.characterSelect:
       characterSelectLoop();

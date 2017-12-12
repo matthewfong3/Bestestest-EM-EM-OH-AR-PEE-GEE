@@ -213,7 +213,12 @@ const doOnPreloadDone = () => {
   console.log('done loading images');
   startButton = new button(canvas.width/2-100,canvas.height * .75);
   selectButton = new button(canvas.width/2-100,canvas.height * .75);
-  
+  shopButton = new button(canvas.width/2-100,canvas.height * .75 + 75);
+  backButton = new button(canvas.width/2-100,canvas.height * .75);
+  BronzeOption = new shopOption(100,50,275,400,'BRONZE','Get Bronze Unique Cosmetics');
+  SilverOption = new shopOption(450,50,275,400,'SILVER','Get Silver Unqiue Cosmetics');
+  GoldOption = new shopOption(800,50,275,400,'GOLD','Get Gold Unqiue Cosmetics');
+    
   debugButton = new button(10,10, {width: 70, height: 35, text: '[debug]'});
   debugButton.callback = menu.toggle;
   
@@ -269,6 +274,14 @@ const titleLoop = () => {
   drawTitle();
   
   if( cursor.isOverButton(startButton) ) cursor.enterButton(startButton);
+  if( cursor.isOverButton(shopButton) ) cursor.enterButton(shopButton);
+};
+
+const shopLoop = () => {
+  drawShop();
+  
+  if( cursor.isOverButton(backButton) ) cursor.enterButton(backButton);
+    
 };
 
 const gameOverLoop = () => {
@@ -284,7 +297,7 @@ const characterSelectLoop = () => {
   
   //console.log('select a character');
 };
-let endGame = 0;
+
 const gameUpdateLoop = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
@@ -356,11 +369,19 @@ const gameUpdateLoop = () => {
   
   // move particles
   if(particles.length > 0){
-    //console.log(particles.length);
     moveParticles();
   }
   
   ROOMS.current.drawRoom();
+  
+  // play ambience depending on room
+  if(ROOMS.current === room_4 || ROOMS.current === room_5 || ROOMS.current === room_6){
+    playAmbience("BirdChirp");
+  } else if(ROOMS.current === room_2 || ROOMS.current === room_3 || ROOMS.current === room_8){
+    playAmbience("FireCracking");
+  } else {
+    playAmbience("none");
+  }
   
   // draw enemies
   drawEnemies();
@@ -404,7 +425,7 @@ const restart = () => {
     for(let i =0; i < keys.length;i++)
     {
         let player = players[keys[i]];
-        if(player.hp == 0)
+        if(player.hp <= 0)
         {
             playersdead += 1;
         }

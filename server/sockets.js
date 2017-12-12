@@ -156,26 +156,39 @@ const setupSockets = (ioServer) => {
     socket.on('revivedAlltoSer', () => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {});
     });
-              
+
+
+    socket.on('gainCoins', (data) => {
+      socket.to(rooms[`room${socket.roomNum}`].host).emit('gainedCoins', data);
+    });
+
+    socket.on('updateCoins', (data) => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('updatedCoins', data);
+    });
+
     socket.on('rpcCall', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('rpcCalled', {});
     });
-    
+
     // sound related events on server
-    socket.on('playShootEffect', () =>{
+    socket.on('playShootEffect', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('playedShootEffect', {});
     });
-    
+
     socket.on('playMonsterOnHit', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('playedMonsterOnHitEffect', {});
     });
-    
+
     socket.on('playPop', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('playedPop', {});
     });
-    
+
     socket.on('playDeathGrunt', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('playedDeathGrunt', {});
+    });
+
+    socket.on('playCoin', () => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('playedCoin', {});
     });
 
     socket.on('disconnect', () => {

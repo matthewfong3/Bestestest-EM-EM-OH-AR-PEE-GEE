@@ -171,8 +171,26 @@ const drawTitle = () => {
   ctx.font = '15pt Courier';
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton,"Start","Color");
+  drawButton(shopButton,"Shop","Color");
   ctx.drawImage(IMAGES.logo.img, canvas.width/2-IMAGES.logo.width/2,canvas.height/2-IMAGES.logo.height/2 -130);
 }; //app title screen
+
+const drawShop = () => {
+    ctx.fillStyle = '#242424';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'white';
+  ctx.font = '30pt Courier';
+  ctx.fillText('Shop', canvas.width/2,canvas.height * .03);
+  ctx.font = '15pt Courier';
+  //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height * .10);
+  drawButton(backButton,"Back","Color");
+  drawShopOptions();
+  //drawButton(shopButton,"Shop","Color");
+  //ctx.drawImage(IMAGES.logo.img, canvas.width/2-IMAGES.logo.width/2,canvas.height/2-IMAGES.logo.height/2 -130);
+}
 
 const drawCharacterselect = () => {
   ctx.fillStyle = '#242424';
@@ -275,3 +293,34 @@ const drawcolorOptions = () => {
 
   ctx.restore();
 }
+
+const drawShopOptions = () => {
+    ctx.save();
+    
+    ctx.lineWidth = 5;
+    
+    ctx.strokeStyle = "black";
+  
+    ctx.font = '12pt Courier';
+    
+    ctx.fillStyle = "white";
+    ctx.fillRect(BronzeOption.x,BronzeOption.y,BronzeOption.width,BronzeOption.height);
+    ctx.strokeRect(BronzeOption.x,BronzeOption.y,BronzeOption.width,BronzeOption.height);
+    ctx.fillStyle = "black";
+    ctx.fillText(BronzeOption.text1,BronzeOption.text1positionX,BronzeOption.text1positionY);
+    ctx.fillText(BronzeOption.text2,BronzeOption.text2positionX,BronzeOption.text2positionY);
+    ctx.fillStyle = "white";
+    ctx.fillRect(SilverOption.x,SilverOption.y,SilverOption.width,SilverOption.height);
+    ctx.strokeRect(SilverOption.x,SilverOption.y,SilverOption.width,SilverOption.height);
+    ctx.fillStyle = "black";
+    ctx.fillText(SilverOption.text1,SilverOption.text1positionX,SilverOption.text1positionY);
+    ctx.fillText(SilverOption.text2,SilverOption.text2positionX,SilverOption.text2positionY);
+    ctx.fillStyle = "white";
+    ctx.fillRect(GoldOption.x,GoldOption.y,GoldOption.width,GoldOption.height);
+    ctx.strokeRect(GoldOption.x,GoldOption.y,GoldOption.width,GoldOption.height);
+    ctx.fillStyle = "black";
+    ctx.fillText(GoldOption.text1,GoldOption.text1positionX,GoldOption.text1positionY);
+    ctx.fillText(GoldOption.text2,GoldOption.text2positionX,GoldOption.text2positionY);
+    
+    ctx.restore();
+};
