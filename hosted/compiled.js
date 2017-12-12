@@ -452,12 +452,13 @@ var drawPlayers = function drawPlayers(time) {
 var drawPlayer = function drawPlayer(playerdrawn) {
   if (playerdrawn.object) {
 
-    if (playerdrawn.hp > 0) playerdrawn.object.img = IMAGES[playerdrawn.object.name].img;else {
-      var ko = playerdrawn.object.name + '_ko';
-      playerdrawn.object.img = IMAGES[ko].img;
+    if (playerdrawn.hp > 0) ctx.drawImage(IMAGES[playerdrawn.object.name].img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);else {
+      var nm = playerdrawn.object.name;
+      var ko = nm + '_ko';
+      ctx.drawImage(IMAGES[ko].img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
     }
 
-    ctx.drawImage(playerdrawn.object.img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
+    //ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
   } else {
 
     ctx.save();
@@ -504,12 +505,16 @@ var drawHealthbar = function drawHealthbar() {
   ctx.strokeStyle = "black";
   ctx.fillStyle = "red";
 
-  ctx.strokeRect(900, 50, 200, 30);
-  ctx.fillRect(900, 50, playerhealthPercentage, 30);
+  ctx.strokeRect(875, 15, 200, 30);
+  ctx.fillRect(875, 15, playerhealthPercentage, 30);
 
+  ctx.textBaseline = 'top';
   ctx.font = "24px Arial";
   ctx.fillStyle = "black";
-  ctx.fillText("HP:", 925, 35);
+  ctx.fillText("HP:", 845, 15);
+
+  ctx.fillText("coins:", 875, height - 45);
+  ctx.fillText(coins, 915, height - 45);
 
   ctx.restore();
 };
@@ -1379,7 +1384,7 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
     for (var j = 0; j < arr2.length; j++) {
       if (arr1[i] && arr2[j]) {
         if (circlesIntersect(arr1[i], arr2[j])) {
-          console.log('collision b/w bullet and enemy detected');
+          //console.log('collision b/w bullet and enemy detected');
           var bullet = arr1.splice(i, 1);
           // deal dmg to enemy here
           if (arr2[j].hp > 0) {
@@ -1388,7 +1393,9 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
-            var coinGain = getRandomRange(10, 100);
+
+            var coinGain = Math.floor(getRandomRange(10, 100));
+            //console.log(`gained: ${coinGain}`);
             socket.emit('gainCoins', { coinGain: coinGain });
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
@@ -1405,12 +1412,12 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
   for (var i = 0; i < keys.length; i++) {
     for (var j = 0; j < array.length; j++) {
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
-        console.log('collision b/w character and enemy detected');
+        //console.log('collision b/w character and enemy detected');
         if (plrObj[keys[i]].hp > 0) {
           plrObj[keys[i]].hp -= 2;
         } else {
           // what happens to player when they 'die'
-          console.log('player should be dead');
+          //console.log('player should be dead');
         }
         socket.emit('playerCollide', { player: plrObj[keys[i]] });
       }
@@ -2528,7 +2535,7 @@ var setupSockets = function setupSockets() {
   socket.on('setHost', function () {
     isHost = true;
     console.log('I am the host');
-    initEnemies(2);
+    initEnemies(0);
     spawnEnemies();
   });
 
@@ -2574,6 +2581,7 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('gainedCoins', function (data) {
+    console.log('in gain coin');
     if (isHost) {
       coins += data.coinGain;
       console.log('coins: ' + coins);
@@ -2832,7 +2840,7 @@ var setUser = function setUser(data) {
   if (color == "purple") {
     players[hash] = new Character(hash, IMAGES.player_purple);
   }
-  console.log(data.id);
+  console.log('id: ' + data.id);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
 };
@@ -2851,7 +2859,7 @@ var setOtherplayers = function setOtherplayers(data) {
     players[data.hash] = new Character(data.hash, IMAGES.player_purple);
   }
 
-  if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: enemies });
+  if (isHost) socket.emit('spawnEnemies', { id: data.id, enemies: {} });
 };
 //endregion
 
@@ -2999,7 +3007,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   //drawPlaceholder();
-  ROOMS.current = room_10;
+  //ROOMS.current = room_10;
   // non-host clients send key updates to server
   if (players[hash]) {
 
@@ -3062,7 +3070,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
 
   // move particles
   if (particles.length > 0) {
-    console.log(particles.length);
+    //console.log(particles.length);
     moveParticles();
   }
 
@@ -3093,7 +3101,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
   var keys = Object.keys(players);
   for (var _i = 0; _i < keys.length; _i++) {
     var player = players[keys[_i]];
-    console.log(_i + ": has killed " + player.enemiesKilled);
+    //console.log( i + ": has killed " + player.enemiesKilled);
   }
 
   ROOMS.current.checkGoals();

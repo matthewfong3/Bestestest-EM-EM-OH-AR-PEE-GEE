@@ -87,6 +87,17 @@ const setupSockets = (ioServer) => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveTohost', data);
     });
 
+    //coin stuff
+    socket.on('gainCoins', (data) => {
+      socket.to(rooms[`room${socket.roomNum}`].host).emit('gainedCoins', data );
+      console.log(`got ${data.coinGain} coins.`);
+    });
+    
+    socket.on('updateCoins', (data) => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit('updatedCoins', data );
+      console.log('got coin total update');
+    });
+    
     // server listens to host client for player position updates and sends them to non-host clients
     socket.on('updatePos', (data) => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('updatedPos', data);
@@ -118,14 +129,6 @@ const setupSockets = (ioServer) => {
 
     socket.on('revivedAlltoSer', () => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {});
-    });
-    
-    socket.on('gainCoins', (data) => {
-      socket.to( rooms[`room${socket.roomNum}`].host ).emit( 'gainedCoins', data );
-    });
-    
-    socket.on('updateCoins', (data) => {
-      socket.broadcast.to(`room${socket.roomNum}`).emit( 'updatedCoins', data );
     });
               
     socket.on('rpcCall', () => {

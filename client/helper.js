@@ -184,7 +184,7 @@ const checkCollisions = (arr1, arr2) => {
     for(let j = 0; j < arr2.length; j++){
       if(arr1[i] && arr2[j]){
         if(circlesIntersect(arr1[i], arr2[j])){
-          console.log('collision b/w bullet and enemy detected');
+          //console.log('collision b/w bullet and enemy detected');
           let bullet = arr1.splice(i, 1);
           // deal dmg to enemy here
           if(arr2[j].hp > 0){
@@ -193,7 +193,9 @@ const checkCollisions = (arr1, arr2) => {
             arr2.splice(j, 1);
             let hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
-            let coinGain = getRandomRange(10, 100);
+            
+            let coinGain = Math.floor(getRandomRange(10, 100));
+            //console.log(`gained: ${coinGain}`);
             socket.emit('gainCoins', {coinGain: coinGain});
           }
           socket.emit('updateBullets', {bulletArray: arr1});
@@ -210,12 +212,12 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
   for(let i = 0; i < keys.length; i++){
     for(let j = 0; j < array.length; j++){
       if(circlesIntersect(plrObj[keys[i]], array[j])){
-        console.log('collision b/w character and enemy detected');
+        //console.log('collision b/w character and enemy detected');
         if(plrObj[keys[i]].hp > 0){
           plrObj[keys[i]].hp -= 2;
         } else {
           // what happens to player when they 'die'
-          console.log('player should be dead');
+          //console.log('player should be dead');
         }
         socket.emit('playerCollide', {player: plrObj[keys[i]]});
       }

@@ -34,13 +34,14 @@ const drawPlayer = (playerdrawn) => {
   if(playerdrawn.object){
 
     if(playerdrawn.hp > 0)
-      playerdrawn.object.img = IMAGES[playerdrawn.object.name ].img;
+      ctx.drawImage( IMAGES[playerdrawn.object.name ].img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
     else {
-      const ko = playerdrawn.object.name + '_ko'; 
-      playerdrawn.object.img = IMAGES[ko].img;
-    }
+      const nm = playerdrawn.object.name;
+      const ko = nm + '_ko'; 
+      ctx.drawImage(IMAGES[ko].img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
+    } 
     
-    ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
+    //ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
   }else {
   
     ctx.save();
@@ -88,12 +89,16 @@ const drawHealthbar = () => {
   ctx.strokeStyle = "black";
   ctx.fillStyle = "red";
 
-  ctx.strokeRect(900,50,200,30);
-  ctx.fillRect(900,50,playerhealthPercentage,30);
+  ctx.strokeRect(875,15,200,30);
+  ctx.fillRect(875,15,playerhealthPercentage,30);
 
+  ctx.textBaseline = 'top';
   ctx.font = "24px Arial";
   ctx.fillStyle = "black";
-  ctx.fillText("HP:",925,35);
+  ctx.fillText("HP:",845,15);
+  
+  ctx.fillText("coins:",875,height-45);
+  ctx.fillText(coins,915,height-45);
 
   ctx.restore();
 }

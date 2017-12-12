@@ -42,7 +42,7 @@ const setupSockets = () => {
   socket.on('setHost', () => {
     isHost = true;
     console.log('I am the host');
-    initEnemies(2);
+    initEnemies(0);
     spawnEnemies();
   });
   
@@ -88,6 +88,7 @@ const setupSockets = () => {
   });
   
   socket.on('gainedCoins', (data) => {
+    console.log('in gain coin');
     if(isHost){
       coins += data.coinGain;
       console.log(`coins: ${coins}`);
@@ -98,7 +99,7 @@ const setupSockets = () => {
   socket.on('updatedCoins', (data) => {
     coins = data.coins;
     console.log(`coins: ${coins}`);
-  })
+  });
   
   socket.on('playerCollided', (data) => {
     console.log('received: player collision detected with enemy');

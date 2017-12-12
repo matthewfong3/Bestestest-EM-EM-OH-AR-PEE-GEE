@@ -106,7 +106,7 @@ const setUser = (data) => {
   {
     players[hash] = new Character(hash, IMAGES.player_purple);
   }
-  console.log(data.id);
+  console.log(`id: ${data.id}`);
   console.log('joined server');
   //gameState = STATES.preload // start animating;
 };
@@ -132,7 +132,7 @@ const setOtherplayers = (data) => {
     players[data.hash] = new Character(data.hash, IMAGES.player_purple);
   }
   
-  if(isHost) socket.emit('spawnEnemies', {id: data.id, enemies: enemies});
+  if(isHost) socket.emit('spawnEnemies', {id: data.id, enemies: {} } );
 };
 //endregion
 
@@ -288,7 +288,7 @@ const gameUpdateLoop = () => {
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
   //drawPlaceholder();
-  ROOMS.current = room_10;
+  //ROOMS.current = room_10;
   // non-host clients send key updates to server
   if(players[hash]){
   
@@ -351,7 +351,7 @@ const gameUpdateLoop = () => {
   
   // move particles
   if(particles.length > 0){
-    console.log(particles.length);
+    //console.log(particles.length);
     moveParticles();
   }
   
@@ -383,7 +383,7 @@ const gameUpdateLoop = () => {
   for(let i = 0; i < keys.length; i++)
   {
       let player = players[keys[i]];
-      console.log( i + ": has killed " + player.enemiesKilled);
+      //console.log( i + ": has killed " + player.enemiesKilled);
   }
   
   ROOMS.current.checkGoals();
