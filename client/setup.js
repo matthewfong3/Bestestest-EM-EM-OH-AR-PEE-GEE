@@ -29,6 +29,11 @@ const setupSockets = () => {
     colorOptionpurple = new colorOption(canvas.width * .32, 150,150,300,"Purple",canBepurple);
     colorOptiongreen = new colorOption(canvas.width * .54, 150,150,300, "Green", canBegreen);
     colorOptionblue = new colorOption(canvas.width * .75, 150,150,300, "Blue", canBeblue);
+    
+    colorOptionblue.available = true;
+    colorOptionred.available = true;
+    colorOptiongreen.available = true;
+    colorOptionpurple.available = true;
   
   
   });
@@ -81,6 +86,19 @@ const setupSockets = () => {
   socket.on('updatedEnemies', (data) => {
     enemies = data.enemies;
   });
+  
+  socket.on('gainedCoins', (data) => {
+    if(isHost){
+      coins += data.coinGain;
+      console.log(`coins: ${coins}`);
+      socket.emit('updateCoins', {coins: coins});
+    }
+  });
+  
+  socket.on('updatedCoins', (data) => {
+    coins = data.coins;
+    console.log(`coins: ${coins}`);
+  })
   
   socket.on('playerCollided', (data) => {
     console.log('received: player collision detected with enemy');

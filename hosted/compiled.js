@@ -316,6 +316,7 @@ var Room = function () {
       //bulletArray = [];
       //enemies = [];
       console.log('Loading room [' + this.name + '] ...');
+      this.lockDoors();
     }
   }, {
     key: 'unlockDoors',
@@ -327,19 +328,27 @@ var Room = function () {
       }
     }
   }, {
+    key: 'lockDoors',
+    value: function lockDoors() {
+      var keys = Object.keys(this.entrances);
+      for (var i = 0; i < keys.length; i++) {
+        var door = this.entrances[keys[i]];
+        door.open = false;
+      }
+    }
+  }, {
     key: 'checkGoals',
     value: function checkGoals() {
-      var keys = Object.keys(this.goals);
-      for (var i = 0; i < keys.length; i++) {
-        var goal = this.goals[keys[i]];
-        if (goal() === false) return false;
+      for (var i = 0; i < this.goals.length; i++) {
+        var goal = this.goals[i]();
+        if (goal === false) return false;
       }
       this.completeRoom();
     }
   }, {
     key: 'completeRoom',
     value: function completeRoom() {
-      console.log('Room [' + this.name + '] cleared!');
+      //console.log(`Room [${this.name}] cleared!`);
       this.unlockDoors();
     }
   }, {
@@ -394,23 +403,16 @@ var drawPlayers = function drawPlayers(time) {
   var keys = Object.keys(players);
   for (var i = 0; i < keys.length; i++) {
     var playerdrawn = players[keys[i]];
-    if (playerdrawn.hp > 0) drawPlayer(playerdrawn);else {
-      drawDeadPlayer(playerdrawn);
-    }
+    drawPlayer(playerdrawn);
   }
 }; //draw all players in the players list
 
 var drawPlayer = function drawPlayer(playerdrawn) {
   if (playerdrawn.object) {
 
-    if (playerdrawn.object.name == "player_red") {
-      playerdrawn.object.img = IMAGES.player_red.img;
-    } else if (playerdrawn.object.name == "player_green") {
-      playerdrawn.object.img = IMAGES.player_green.img;
-    } else if (playerdrawn.object.name == "player_purple") {
-      playerdrawn.object.img = IMAGES.player_purple.img;
-    } else if (playerdrawn.object.name == "player_blue") {
-      playerdrawn.object.img = IMAGES.player_blue.img;
+    if (playerdrawn.hp > 0) playerdrawn.object.img = IMAGES[playerdrawn.object.name].img;else {
+      var ko = playerdrawn.object.name + '_ko';
+      playerdrawn.object.img = IMAGES[ko].img;
     }
 
     ctx.drawImage(playerdrawn.object.img, playerdrawn.x - playerdrawn.object.width / 2, playerdrawn.y - playerdrawn.object.height / 2);
@@ -589,6 +591,8 @@ var drawGameOver = function drawGameOver() {
 var drawcolorOptions = function drawcolorOptions() {
   ctx.save();
 
+  ctx.lineWidth = 5;
+
   var plr_width = IMAGES.player_red.width;
   var plr_height = IMAGES.player_red.height;
 
@@ -599,6 +603,8 @@ var drawcolorOptions = function drawcolorOptions() {
   if (canBered) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionred.x, colorOptionred.y, colorOptionred.width, colorOptionred.height);
+
+    if (color === 'red') ctx.strokeStyle = 'yellow';else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptionred.x, colorOptionred.y, colorOptionred.width, colorOptionred.height);
     ctx.fillStyle = "black";
     ctx.fillText("Red", colorOptionred.x + 75, colorOptionred.y + colorOptionred.height - 40);
@@ -608,6 +614,8 @@ var drawcolorOptions = function drawcolorOptions() {
   if (canBepurple) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionpurple.x, colorOptionpurple.y, colorOptionpurple.width, colorOptionpurple.height);
+
+    if (color === 'purple') ctx.strokeStyle = 'yellow';else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptionpurple.x, colorOptionpurple.y, colorOptionpurple.width, colorOptionpurple.height);
     ctx.fillStyle = "black";
     ctx.fillText("Purple", colorOptionpurple.x + 75, colorOptionpurple.y + colorOptionpurple.height - 40);
@@ -617,6 +625,8 @@ var drawcolorOptions = function drawcolorOptions() {
   if (canBegreen) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptiongreen.x, colorOptiongreen.y, colorOptiongreen.width, colorOptiongreen.height);
+
+    if (color === 'green') ctx.strokeStyle = 'yellow';else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptiongreen.x, colorOptiongreen.y, colorOptiongreen.width, colorOptiongreen.height);
     ctx.fillStyle = "black";
     ctx.fillText("Green", colorOptiongreen.x + 75, colorOptiongreen.y + colorOptiongreen.height - 40);
@@ -626,6 +636,8 @@ var drawcolorOptions = function drawcolorOptions() {
   if (canBeblue) {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionblue.x, colorOptionblue.y, colorOptionblue.width, colorOptionblue.height);
+
+    if (color === 'blue') ctx.strokeStyle = 'yellow';else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptionblue.x, colorOptionblue.y, colorOptionblue.width, colorOptionblue.height);
     ctx.fillStyle = "black";
     ctx.fillText("Blue", colorOptionblue.x + 75, colorOptionblue.y + colorOptionblue.height - 40);
@@ -706,7 +718,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       right: {
         ID: 'room_1',
-        name: 'main hall',
+        name: '[left] main hall',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: false,
@@ -714,7 +726,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_0'] = room_0;
 
@@ -727,7 +739,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       bottom: {
         ID: 'room_2',
-        name: 'basement A',
+        name: '[down] basement A',
         location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
         open: true,
         visited: false,
@@ -735,7 +747,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       top: {
         ID: 'room_4',
-        name: 'roof A',
+        name: '[up] roof A',
         location: { x: width / 2 - doors.top.width / 2, y: 0 },
         open: true,
         visited: false,
@@ -743,7 +755,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       left: {
         ID: 'room_0',
-        name: 'entrance hall',
+        name: '[left] entrance hall',
         location: { x: 0, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: true,
@@ -764,7 +776,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       top: {
         ID: 'room_1',
-        name: 'main hall',
+        name: '[up] main hall',
         location: { x: width / 2 - doors.top.width / 2, y: 0 },
         object: doors.top,
         open: true,
@@ -772,7 +784,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       left: {
         ID: 'room_3',
-        name: 'storage room',
+        name: '[left] storage room',
         location: { x: 0, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: false,
@@ -793,7 +805,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       right: {
         ID: 'room_2',
-        name: 'basement',
+        name: '[right] basement',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: true,
@@ -814,7 +826,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       right: {
         ID: 'room_5',
-        name: 'roof B',
+        name: '[right] roof B',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: false,
@@ -822,7 +834,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       bottom: {
         ID: 'room_1',
-        name: 'main hall',
+        name: '[down] main hall',
         location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
         open: true,
         visited: true,
@@ -843,7 +855,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       right: {
         ID: 'room_6',
-        name: 'balcony',
+        name: '[right] balcony',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: false,
@@ -851,7 +863,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       bottom: {
         ID: 'room_7',
-        name: 'hall B',
+        name: '[down] hall B',
         location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
         open: true,
         visited: false,
@@ -859,7 +871,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       left: {
         ID: 'room_4',
-        name: 'roof A',
+        name: '[left] roof A',
         location: { x: 0, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: true,
@@ -880,7 +892,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       left: {
         ID: 'room_5',
-        name: 'roof B',
+        name: '[left] roof B',
         location: { x: 0, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: true,
@@ -901,7 +913,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       bottom: {
         ID: 'room_8',
-        name: 'basement B',
+        name: '[down] basement B',
         location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
         open: true,
         visited: false,
@@ -909,7 +921,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       top: {
         ID: 'room_5',
-        name: 'roof B',
+        name: '[up] roof B',
         location: { x: width / 2 - doors.top.width / 2, y: 0 },
         object: doors.top,
         open: true,
@@ -930,7 +942,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       right: {
         ID: 'room_9',
-        name: 'hall C',
+        name: '[right] hall C',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: false,
@@ -938,7 +950,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       top: {
         ID: 'room_7',
-        name: 'hall B',
+        name: '[up] hall B',
         location: { x: width / 2 - doors.top.width / 2, y: 0 },
         object: doors.top,
         open: true,
@@ -959,7 +971,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       right: {
         ID: 'room_10',
-        name: 'Throne room',
+        name: '[right] Throne room',
         location: { x: width - doors.right.width, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: false,
@@ -967,7 +979,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       },
       bottom: {
         ID: 'room_8',
-        name: 'basement B',
+        name: '[down] basement B',
         location: { x: width / 2 - doors.bottom.width / 2, y: height - doors.bottom.height },
         open: true,
         visited: true,
@@ -988,7 +1000,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
     entrances: {
       left: {
         ID: 'room_9',
-        name: 'hall C',
+        name: '[left] hall C',
         location: { x: 0, y: height / 2 - doors.right.height / 2 },
         open: true,
         visited: true,
@@ -1000,7 +1012,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
 
   });ROOMS['room_10'] = room_10;
 
-  room_0.enemiesCount = 2;
+  room_0.enemiesCount = 0;
   ROOMS.current = room_0;
   enterRoom(room_0);
 };
@@ -1128,11 +1140,15 @@ var positionInNextRoom = function positionInNextRoom(lastRoom, currentRoom) {
 
 //room clear goals
 var goal_defeatAllEnemies = function goal_defeatAllEnemies() {
-  var keys = Object.keys(ROOMS.current.enemies);
+  var keys = Object.keys(enemies);
   for (var i = 0; i < keys.length; i++) {
-    if (ROOMS.current.enemies[keys[i]].hp > 0) return false;
+    if (enemies[keys[i]]) return false;
   }
   return true;
+};
+
+var goal_waitForGameStart = function goal_waitForGameStart() {
+  return gameLocked;
 };
 
 var goal_collectObjects = function goal_collectObjects(toCollect) {};
@@ -1310,6 +1326,8 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
+            var coinGain = getRandomRange(10, 100);
+            socket.emit('gainCoins', { coinGain: coinGain });
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
           socket.emit('updateEnemies', { enemies: enemies });
@@ -1635,11 +1653,13 @@ var STATES = {
 var gameState = STATES.wait;
 var paused = false,
     debug = true;
+var gameLocked = false;
 
 var players = {};
 var bulletArray = [];
 var enemies = [];
 var rooms = {};
+var coins = 0;
 
 var directions = {
   DOWNLEFT: 0,
@@ -1962,6 +1982,22 @@ var toLoadImgs = [{
 {
   name: 'player_purple',
   url: 'assets/img/plr-purple.png'
+}, //purple player
+{
+  name: 'player_red_ko',
+  url: 'assets/img/plr-ko-red.png'
+}, //red player
+{
+  name: 'player_blue_ko',
+  url: 'assets/img/plr-ko-blue.png'
+}, //blue player
+{
+  name: 'player_green_ko',
+  url: 'assets/img/plr-ko-green.png'
+}, //green player
+{
+  name: 'player_purple_ko',
+  url: 'assets/img/plr-ko-purple.png'
 }, //purple player
 {
   name: 'mob_blue',
@@ -2419,6 +2455,11 @@ var setupSockets = function setupSockets() {
     colorOptionpurple = new colorOption(canvas.width * .32, 150, 150, 300, "Purple", canBepurple);
     colorOptiongreen = new colorOption(canvas.width * .54, 150, 150, 300, "Green", canBegreen);
     colorOptionblue = new colorOption(canvas.width * .75, 150, 150, 300, "Blue", canBeblue);
+
+    colorOptionblue.available = true;
+    colorOptionred.available = true;
+    colorOptiongreen.available = true;
+    colorOptionpurple.available = true;
   });
 
   // only runs if it's this user is the first to join a room
@@ -2468,6 +2509,19 @@ var setupSockets = function setupSockets() {
 
   socket.on('updatedEnemies', function (data) {
     enemies = data.enemies;
+  });
+
+  socket.on('gainedCoins', function (data) {
+    if (isHost) {
+      coins += data.coinGain;
+      console.log('coins: ' + coins);
+      socket.emit('updateCoins', { coins: coins });
+    }
+  });
+
+  socket.on('updatedCoins', function (data) {
+    coins = data.coins;
+    console.log('coins: ' + coins);
   });
 
   socket.on('playerCollided', function (data) {
@@ -2958,6 +3012,8 @@ var gameUpdateLoop = function gameUpdateLoop() {
     var player = players[keys[_i]];
     console.log(_i + ": has killed " + player.enemiesKilled);
   }
+
+  ROOMS.current.checkGoals();
 };
 
 //function to revive all if everyone is dead

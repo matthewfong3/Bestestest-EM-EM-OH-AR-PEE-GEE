@@ -68,7 +68,7 @@ const setupDungeonAssets = () => {
     entrances: {
       right: {
         ID: 'room_1',
-        name: 'main hall',
+        name: '[left] main hall',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -76,7 +76,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [ goal_defeatAllEnemies ],
     
     
   }); ROOMS['room_0'] = room_0;
@@ -90,7 +90,7 @@ const setupDungeonAssets = () => {
     entrances: {
       bottom: {
         ID: 'room_2',
-        name: 'basement A',
+        name: '[down] basement A',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
@@ -98,7 +98,7 @@ const setupDungeonAssets = () => {
       },
       top: {
         ID: 'room_4',
-        name: 'roof A',
+        name: '[up] roof A',
         location: {x: width/2-doors.top.width/2, y: 0},
         open: true,
         visited: false,
@@ -106,7 +106,7 @@ const setupDungeonAssets = () => {
       },
       left: {
         ID: 'room_0',
-        name: 'entrance hall',
+        name: '[left] entrance hall',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -128,7 +128,7 @@ const setupDungeonAssets = () => {
     entrances: {
       top: {
         ID: 'room_1',
-        name: 'main hall',
+        name: '[up] main hall',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
@@ -136,7 +136,7 @@ const setupDungeonAssets = () => {
       },
       left: {
         ID: 'room_3',
-        name: 'storage room',
+        name: '[left] storage room',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -158,7 +158,7 @@ const setupDungeonAssets = () => {
     entrances: {
       right: {
         ID: 'room_2',
-        name: 'basement',
+        name: '[right] basement',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -180,7 +180,7 @@ const setupDungeonAssets = () => {
     entrances: {
       right: {
         ID: 'room_5',
-        name: 'roof B',
+        name: '[right] roof B',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -188,7 +188,7 @@ const setupDungeonAssets = () => {
       },
       bottom: {
         ID: 'room_1',
-        name: 'main hall',
+        name: '[down] main hall',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: true,
@@ -210,7 +210,7 @@ const setupDungeonAssets = () => {
     entrances: {
       right: {
         ID: 'room_6',
-        name: 'balcony',
+        name: '[right] balcony',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -218,7 +218,7 @@ const setupDungeonAssets = () => {
       },
       bottom: {
         ID: 'room_7',
-        name: 'hall B',
+        name: '[down] hall B',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
@@ -226,7 +226,7 @@ const setupDungeonAssets = () => {
       },
       left: {
         ID: 'room_4',
-        name: 'roof A',
+        name: '[left] roof A',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -248,7 +248,7 @@ const setupDungeonAssets = () => {
     entrances: {
       left: {
         ID: 'room_5',
-        name: 'roof B' ,
+        name: '[left] roof B' ,
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -270,7 +270,7 @@ const setupDungeonAssets = () => {
     entrances: {
       bottom: {
         ID: 'room_8',
-        name: 'basement B',
+        name: '[down] basement B',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: false,
@@ -278,7 +278,7 @@ const setupDungeonAssets = () => {
       },
       top: {
         ID: 'room_5',
-        name: 'roof B',
+        name: '[up] roof B',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
@@ -300,7 +300,7 @@ const setupDungeonAssets = () => {
     entrances: {
       right: {
         ID: 'room_9',
-        name: 'hall C',
+        name: '[right] hall C',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -308,7 +308,7 @@ const setupDungeonAssets = () => {
       },
       top: {
         ID: 'room_7',
-        name: 'hall B',
+        name: '[up] hall B',
         location: {x: width/2-doors.top.width/2, y: 0},
         object: doors.top,
         open: true,
@@ -330,7 +330,7 @@ const setupDungeonAssets = () => {
     entrances: {
       right: {
         ID: 'room_10',
-        name: 'Throne room',
+        name: '[right] Throne room',
         location: {x: width-doors.right.width, y: height/2-doors.right.height/2},
         open: true,
         visited: false,
@@ -338,7 +338,7 @@ const setupDungeonAssets = () => {
       },
       bottom: {
         ID: 'room_8',
-        name: 'basement B',
+        name: '[down] basement B',
         location: {x: width/2-doors.bottom.width/2, y: height-doors.bottom.height},
         open: true,
         visited: true,
@@ -360,7 +360,7 @@ const setupDungeonAssets = () => {
     entrances: {
       left: {
         ID: 'room_9',
-        name: 'hall C',
+        name: '[left] hall C',
         location: {x: 0, y: height/2-doors.right.height/2},
         open: true,
         visited: true,
@@ -373,7 +373,7 @@ const setupDungeonAssets = () => {
     
   }); ROOMS['room_10'] = room_10;
   
-  room_0.enemiesCount = 2;    
+  room_0.enemiesCount = 0;    
   ROOMS.current = room_0;
   enterRoom(room_0);
 };
@@ -385,7 +385,6 @@ const spawnLeft = {
     player3:{x: 77.5, y: 342.5},
     player4:{x: 77.5, y: 372.5},
 };
-
 
 const spawnTop = {
     player1:{x:526.5,y:66.5},
@@ -518,11 +517,15 @@ const positionInNextRoom = (lastRoom,currentRoom) => {
 
 //room clear goals
 const goal_defeatAllEnemies = () => {
-  const keys = Object.keys(ROOMS.current.enemies);
+  const keys = Object.keys(enemies);
   for(let i = 0; i< keys.length; i++){
-    if(ROOMS.current.enemies[keys[i]].hp > 0) return false
+    if(enemies[keys[i]]) return false
   } 
   return true;
+}
+
+const goal_waitForGameStart = () => {
+  return gameLocked;
 }
 
 const goal_collectObjects = (toCollect) => {

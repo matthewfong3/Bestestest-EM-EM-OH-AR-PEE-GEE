@@ -3,33 +3,20 @@ const drawPlayers = (time) => {
   let keys = Object.keys(players);
   for(let i =0; i < keys.length; i++) {
     let playerdrawn = players[keys[i]];
-    if(playerdrawn.hp > 0) drawPlayer(playerdrawn);
-    else{
-        drawDeadPlayer(playerdrawn);
-    }
+    drawPlayer(playerdrawn);
   }
 }; //draw all players in the players list
 
 const drawPlayer = (playerdrawn) => {
   if(playerdrawn.object){
 
-      if(playerdrawn.object.name == "player_red")
-      {
-        playerdrawn.object.img = IMAGES.player_red.img;
-      }
-      else if(playerdrawn.object.name == "player_green")
-      {
-        playerdrawn.object.img = IMAGES.player_green.img;
-      }
-      else if(playerdrawn.object.name == "player_purple")
-      {
-        playerdrawn.object.img = IMAGES.player_purple.img;
-      }
-      else if(playerdrawn.object.name == "player_blue")
-      {
-        playerdrawn.object.img = IMAGES.player_blue.img;
-      }
-
+    if(playerdrawn.hp > 0)
+      playerdrawn.object.img = IMAGES[playerdrawn.object.name ].img;
+    else {
+      const ko = playerdrawn.object.name + '_ko'; 
+      playerdrawn.object.img = IMAGES[ko].img;
+    }
+    
     ctx.drawImage(playerdrawn.object.img, playerdrawn.x-playerdrawn.object.width/2, playerdrawn.y -playerdrawn.object.height/2)
   }else {
   
@@ -207,6 +194,8 @@ ctx.fillStyle = 'black';
 const drawcolorOptions = () => {
   ctx.save();
     
+  ctx.lineWidth = 5;
+  
   const plr_width = IMAGES.player_red.width;
   const plr_height = IMAGES.player_red.height;
   
@@ -218,6 +207,8 @@ const drawcolorOptions = () => {
   {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionred.x,colorOptionred.y,colorOptionred.width,colorOptionred.height);
+   
+   if(color === 'red') ctx.strokeStyle = 'yellow'; else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptionred.x,colorOptionred.y,colorOptionred.width,colorOptionred.height);
     ctx.fillStyle = "black";
     ctx.fillText("Red",colorOptionred.x + 75,colorOptionred.y + colorOptionred.height-40);
@@ -228,6 +219,8 @@ const drawcolorOptions = () => {
   {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionpurple.x,colorOptionpurple.y,colorOptionpurple.width,colorOptionpurple.height);
+   
+    if(color === 'purple') ctx.strokeStyle = 'yellow'; else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptionpurple.x,colorOptionpurple.y,colorOptionpurple.width,colorOptionpurple.height);
     ctx.fillStyle = "black";
     ctx.fillText("Purple",colorOptionpurple.x + 75,colorOptionpurple.y + colorOptionpurple.height-40);
@@ -238,6 +231,8 @@ const drawcolorOptions = () => {
   {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptiongreen.x,colorOptiongreen.y,colorOptiongreen.width,colorOptiongreen.height);
+   
+    if(color === 'green') ctx.strokeStyle = 'yellow'; else ctx.strokeStyle = 'black';
     ctx.strokeRect(colorOptiongreen.x,colorOptiongreen.y,colorOptiongreen.width,colorOptiongreen.height);
     ctx.fillStyle = "black";
     ctx.fillText("Green",colorOptiongreen.x + 75,colorOptiongreen.y + colorOptiongreen.height-40);
@@ -248,7 +243,9 @@ const drawcolorOptions = () => {
   {
     ctx.fillStyle = "white";
     ctx.fillRect(colorOptionblue.x,colorOptionblue.y,colorOptionblue.width,colorOptionblue.height);
-    ctx.strokeRect(colorOptionblue.x,colorOptionblue.y,colorOptionblue.width,colorOptionblue.height);
+   
+    if(color === 'blue') ctx.strokeStyle = 'yellow'; else ctx.strokeStyle = 'black';
+      ctx.strokeRect(colorOptionblue.x,colorOptionblue.y,colorOptionblue.width,colorOptionblue.height);
     ctx.fillStyle = "black";
     ctx.fillText("Blue",colorOptionblue.x + 75,colorOptionblue.y +  colorOptionblue.height-40);
     
@@ -256,11 +253,5 @@ const drawcolorOptions = () => {
   }
   
   
-
-
-
-
   ctx.restore();
-
-
 }

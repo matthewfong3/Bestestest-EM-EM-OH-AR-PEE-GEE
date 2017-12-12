@@ -366,7 +366,8 @@ const gameUpdateLoop = () => {
       let player = players[keys[i]];
       console.log( i + ": has killed " + player.enemiesKilled);
   }
-    
+  
+  ROOMS.current.checkGoals();
 };
 
 //function to revive all if everyone is dead
