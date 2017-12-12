@@ -68,7 +68,7 @@ const setupSockets = (ioServer) => {
         //console.log(`host has joined room${roomNum}`);
 
         socket.emit('setHost', {});
-      } else //console.log(`user has joined room${roomNum}`);
+      }// else console.log(`user has joined room${roomNum}`);
 
       socket.emit('joined', { hash });
       socket.broadcast.to(`room${socket.roomNum}`).emit('otherConnects', { hash, id: socket.id, color: data.color });
