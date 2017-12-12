@@ -179,7 +179,6 @@ const updatePosition = () => {
     plr.x = lerp(plr.prevX,plr.destX,plr.alpha);
     plr.y = lerp(plr.prevY,plr.destY,plr.alpha);
       
-    console.log(plr.y);
     
     //socket.emit("updatePos", {player: plr});
   }   
@@ -360,6 +359,14 @@ const gameUpdateLoop = () => {
   
   checkMenu();
   drawMenu();
+
+  let keys = Object.keys(players);
+  for(let i = 0; i < keys.length; i++)
+  {
+      let player = players[keys[i]];
+      console.log( i + ": has killed " + player.enemiesKilled);
+  }
+    
 };
 
 //function to revive all if everyone is dead
