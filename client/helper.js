@@ -196,8 +196,13 @@ const checkCollisions = (arr1, arr2) => {
             arr2.splice(j, 1);
             let hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
+
             playEffect("Pop");
             socket.emit('playPop', {});
+
+            let coinGain = getRandomRange(10, 100);
+            socket.emit('gainCoins', {coinGain: coinGain});
+
           }
           socket.emit('updateBullets', {bulletArray: arr1});
           socket.emit('updateEnemies', {enemies: enemies});

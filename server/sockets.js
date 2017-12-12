@@ -120,6 +120,14 @@ const setupSockets = (ioServer) => {
       socket.to(rooms[`room${socket.roomNum}`].host).emit('reviveAllTohost', {});
     });
     
+    socket.on('gainCoins', (data) => {
+      socket.to( rooms[`room${socket.roomNum}`].host ).emit( 'gainedCoins', data );
+    });
+    
+    socket.on('updateCoins', (data) => {
+      socket.broadcast.to(`room${socket.roomNum}`).emit( 'updatedCoins', data );
+    });
+              
     socket.on('rpcCall', () => {
       socket.broadcast.to(`room${socket.roomNum}`).emit('rpcCalled', {});
     });

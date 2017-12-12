@@ -37,6 +37,7 @@ class Room {
     //bulletArray = [];
     //enemies = [];
     console.log(`Loading room [${this.name}] ...`);
+    this.lockDoors();
   }
   
   unlockDoors(){
@@ -47,17 +48,24 @@ class Room {
     }
   }
   
-  checkGoals(){
-    const keys = Object.keys(this.goals);
+  lockDoors(){
+    const keys = Object.keys(this.entrances);
     for(let i = 0; i<keys.length; i++){
-      const goal = this.goals[keys[i]];
-      if(goal() === false) return false;
+      const door = this.entrances[keys[i]];
+      door.open = false;
+    }
+  }
+  
+  checkGoals(){
+    for(let i = 0; i< this.goals.length; i++){
+      const goal = this.goals[i]();
+      if(goal === false) return false;
     }
     this.completeRoom();
   }
   
   completeRoom(){
-    console.log(`Room [${this.name}] cleared!`);
+    //console.log(`Room [${this.name}] cleared!`);
     this.unlockDoors();
   }
   

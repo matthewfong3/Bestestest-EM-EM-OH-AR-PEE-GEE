@@ -39,11 +39,13 @@ let STATES = {
 };
 let gameState = STATES.wait;
 let paused = false, debug = true;
+let gameLocked = false;
 
 let players = {};
 let bulletArray = [];
 let enemies = [];
 let rooms = {};
+let coins = 0;
 
 const directions = {
   DOWNLEFT: 0,

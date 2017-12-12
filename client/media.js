@@ -99,6 +99,22 @@ const toLoadImgs = [
     url: 'assets/img/plr-purple.png'
   }, //purple player
   {
+    name: 'player_red_ko',
+    url: 'assets/img/plr-ko-red.png'
+  }, //red player
+  {
+    name: 'player_blue_ko',
+    url: 'assets/img/plr-ko-blue.png'
+  }, //blue player
+  {
+    name: 'player_green_ko',
+    url: 'assets/img/plr-ko-green.png'
+  }, //green player
+  {
+    name: 'player_purple_ko',
+    url: 'assets/img/plr-ko-purple.png'
+  }, //purple player
+  {
     name: 'mob_blue',
     url: 'assets/img/mob-blue.png'
   }, //blue slime
