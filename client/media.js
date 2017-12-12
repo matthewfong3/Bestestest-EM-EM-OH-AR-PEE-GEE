@@ -100,7 +100,7 @@ const toLoadImgs = [
   }, //purple player
   {
     name: 'logo',
-    url: 'assets/img/logo.png'
+    url: 'assets/img/test.png'
   },
 ];
 

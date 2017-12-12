@@ -150,7 +150,7 @@ const drawWait = () => {
 }; //waiting for server connction
 
 const drawTitle = () => {
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = '#242424';
   ctx.fillRect(0,0,canvas.width,canvas.height);
   
   ctx.textAlign = 'center';
@@ -161,11 +161,11 @@ const drawTitle = () => {
   ctx.font = '15pt Courier';
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton,"Start","Color");
-  ctx.drawImage(IMAGES.logo.img, canvas.width/2-25,canvas.height/2-100);
+  ctx.drawImage(IMAGES.logo.img, canvas.width/2-IMAGES.logo.width/2,canvas.height/2-IMAGES.logo.height/2 -130);
 }; //app title screen
 
 const drawCharacterselect = () => {
-  ctx.fillStyle = 'grey';
+  ctx.fillStyle = '#242424';
   ctx.fillRect(0,0,canvas.width,canvas.height);
   
   ctx.textAlign = 'center';

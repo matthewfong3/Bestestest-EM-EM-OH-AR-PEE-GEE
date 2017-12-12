@@ -530,7 +530,7 @@ var drawWait = function drawWait() {
 }; //waiting for server connction
 
 var drawTitle = function drawTitle() {
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = '#242424';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.textAlign = 'center';
@@ -541,11 +541,11 @@ var drawTitle = function drawTitle() {
   ctx.font = '15pt Courier';
   //ctx.fillText('- Click or press any button to play! -', canvas.width/2,canvas.height/2+40);
   drawButton(startButton, "Start", "Color");
-  ctx.drawImage(IMAGES.logo.img, canvas.width / 2 - 25, canvas.height / 2 - 100);
+  ctx.drawImage(IMAGES.logo.img, canvas.width / 2 - IMAGES.logo.width / 2, canvas.height / 2 - IMAGES.logo.height / 2 - 130);
 }; //app title screen
 
 var drawCharacterselect = function drawCharacterselect() {
-  ctx.fillStyle = 'grey';
+  ctx.fillStyle = '#242424';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.textAlign = 'center';
@@ -1946,7 +1946,7 @@ var toLoadImgs = [{
 }, //purple player
 {
   name: 'logo',
-  url: 'assets/img/logo.png'
+  url: 'assets/img/test.png'
 }];
 
 var toLoadAnims = [{
