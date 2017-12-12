@@ -1275,6 +1275,7 @@ var otherClientFire = function otherClientFire() {
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
       socket.emit('updateFireProps', { id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire });
+      socket.emit('playShootEffect', {});
     }
   }
   //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
@@ -1363,15 +1364,19 @@ var checkCollisions = function checkCollisions(arr1, arr2) {
     for (var j = 0; j < arr2.length; j++) {
       if (arr1[i] && arr2[j]) {
         if (circlesIntersect(arr1[i], arr2[j])) {
-          console.log('collision b/w bullet and enemy detected');
+          //console.log('collision b/w bullet and enemy detected');
           var bullet = arr1.splice(i, 1);
           // deal dmg to enemy here
           if (arr2[j].hp > 0) {
             arr2[j].hp -= 2;
+            playEffect("MonsterOnHit");
+            socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             var hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
+            playEffect("Pop");
+            socket.emit('playPop', {});
           }
           socket.emit('updateBullets', { bulletArray: arr1 });
           socket.emit('updateEnemies', { enemies: enemies });
@@ -1387,12 +1392,16 @@ var checkCollisionsPlayersVEnemies = function checkCollisionsPlayersVEnemies(plr
   for (var i = 0; i < keys.length; i++) {
     for (var j = 0; j < array.length; j++) {
       if (circlesIntersect(plrObj[keys[i]], array[j])) {
-        console.log('collision b/w character and enemy detected');
+        //console.log('collision b/w character and enemy detected');
+        playEffect("SlimeShotAtk");
         if (plrObj[keys[i]].hp > 0) {
           plrObj[keys[i]].hp -= 2;
+          playEffect("OnHit");
         } else {
           // what happens to player when they 'die'
           console.log('player should be dead');
+          playEffect("DeathGrunt");
+          socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', { player: plrObj[keys[i]] });
       }
@@ -2533,7 +2542,9 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('playerCollided', function (data) {
-    console.log('received: player collision detected with enemy');
+    //console.log('received: player collision detected with enemy');
+    playEffect("SlimeShotAtk");
+    playEffect("OnHit");
     players[data.player.hash] = data.player;
   });
 
@@ -2566,6 +2577,22 @@ var setupSockets = function setupSockets() {
   });
 
   socket.on('rpcCalled', rpcCall);
+
+  socket.on('playedShootEffect', function () {
+    playEffect("Shooting");
+  });
+
+  socket.on('playedMonsterOnHitEffect', function () {
+    playEffect("MonsterOnHit");
+  });
+
+  socket.on('playedPop', function () {
+    playEffect("Pop");
+  });
+
+  socket.on('playedDeathGrunt', function () {
+    playEffect("DeathGrunt");
+  });
 };
 
 var setupGame = function setupGame() {
@@ -2945,7 +2972,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
   ctx_overlay.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 
   //drawPlaceholder();
-  ROOMS.current = room_10;
+
   // non-host clients send key updates to server
   if (players[hash]) {
 
