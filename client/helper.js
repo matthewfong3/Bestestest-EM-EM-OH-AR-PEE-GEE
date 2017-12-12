@@ -94,6 +94,7 @@ const otherClientFire = () => {
       bulletArray.push(bullet);
       playersProps[keys[i]].canFire = false;
       socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
+      socket.emit('playShootEffect', {});
     }
   }
   //socket.emit('updateFireProps', {id: playersProps[keys[i]].id, canFire: playersProps[keys[i]].canFire});
@@ -184,17 +185,24 @@ const checkCollisions = (arr1, arr2) => {
     for(let j = 0; j < arr2.length; j++){
       if(arr1[i] && arr2[j]){
         if(circlesIntersect(arr1[i], arr2[j])){
-          console.log('collision b/w bullet and enemy detected');
+          //console.log('collision b/w bullet and enemy detected');
           let bullet = arr1.splice(i, 1);
           // deal dmg to enemy here
           if(arr2[j].hp > 0){
             arr2[j].hp -= 2;
+            playEffect("MonsterOnHit");
+            socket.emit('playMonsterOnHit', {});
           } else {
             arr2.splice(j, 1);
             let hashout = bullet[0].firedfrom;
             players[hashout].enemiesKilled += 1;
+
+            playEffect("Pop");
+            socket.emit('playPop', {});
+
             let coinGain = getRandomRange(10, 100);
             socket.emit('gainCoins', {coinGain: coinGain});
+
           }
           socket.emit('updateBullets', {bulletArray: arr1});
           socket.emit('updateEnemies', {enemies: enemies});
@@ -210,12 +218,16 @@ const checkCollisionsPlayersVEnemies = (plrObj, array) => {
   for(let i = 0; i < keys.length; i++){
     for(let j = 0; j < array.length; j++){
       if(circlesIntersect(plrObj[keys[i]], array[j])){
-        console.log('collision b/w character and enemy detected');
+        //console.log('collision b/w character and enemy detected');
+        playEffect("SlimeShotAtk");
         if(plrObj[keys[i]].hp > 0){
           plrObj[keys[i]].hp -= 2;
+          playEffect("OnHit");
         } else {
           // what happens to player when they 'die'
           console.log('player should be dead');
+          playEffect("DeathGrunt");
+          socket.emit('playDeathGrunt', {});
         }
         socket.emit('playerCollide', {player: plrObj[keys[i]]});
       }

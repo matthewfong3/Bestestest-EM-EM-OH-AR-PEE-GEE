@@ -288,7 +288,7 @@ const gameUpdateLoop = () => {
   ctx_overlay.clearRect(0,0,canvas_overlay.width,canvas_overlay.height);
   
   //drawPlaceholder();
-  ROOMS.current = room_10;
+  
   // non-host clients send key updates to server
   if(players[hash]){
   

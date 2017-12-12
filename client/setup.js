@@ -101,7 +101,9 @@ const setupSockets = () => {
   })
   
   socket.on('playerCollided', (data) => {
-    console.log('received: player collision detected with enemy');
+    //console.log('received: player collision detected with enemy');
+    playEffect("SlimeShotAtk");
+    playEffect("OnHit");
     players[data.player.hash] = data.player;
   });
   
@@ -134,6 +136,22 @@ const setupSockets = () => {
   });
   
   socket.on('rpcCalled', rpcCall);
+  
+  socket.on('playedShootEffect', () => {
+    playEffect("Shooting");
+  });
+  
+  socket.on('playedMonsterOnHitEffect', () => {
+    playEffect("MonsterOnHit");
+  });
+  
+  socket.on('playedPop', () => {
+    playEffect("Pop");
+  });
+  
+  socket.on('playedDeathGrunt', () => {
+    playEffect("DeathGrunt");
+  });
 };
 
 const setupGame = () => {
