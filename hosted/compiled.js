@@ -369,6 +369,12 @@ var Room = function () {
     value: function completeRoom() {
       //console.log(`Room [${this.name}] cleared!`);
       this.unlockDoors();
+
+      if (isHost) {
+        moveButton.available = true;
+        setChangeRoomMenu();
+        menu.toggle();
+      }
     }
   }, {
     key: 'drawDoors',
@@ -514,6 +520,7 @@ var drawHealthbar = function drawHealthbar() {
   ctx.fillText("HP:", 845, 15);
 
   ctx.fillText("coins:", 875, height - 45);
+  ctx.textAlign = 'left';
   ctx.fillText(coins, 915, height - 45);
 
   ctx.restore();
@@ -802,7 +809,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_1'] = room_1;
 
@@ -831,7 +838,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_2'] = room_2;
 
@@ -852,7 +859,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_3'] = room_3;
 
@@ -881,7 +888,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_4'] = room_4;
 
@@ -918,7 +925,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_5'] = room_5;
 
@@ -939,7 +946,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_6'] = room_6;
 
@@ -968,7 +975,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_7'] = room_7;
 
@@ -997,7 +1004,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_8'] = room_8;
 
@@ -1026,7 +1033,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_9'] = room_9;
 
@@ -1047,7 +1054,7 @@ var setupDungeonAssets = function setupDungeonAssets() {
       }
     },
 
-    goals: goal_defeatAllEnemies
+    goals: [goal_defeatAllEnemies]
 
   });ROOMS['room_10'] = room_10;
 
@@ -1101,10 +1108,16 @@ var enterRoom = function enterRoom(newRoom) {
     if (ROOMS.current.visited == false) {
       initEnemies(ROOMS.current.enemiesCount);
       spawnEnemies();
+      moveButton.available = false;
     }
   }
 
   ROOMS.current.loadRoom();
+  if (isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins });
+};
+
+var setRoom = function setRoom(room) {
+  ROOMS.current = room;
 };
 
 //position chars in new room
@@ -2370,19 +2383,19 @@ var setChangeRoomMenu = function setChangeRoomMenu() {
   var opts = {};
   opts.options = {};
 
-  var offset = 100;
+  var offset = 150;
   var keys = Object.keys(ROOMS.current.entrances);
 
   var _loop = function _loop(i) {
     var door = ROOMS.current.entrances[keys[i]];
     if (door.open) {
-      opts.options[door.ID] = new button(100, offset, { text: door.name });
+      opts.options[door.ID] = new button(200, offset, { text: door.name });
       opts.options[door.ID].callback = function () {
         enterRoom(ROOMS[door.ID]);
         closeMenu();
       };
     } else {
-      opts.options[door.ID] = new button(100, offset, { text: door.name + ' [X]' });
+      opts.options[door.ID] = new button(200, offset, { text: door.name + ' [X]' });
       opts.options[door.ID].available = false;
     }
     offset += 70;
@@ -2434,10 +2447,10 @@ var resetMenu = function resetMenu() {
   setMenu(opts);
 };resetMenu();
 
-console.dir(menu.options);
+//console.dir(menu.options);
 
 menu.checkClose = function () {
-  if (!isInBounds(cursor, { x: 30, y: 30, width: width - 100, height: height - 100 })) closeMenu();
+  if (!isInBounds(cursor, { x: 90, y: 100, width: width - 200, height: height - 180 })) closeMenu();
 };
 
 menu.toggle = function () {
@@ -2446,14 +2459,14 @@ menu.toggle = function () {
 };
 
 var openMenu = function openMenu() {
-  suspendPlayerControls();
+  //suspendPlayerControls();
 
   menu.open = true;
   console.log('open menu');
 };
 
 var closeMenu = function closeMenu() {
-  restorePlayerControls();
+  //restorePlayerControls();
 
   menu.open = false;
   console.log('close menu');
@@ -2477,10 +2490,10 @@ var drawMenu = function drawMenu() {
     ctx_overlay.fillStyle = 'rgba(100, 115, 139, 0.45)';
     ctx_overlay.strokeStyle = 'black';
     ctx_overlay.lineWidth = 3;
-    drawRoundedRect(50, 50, width - 100, height - 100, 7, ctx_overlay, true);
+    drawRoundedRect(100, 90, width - 200, height - 180, 7, ctx_overlay, true);
 
     ctx_overlay.textAlign = 'left';
-    fillText(ctx_overlay, menu.title, 100, 80, '15pt courier', 'white');
+    fillText(ctx_overlay, menu.title, 170, 120, '15pt courier', 'white');
 
     var keys = Object.keys(menu.options);
     for (var i = 0; i < keys.length; i++) {
@@ -2539,6 +2552,7 @@ var setupSockets = function setupSockets() {
   // once this user successfully joins
   socket.on("joined", function (data) {
     setUser(data);
+    socket.emit('getRoomData', {});
   });
 
   //if other players join
@@ -2577,11 +2591,25 @@ var setupSockets = function setupSockets() {
     enemies = data.enemies;
   });
 
+  socket.on('updatedRoom', function (data) {
+    if (!host) {
+      setRoom(data.room);
+      coins = data.coins;
+      console.log('set room: ' + data.room.name);
+    }
+    console.log('got room update');
+  });
+
+  socket.on('sendRoomData', function () {
+    console.log('got send room req');
+    if (isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins });
+  });
+
   socket.on('gainedCoins', function (data) {
     console.log('in gain coin');
     if (isHost) {
       coins += data.coinGain;
-      console.log('coins: ' + coins);
+      //console.log(`coins: ${coins}`);
       socket.emit('updateCoins', { coins: coins });
     }
   });
@@ -2953,8 +2981,10 @@ var doOnPreloadDone = function doOnPreloadDone() {
 
   moveButton = new button(90, 10, { width: 50, height: 35, text: 'move' });
   moveButton.callback = function () {
-    setChangeRoomMenu();
-    menu.toggle();
+    if (moveButton.available) {
+      setChangeRoomMenu();
+      menu.toggle();
+    }
   };
 
   gameState = STATES.title;
@@ -3107,12 +3137,13 @@ var gameUpdateLoop = function gameUpdateLoop() {
   //draw Health
   drawHealthbar();
 
-  drawButton(debugButton, debugButton.text, '#ffc7c7');
-  drawButton(moveButton, moveButton.text, '#ffc7c7');
+  if (isHost) {
+    //drawButton(debugButton, debugButton.text, '#ffc7c7');
+    drawButton(moveButton, moveButton.text, '#ffc7c7');
 
-  if (cursor.isOverButton(debugButton)) cursor.enterButton(debugButton);
-  if (cursor.isOverButton(moveButton)) cursor.enterButton(moveButton);
-
+    //if( cursor.isOverButton(debugButton) ) cursor.enterButton(debugButton);
+    if (cursor.isOverButton(moveButton)) cursor.enterButton(moveButton);
+  }
   checkMenu();
   drawMenu();
 

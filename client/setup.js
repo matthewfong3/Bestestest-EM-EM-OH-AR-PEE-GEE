@@ -48,7 +48,8 @@ const setupSockets = () => {
   
   // once this user successfully joins
   socket.on("joined",(data) => {
-     setUser(data);
+    setUser(data);
+    socket.emit('getRoomData', {});
   });
 
   //if other players join
@@ -87,11 +88,25 @@ const setupSockets = () => {
     enemies = data.enemies;
   });
   
+  socket.on('updatedRoom', (data) => {
+    if(!host){
+      setRoom(data.room);
+      coins = data.coins;
+      console.log(`set room: ${data.room.name}`);
+    }
+    console.log('got room update');
+  });
+  
+  socket.on('sendRoomData', () => {
+    console.log('got send room req');
+    if(isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins });
+  });
+  
   socket.on('gainedCoins', (data) => {
     console.log('in gain coin');
     if(isHost){
       coins += data.coinGain;
-      console.log(`coins: ${coins}`);
+      //console.log(`coins: ${coins}`);
       socket.emit('updateCoins', {coins: coins});
     }
   });

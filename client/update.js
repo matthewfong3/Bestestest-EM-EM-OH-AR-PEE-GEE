@@ -219,8 +219,10 @@ const doOnPreloadDone = () => {
   
   moveButton = new button(90,10, {width: 50, height: 35, text: 'move'});
   moveButton.callback = function(){
-    setChangeRoomMenu();
-    menu.toggle();
+    if(moveButton.available){
+      setChangeRoomMenu();
+      menu.toggle();
+    }
   };
   
   gameState = STATES.title;
@@ -373,12 +375,13 @@ const gameUpdateLoop = () => {
   //draw Health
   drawHealthbar();
   
-  drawButton(debugButton, debugButton.text, '#ffc7c7');
-  drawButton(moveButton, moveButton.text, '#ffc7c7');
-  
-  if( cursor.isOverButton(debugButton) ) cursor.enterButton(debugButton);
-  if( cursor.isOverButton(moveButton) ) cursor.enterButton(moveButton);
-  
+  if(isHost){
+    //drawButton(debugButton, debugButton.text, '#ffc7c7');
+    drawButton(moveButton, moveButton.text, '#ffc7c7');
+    
+    //if( cursor.isOverButton(debugButton) ) cursor.enterButton(debugButton);
+    if( cursor.isOverButton(moveButton) ) cursor.enterButton(moveButton);
+  }
   checkMenu();
   drawMenu();
 

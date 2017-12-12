@@ -67,6 +67,12 @@ class Room {
   completeRoom(){
     //console.log(`Room [${this.name}] cleared!`);
     this.unlockDoors();
+    
+    if(isHost) {
+      moveButton.available = true;
+      setChangeRoomMenu();
+      menu.toggle();
+    }
   }
   
   drawDoors() {

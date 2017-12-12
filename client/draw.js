@@ -98,6 +98,7 @@ const drawHealthbar = () => {
   ctx.fillText("HP:",845,15);
   
   ctx.fillText("coins:",875,height-45);
+  ctx.textAlign = 'left';
   ctx.fillText(coins,915,height-45);
 
   ctx.restore();

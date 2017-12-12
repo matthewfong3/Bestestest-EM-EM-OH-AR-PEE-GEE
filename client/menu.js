@@ -4,7 +4,6 @@ const COLORS = {
   unavailable: '#c1c1c1'
 }
 
-
 const menu = {
   open: false,
   options: { },
@@ -39,19 +38,19 @@ const setChangeRoomMenu = () => {
   const opts = {};
   opts.options = { };
   
-  let offset = 100
+  let offset = 150
   const keys = Object.keys(ROOMS.current.entrances);
   for(let i = 0; i< keys.length; i++){
     const door = ROOMS.current.entrances[keys[i]];
     if(door.open) {
-      opts.options[door.ID] = new button(100, offset, {text: door.name});
+      opts.options[door.ID] = new button(200, offset, {text: door.name});
       opts.options[door.ID].callback = () => {
         enterRoom(ROOMS[door.ID]);
         closeMenu();
       }
     }
     else{ 
-      opts.options[door.ID] = new button(100, offset, {text: `${door.name} [X]`});
+      opts.options[door.ID] = new button(200, offset, {text: `${door.name} [X]`});
       opts.options[door.ID].available = false;
     }
     offset+=70;
@@ -98,10 +97,10 @@ const resetMenu = () => {
   setMenu(opts);
 }; resetMenu();
 
-console.dir(menu.options);
+//console.dir(menu.options);
 
 menu.checkClose = () => {
-  if(!isInBounds(cursor, {x: 30, y: 30, width: width-100, height: height-100})) closeMenu();
+  if(!isInBounds(cursor, {x: 90, y: 100, width: width-200, height: height-180})) closeMenu();
 };
 
 menu.toggle = () => {
@@ -110,14 +109,14 @@ menu.toggle = () => {
 }
 
 const openMenu = () => {
-  suspendPlayerControls();
+  //suspendPlayerControls();
   
   menu.open = true;
   console.log('open menu');
 }
 
 const closeMenu = () => {
-  restorePlayerControls();
+  //restorePlayerControls();
   
   menu.open = false;
   console.log('close menu');
@@ -141,10 +140,10 @@ const drawMenu = () => {
     ctx_overlay.fillStyle = 'rgba(100, 115, 139, 0.45)';
     ctx_overlay.strokeStyle = 'black';
     ctx_overlay.lineWidth = 3;
-    drawRoundedRect(50, 50, width-100, height-100, 7,ctx_overlay, true );
+    drawRoundedRect(100, 90, width-200, height-180, 7,ctx_overlay, true );
     
     ctx_overlay.textAlign = 'left';
-    fillText(ctx_overlay, menu.title, 100, 80, '15pt courier', 'white');
+    fillText(ctx_overlay, menu.title, 170, 120, '15pt courier', 'white');
     
     const keys = Object.keys(menu.options);
     for(let i = 0; i< keys.length; i++){

@@ -115,7 +115,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_1'] = room_1;
@@ -145,7 +145,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_2'] = room_2;
@@ -167,7 +167,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_3'] = room_3;
@@ -197,7 +197,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_4'] = room_4;
@@ -235,7 +235,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_5'] = room_5;
@@ -257,7 +257,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_6'] = room_6;
@@ -287,7 +287,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_7'] = room_7;
@@ -317,7 +317,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_8'] = room_8;
@@ -347,7 +347,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_9'] = room_9;
@@ -369,7 +369,7 @@ const setupDungeonAssets = () => {
       },
     },
     
-    goals: goal_defeatAllEnemies,
+    goals: [goal_defeatAllEnemies],
     
     
   }); ROOMS['room_10'] = room_10;
@@ -424,13 +424,19 @@ const enterRoom = (newRoom) => {
     
     if(ROOMS.current.visited == false)
     {
-        initEnemies(ROOMS.current.enemiesCount);
-        spawnEnemies();
+      initEnemies(ROOMS.current.enemiesCount);
+      spawnEnemies();
+      moveButton.available = false;
     }
   }
-    
+  
   ROOMS.current.loadRoom();
+  if(isHost) socket.emit('updateRoom', { room: ROOMS.current, coins: coins })
 }
+
+const setRoom = (room) => {
+  ROOMS.current = room;
+};
 
 //position chars in new room
 const positionInNextRoom = (lastRoom,currentRoom) => {
