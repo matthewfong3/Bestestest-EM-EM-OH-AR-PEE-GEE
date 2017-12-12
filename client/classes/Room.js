@@ -28,6 +28,8 @@ class Room {
     this.entrances = props.entrances || undefined;     //where players are spawned in room. set in [move to room]
     this.entered_from = props.entered_from || undefined;
     
+    this.enemiesCount = Math.floor(Math.random()* 7) + 2;
+      
   }
   
   loadRoom(){

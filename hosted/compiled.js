@@ -302,6 +302,8 @@ var Room = function () {
     this.cleared = props.cleared || false;
     this.entrances = props.entrances || undefined; //where players are spawned in room. set in [move to room]
     this.entered_from = props.entered_from || undefined;
+
+    this.enemiesCount = Math.floor(Math.random() * 7) + 2;
   }
 
   _createClass(Room, [{
@@ -622,6 +624,8 @@ var drawcolorOptions = function drawcolorOptions() {
 var editMode = true; //maybe if we make a room 'editor'
 
 var doors = {};
+
+var direction = void 0;
 
 /* [dungeon map]
      ___  ___  ___
@@ -1025,6 +1029,11 @@ var enterRoom = function enterRoom(newRoom) {
     reviveAll("restart");
 
     positionInNextRoom(lastRoom, ROOMS.current);
+
+    if (ROOMS.current.visited == false) {
+      initEnemies(ROOMS.current.enemiesCount);
+      spawnEnemies();
+    }
   }
 
   ROOMS.current.loadRoom();
@@ -1034,8 +1043,10 @@ var enterRoom = function enterRoom(newRoom) {
 var positionInNextRoom = function positionInNextRoom(lastRoom, currentRoom) {
   //try to find which direction we came from
   if (isHost) {
+
+    emptyEnemiesandBullets();
+
     var entrances = lastRoom.entrances;
-    var direction = void 0;
     for (var i in entrances) {
       if (entrances[i].ID == currentRoom.ID) {
         direction = i;
@@ -1467,21 +1478,80 @@ var reviveAll = function reviveAll(casein) {
   }
 };
 
-var emptyEnemies = function emptyEnemies() {
+var emptyEnemiesandBullets = function emptyEnemiesandBullets() {
   enemies = [];
+  bulletArray = [];
+  socket.emit('updateBullets', { bulletArray: bulletArray });
   socket.emit('updateEnemies', { enemies: enemies });
 };
 
 var PositionReset = function PositionReset() {
-  var keys = Object.keys(players);
-  for (var i = 0; i < keys.length; i++) {
-    var player = players[keys[i]];
-    player.x = canvas.width / 2;
-    player.y = canvas.height / 2;
-    player.prevX = canvas.width / 2;
-    player.prevY = canvas.height / 2;
-    player.destX = canvas.width / 2;
-    player.destY = canvas.height / 2;
+  /*
+  let keys = Object.keys(players);
+  for(let i = 0; i < keys.length; i++)
+      {
+          let player = players[keys[i]];
+          player.x = canvas.width/2;
+          player.y = canvas.height/2;
+          player.prevX = canvas.width/2;
+          player.prevY = canvas.height/2;
+          player.destX = canvas.width/2;
+          player.destY = canvas.height/2;
+      }
+  */
+  //put each player in the right position after the program finds where party came from
+  if (direction == "right") {
+    var spawnKeys = Object.keys(spawnLeft);
+    var playerKeys = Object.keys(players);
+    for (var i = 0; i < playerKeys.length; i++) {
+      var player = players[playerKeys[i]];
+      var newLocation = spawnLeft[spawnKeys[i]];
+      player.x = newLocation.x;
+      player.y = newLocation.y;
+      player.prevX = newLocation.x;
+      player.prevY = newLocation.y;
+      player.destX = newLocation.x;
+      player.destY = newLocation.y;
+    }
+  } else if (direction == "left") {
+    var _spawnKeys = Object.keys(spawnRight);
+    var _playerKeys = Object.keys(players);
+    for (var _i = 0; _i < _playerKeys.length; _i++) {
+      var _player = players[_playerKeys[_i]];
+      var _newLocation = spawnRight[_spawnKeys[_i]];
+      _player.x = _newLocation.x;
+      _player.y = _newLocation.y;
+      _player.prevX = _newLocation.x;
+      _player.prevY = _newLocation.y;
+      _player.destX = _newLocation.x;
+      _player.destY = _newLocation.y;
+    }
+  } else if (direction == "bottom") {
+    var _spawnKeys2 = Object.keys(spawnTop);
+    var _playerKeys2 = Object.keys(players);
+    for (var _i2 = 0; _i2 < _playerKeys2.length; _i2++) {
+      var _player2 = players[_playerKeys2[_i2]];
+      var _newLocation2 = spawnTop[_spawnKeys2[_i2]];
+      _player2.x = _newLocation2.x;
+      _player2.y = _newLocation2.y;
+      _player2.prevX = _newLocation2.x;
+      _player2.prevY = _newLocation2.y;
+      _player2.destX = _newLocation2.x;
+      _player2.destY = _newLocation2.y;
+    }
+  } else if (direction == "top") {
+    var _spawnKeys3 = Object.keys(spawnBottom);
+    var _playerKeys3 = Object.keys(players);
+    for (var _i3 = 0; _i3 < _playerKeys3.length; _i3++) {
+      var _player3 = players[_playerKeys3[_i3]];
+      var _newLocation3 = spawnBottom[_spawnKeys3[_i3]];
+      _player3.x = _newLocation3.x;
+      _player3.y = _newLocation3.y;
+      _player3.prevX = _newLocation3.x;
+      _player3.prevY = _newLocation3.y;
+      _player3.destX = _newLocation3.x;
+      _player3.destY = _newLocation3.y;
+    }
   }
 };
 'use strict';
@@ -2528,16 +2598,51 @@ var initEnemies = function initEnemies(numEnemies) {
 };
 
 var spawnEnemies = function spawnEnemies() {
-  for (var i = 0; i < enemies.length; i++) {
-    var x = getRandomRange(20, canvas.width - 20);
-    var y = getRandomRange(20, canvas.height - 20);
+  //average all player locations
+  var xtotal = 0;
+  var ytotal = 0;
+  var keys = Object.keys(players);
+  var avgPos = void 0;
 
-    enemies[i].prevX = x;
-    enemies[i].prevY = y;
-    enemies[i].x = x;
-    enemies[i].y = y;
-    enemies[i].destX = x;
-    enemies[i].destY = y;
+  //if it is the start of game
+  if (keys.length == 0) {
+    xtotal = canvas.width / 2;
+    ytotal = canvas.height / 2;
+    avgPos = { x: xtotal, y: ytotal };
+  }
+
+  //else count for avg
+  else {
+      for (var j = 0; j < keys.length; j++) {
+        var player = players[keys[j]];
+        xtotal += player.x;
+        ytotal += player.y;
+      }
+      avgPos = { x: xtotal / keys.length, y: ytotal / keys.length };
+    }
+
+  for (var i = 0; i < enemies.length; i++) {
+    var enemiesplaced = false;
+
+    while (enemiesplaced == false) {
+      //previous was {20, canvas.width - 20}
+      var x = getRandomRange(77.5, 1071.5);
+      var y = getRandomRange(66.5, 578.5);
+
+      var testposition = { x: x, y: y };
+
+      var distance = getDistance(avgPos, testposition);
+
+      if (distance >= 200) {
+        enemies[i].prevX = x;
+        enemies[i].prevY = y;
+        enemies[i].x = x;
+        enemies[i].y = y;
+        enemies[i].destX = x;
+        enemies[i].destY = y;
+        enemiesplaced = true;
+      }
+    }
   }
 };
 //endregion
@@ -2843,10 +2948,10 @@ var restart = function restart() {
     //get rid of enemies
     //revive everyone
     reviveAll("restart");
-    emptyEnemies();
-    initEnemies(2);
-    spawnEnemies();
+    emptyEnemiesandBullets();
+    initEnemies(ROOMS.current.enemiesCount);
     PositionReset();
+    spawnEnemies();
   }
 };
 

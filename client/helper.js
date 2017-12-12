@@ -378,12 +378,15 @@ const reviveAll = (casein) => {
 }
 
 
-const emptyEnemies = () => {
+const emptyEnemiesandBullets = () => {
      enemies = [];
+     bulletArray = [];
+     socket.emit('updateBullets', {bulletArray: bulletArray});
      socket.emit('updateEnemies', {enemies: enemies});
 };
 
 const PositionReset = () => {
+    /*
     let keys = Object.keys(players);
     for(let i = 0; i < keys.length; i++)
         {
@@ -395,4 +398,71 @@ const PositionReset = () => {
             player.destX = canvas.width/2;
             player.destY = canvas.height/2;
         }
+    */
+    //put each player in the right position after the program finds where party came from
+    if(direction == "right")
+    {
+        let spawnKeys = Object.keys(spawnLeft);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnLeft[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    else if(direction == "left")
+    {
+        let spawnKeys = Object.keys(spawnRight);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnRight[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    else if(direction == "bottom")
+    {
+        let spawnKeys = Object.keys(spawnTop);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnTop[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    else if(direction == "top")
+    {
+        let spawnKeys = Object.keys(spawnBottom);
+        let playerKeys = Object.keys(players);
+        for(let i =0; i < playerKeys.length; i++)
+        {
+            let player = players[playerKeys[i]];
+            let newLocation = spawnBottom[spawnKeys[i]];
+            player.x = newLocation.x;
+            player.y = newLocation.y;
+            player.prevX = newLocation.x;
+            player.prevY = newLocation.y;
+            player.destX = newLocation.x;
+            player.destY = newLocation.y;
+        }
+    }
+    
 }

@@ -2,6 +2,8 @@ let editMode = true; //maybe if we make a room 'editor'
 
 let doors = { };
 
+let direction;
+
 
 /* [dungeon map]
      ___  ___  ___
@@ -418,7 +420,12 @@ const enterRoom = (newRoom) => {
     reviveAll("restart");
 
     positionInNextRoom(lastRoom,ROOMS.current);
-
+    
+    if(ROOMS.current.visited == false)
+    {
+        initEnemies(ROOMS.current.enemiesCount);
+        spawnEnemies();
+    }
   }
     
   ROOMS.current.loadRoom();
@@ -429,8 +436,10 @@ const positionInNextRoom = (lastRoom,currentRoom) => {
       //try to find which direction we came from
   if(isHost)
   {
+      
+    emptyEnemiesandBullets();
+      
     let entrances = lastRoom.entrances;
-    let direction;
     for(let i in entrances)
         {
             if(entrances[i].ID == currentRoom.ID)

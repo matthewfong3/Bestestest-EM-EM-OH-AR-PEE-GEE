@@ -1,21 +1,59 @@
 //-- init & spawn enemies --region
-const initEnemies = (numEnemies) => {
+const initEnemies = (numEnemies) => {  
   for(let i = 0; i < numEnemies; i++){
     enemies.push(new Enemy());
   }
 };
 
 const spawnEnemies = () => {
-  for(let i = 0; i < enemies.length; i++){
-    let x = getRandomRange(20, canvas.width - 20);
-    let y = getRandomRange(20, canvas.height - 20);
+    //average all player locations
+    let xtotal = 0;
+    let ytotal = 0;
+    let keys = Object.keys(players);
+    let avgPos;
+  
+  //if it is the start of game
+  if(keys.length == 0)
+  {
+    xtotal = canvas.width/2;
+    ytotal = canvas.height/2;
+    avgPos = {x:xtotal,y:ytotal};
+  }
+
+  //else count for avg
+  else
+  {
+      for(let j =0; j < keys.length; j++){
+         let player = players[keys[j]];  
+         xtotal += player.x;
+         ytotal += player.y;
+    }
+      avgPos = {x:xtotal/keys.length,y:ytotal/keys.length};
+  }
     
-    enemies[i].prevX = x;
-    enemies[i].prevY = y;
-    enemies[i].x = x;
-    enemies[i].y = y;
-    enemies[i].destX = x;
-    enemies[i].destY = y;
+  for(let i = 0; i < enemies.length; i++){
+    let enemiesplaced = false;
+      
+    while (enemiesplaced == false) {
+    //previous was {20, canvas.width - 20}
+    let x = getRandomRange(77.5, 1071.5);
+    let y = getRandomRange(66.5, 578.5);
+    
+    let testposition = {x,y};
+        
+    let distance = getDistance(avgPos,testposition);
+        
+      if(distance >= 200)
+      {
+          enemies[i].prevX = x;
+          enemies[i].prevY = y;
+          enemies[i].x = x;
+          enemies[i].y = y;
+          enemies[i].destX = x;
+          enemies[i].destY = y;
+          enemiesplaced = true;
+      }
+    }
   }
 };
 //endregion
@@ -342,10 +380,10 @@ const restart = () => {
         //get rid of enemies
         //revive everyone
         reviveAll("restart");
-        emptyEnemies();
-        initEnemies(2);
-        spawnEnemies();
+        emptyEnemiesandBullets();
+        initEnemies(ROOMS.current.enemiesCount);
         PositionReset();
+        spawnEnemies();
     }
 };
 
