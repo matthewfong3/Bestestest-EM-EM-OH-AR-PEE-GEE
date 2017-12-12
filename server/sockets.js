@@ -20,7 +20,6 @@ const setupSockets = (ioServer) => {
       socket.room = room;
       socket.roomMember = roomMember;
 
-
       if (!rooms[`room${roomNum}`]) {
         rooms[`room${roomNum}`] = {};
         rooms[`room${roomNum}`].Red = true;
@@ -106,7 +105,7 @@ const setupSockets = (ioServer) => {
 
     socket.on('updateRoom', (data) => {
       io.sockets.in(`room${socket.roomNum}`).emit('updatedRoom', data);
-      console.log(`updated ${data.room.name} data.`);
+      //console.log(`updated ${data.room.name} data.`);
     });
 
     // coin stuff

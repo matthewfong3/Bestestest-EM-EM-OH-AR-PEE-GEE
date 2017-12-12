@@ -1184,7 +1184,8 @@ var enterRoom = function enterRoom(newRoom) {
 };
 
 var setRoom = function setRoom(room) {
-  ROOMS.current = ROOMS[room];
+  ROOMS.current = ROOMS[room] || ROOMS[room_0];
+  ROOMS.current.lockDoors();
   console.log('set room');
 };
 
@@ -2383,7 +2384,7 @@ var playAnim = function playAnim(ctx, targetSprite, freeze) {
 //--sound---------------------------region
 var setupSound = function setupSound() {
   bgAudio = document.querySelector("#bgAudio");
-  bgAudio.volume = 0.05;
+  bgAudio.volume = 0.03;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
   ambienceAudio = document.querySelector("#ambienceAudio");
@@ -2394,7 +2395,7 @@ var setupSound = function setupSound() {
 
 var playBgAudio = function playBgAudio(reset) {
   if (reset) bgAudio.currentTime = 0;
-  //bgAudio.play();
+  bgAudio.play();
 };
 
 var swapBg = function swapBg(track, reset) {
@@ -3309,7 +3310,7 @@ var gameUpdateLoop = function gameUpdateLoop() {
     //console.log( i + ": has killed " + player.enemiesKilled);
   }
 
-  ROOMS.current.checkGoals();
+  if (isHost) ROOMS.current.checkGoals();
 };
 
 //function to revive all if everyone is dead

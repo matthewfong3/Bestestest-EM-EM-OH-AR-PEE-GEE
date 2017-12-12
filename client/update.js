@@ -413,6 +413,7 @@ const gameUpdateLoop = () => {
       //console.log( i + ": has killed " + player.enemiesKilled);
   }
   
+  if(isHost)
   ROOMS.current.checkGoals();
     
 };

@@ -354,7 +354,7 @@ const playAnim = (ctx, targetSprite, freeze) => {
 //--sound---------------------------region
 const setupSound = () => {
   bgAudio = document.querySelector("#bgAudio");
-  bgAudio.volume = 0.05;
+  bgAudio.volume = 0.03;
   effectAudio = document.querySelector("#effectAudio");
   effectAudio.volume = 0.3;
   ambienceAudio = document.querySelector("#ambienceAudio");
@@ -365,7 +365,7 @@ const setupSound = () => {
 
 const playBgAudio = (reset) => {
   if(reset) bgAudio.currentTime = 0;
-  //bgAudio.play();
+  bgAudio.play();
 };
 
 const swapBg = (track, reset) => {
