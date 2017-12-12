@@ -162,14 +162,26 @@ var Enemy = function () {
         y: this.y
       };
 
-      var shortestDist = getDistance(players[keys[0]], location);
+      var shortestDist = -1;
 
-      this.target = players[keys[0]];
+      this.target = "";
 
       for (var i = 0; i < keys.length; i++) {
-        var distance = getDistance(players[keys[i]], location);
-
-        if (distance < shortestDist) this.target = players[keys[i]];
+        //if the player is alive, count him in calculation
+        if (players[keys[i]].hp > 0) {
+          //find distance
+          var distance = getDistance(players[keys[i]], location);
+          //if the first one, replace the value
+          if (shortestDist == -1) {
+            shortestDist = distance;
+            this.target = players[keys[i]];
+          }
+          //else if it has a value, look to see if the distance is smaller and replace if it is   
+          else if (distance < shortestDist) {
+              this.target = players[keys[i]];
+              shortestDist = distance;
+            }
+        }
       }
 
       var desired = {
